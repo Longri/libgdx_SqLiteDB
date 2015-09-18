@@ -86,6 +86,33 @@ project(":core") {
     }
 }
 
+project(":sqlite_core") {
+    apply plugin: "java"
+
+
+    dependencies {
+        
+    }
+}
+
+project(":sqlite_android") {
+    apply plugin: "java"
+
+
+    dependencies {
+        
+    }
+}
+
+project(":sqlite_desktop") {
+    apply plugin: "java"
+
+
+    dependencies {
+        
+    }
+}
+
 tasks.eclipse.doLast {
     delete ".project"
 }
