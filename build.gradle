@@ -1,7 +1,6 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.2.3'
@@ -25,9 +24,7 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-    }
+        }
 }
 
 project(":desktop") {
@@ -83,6 +80,7 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+
     }
 }
 
@@ -91,7 +89,8 @@ project(":sqlite_core") {
 
 
     dependencies {
-        
+        compile "org.slf4j:slf4j-api:1.7.12"
+        compile "ch.qos.logback:logback-classic:1.1.3"
     }
 }
 
@@ -100,7 +99,7 @@ project(":sqlite_android") {
 
 
     dependencies {
-        
+        compile project(":sqlite_core")
     }
 }
 
@@ -109,7 +108,9 @@ project(":sqlite_desktop") {
 
 
     dependencies {
-        
+        compile project(":sqlite_core")
+        compile "org.slf4j:slf4j-api:1.7.12"
+        compile "ch.qos.logback:logback-classic:1.1.3"
     }
 }
 

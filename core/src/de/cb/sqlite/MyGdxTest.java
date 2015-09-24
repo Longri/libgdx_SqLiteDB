@@ -3,6 +3,7 @@ package de.cb.sqlite;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -184,5 +185,7 @@ public class MyGdxTest extends ApplicationAdapter {
 		skin.dispose();
 		texture1.dispose();
 		texture2.dispose();
+		FileHandle test=new FileHandle("w");
+
 	}
 }
