@@ -15,6 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.sun.org.apache.xpath.internal.operations.*;
+
+import java.lang.String;
 
 public class MyGdxTest extends ApplicationAdapter {
     Object[] listEntries = {"This is a list entry1", "And another one1", "The meaning of life1", "Is hard to come by1",
@@ -28,6 +31,7 @@ public class MyGdxTest extends ApplicationAdapter {
     Texture texture1;
     Texture texture2;
     Label fpsLabel;
+    private TextArea msgLabel;
 
 
     public void create() {
@@ -64,13 +68,42 @@ public class MyGdxTest extends ApplicationAdapter {
         stage.addActor(btnCreateDB);
 
         // Label for massage output
-        Label msgLabel = new Label("this is some text.", skin);
+        msgLabel = new TextArea("this is some text.", skin);
         msgLabel.setWidth(stage.getWidth());
         msgLabel.setHeight(stage.getHeight() / 2);
-        msgLabel.setWrap(true);
+        msgLabel.setAlignment(Align.topLeft);
+        msgLabel.setDisabled(true);
+        msgLabel.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                msgLabel.setCursorPosition(msgLabel.getText().length());
+                msgLabel.layout();
+            }
+        });
         stage.addActor(msgLabel);
 
+
+        //save type selection
+        final SelectBox selectBox = new SelectBox(skin);
+        selectBox.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                writeMsg("Switch save type to: " + selectBox.getSelected());
+            }
+        });
+        selectBox.setItems("InternSD", "ExtSD", "Sandbox");
+        selectBox.setSelected("InternSD");
+        selectBox.setWidth(150);
+        selectBox.setY(btnCreateDB.getY() - selectBox.getHeight());
+        stage.addActor(selectBox);
     }
+
+
+    private void writeMsg(String msg){
+        msgLabel.setText(msgLabel.getText() + "\n" + msg);
+        msgLabel.setCursorPosition(msgLabel.getText().length());
+        msgLabel.layout();
+    }
+
 
 
     private void createDemoUI() {
@@ -223,7 +256,7 @@ public class MyGdxTest extends ApplicationAdapter {
         skin.dispose();
         if (texture1 != null) texture1.dispose();
         if (texture2 != null) texture2.dispose();
-
+        msgLabel = null;
 
     }
 }
