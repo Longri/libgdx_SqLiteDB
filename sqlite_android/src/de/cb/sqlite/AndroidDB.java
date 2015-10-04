@@ -12,15 +12,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-public class AndroidDB extends Database
+public class AndroidDB extends Database_Core
 {
 	final static org.slf4j.Logger log = LoggerFactory.getLogger(AndroidDB.class);
 	private Activity activity;
 	public SQLiteDatabase myDB = null;
 
-	public AndroidDB(DatabaseType databaseType, Activity activity)
+	public AndroidDB(  Activity activity)
 	{
-		super(databaseType);
+		super();
 		this.activity = activity;
 	}
 
@@ -29,7 +29,10 @@ public class AndroidDB extends Database
 	{
 		if (myDB == null)
 		{
-			if (!FileIO.FileExists(databasePath))
+
+			File file = new File(databasePath);
+
+			if (file.exists())
 			{
 				Reset();
 			}

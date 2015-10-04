@@ -15,9 +15,9 @@ public class TestDB extends Database_Core
 
 	Connection myDB = null;
 
-	public TestDB(DatabaseType databaseType) throws ClassNotFoundException
+	public TestDB() throws ClassNotFoundException
 	{
-		super(databaseType);
+		super();
 
 		System.setProperty("sqlite.purejava", "true");
 		Class.forName("org.sqlite.JDBC");
