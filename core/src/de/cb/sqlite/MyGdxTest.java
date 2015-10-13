@@ -15,9 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.sun.org.apache.xpath.internal.operations.*;
 
-import java.lang.String;
+import java.io.File;
 
 public class MyGdxTest extends ApplicationAdapter {
     Object[] listEntries = {"This is a list entry1", "And another one1", "The meaning of life1", "Is hard to come by1",
@@ -41,7 +40,6 @@ public class MyGdxTest extends ApplicationAdapter {
 
         //createDemoUI();
         createTestUI();
-
     }
 
     private void createTestUI() {
@@ -65,6 +63,12 @@ public class MyGdxTest extends ApplicationAdapter {
         btnCreateDB.setWidth(100);
         btnCreateDB.setX((stage.getWidth() - btnCreateDB.getWidth()) / 2);
         btnCreateDB.setY(stage.getHeight() - btnCreateDB.getHeight() - 10);
+        btnCreateDB.addListener(new ClickListener(Input.Buttons.LEFT) {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                createDB();
+            }
+        });
         stage.addActor(btnCreateDB);
 
         // Label for massage output
@@ -72,7 +76,7 @@ public class MyGdxTest extends ApplicationAdapter {
         msgLabel.setWidth(stage.getWidth());
         msgLabel.setHeight(stage.getHeight() / 2);
         msgLabel.setAlignment(Align.topLeft);
-        msgLabel.setDisabled(true);
+        //msgLabel.setDisabled(true);
         msgLabel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -98,12 +102,11 @@ public class MyGdxTest extends ApplicationAdapter {
     }
 
 
-    private void writeMsg(String msg){
+    private void writeMsg(String msg) {
         msgLabel.setText(msgLabel.getText() + "\n" + msg);
         msgLabel.setCursorPosition(msgLabel.getText().length());
         msgLabel.layout();
     }
-
 
 
     private void createDemoUI() {
@@ -259,4 +262,108 @@ public class MyGdxTest extends ApplicationAdapter {
         msgLabel = null;
 
     }
+
+
+    //##################################################################################
+    //      Database creation
+    //##################################################################################
+    public static final int LatestDatabaseChange = 1;
+
+    private void createDB() {
+
+        String path = "./testdata/test.db3";
+        File databaseFile=new File(path);
+
+        writeMsg("Create DB instance on " + databaseFile.getAbsolutePath());
+        TestDB test = new TestDB(DatabaseFactory.getInstanz(path, alternate));
+
+        writeMsg("Reset DB");
+        test.Reset();
+
+        writeMsg("DB Start up");
+        test.StartUp();
+
+        if(databaseFile.exists()){
+           writeMsg("DB File exists");
+        }else{
+            writeMsg("ERROR DB File not exists");
+        }
+
+        writeMsg("Databaseschema version:" + test.db.GetDatabaseSchemeVersion());
+
+        writeMsg("close DB");
+        test.Close();
+
+        writeMsg("");
+
+        writeMsg("ALTERNATE DB create table");
+
+        writeMsg("Create DB instance on " + databaseFile.getAbsolutePath());
+        TestDB test2 = new TestDB(DatabaseFactory.getInstanz(path, alternate2));
+
+        writeMsg("DB Start up");
+        test2.StartUp();
+
+        if(databaseFile.exists()){
+            writeMsg("DB File exists");
+        }else{
+            writeMsg("ERROR DB File not exists");
+        }
+        writeMsg("Databaseschema version:" + test2.db.GetDatabaseSchemeVersion());
+
+        writeMsg("write data");
+        test2.db.beginTransaction();
+
+        Parameters para = new Parameters();
+        para.put("TestId", 0);
+        para.put("TEXT", "testText");
+        test2.db.insert("TESTTABLE", para);
+        test2.db.endTransaction();
+
+        //read
+        writeMsg("read data");
+        String resultString = "";
+        CoreCursor c = test2.db.rawQuery("select TEXT from TESTTABLE where TestId=?", new String[]
+                { String.valueOf(0) });
+        c.moveToFirst();
+        while (c.isAfterLast() == false)
+        {
+            resultString = c.getString(0);
+            break;
+        }
+
+        if(resultString.equals("testText")){
+            writeMsg("Result Ok");
+        }else writeMsg("ERROR wrong result" + resultString);
+        writeMsg("close DB");
+        test2.Close();
+
+
+    }
+
+    private AlternateDatabase alternate = new AlternateDatabase() {
+        @Override
+        public void alternateDatabase(SQLite db, int databaseSchemeVersion) {
+
+        }
+
+        @Override
+        public int databaseSchemeVersion() {
+            return 0;
+        }
+    };
+
+    private AlternateDatabase alternate2 = new AlternateDatabase() {
+        @Override
+        public void alternateDatabase(SQLite db, int databaseSchemeVersion) {
+                if(databaseSchemeVersion<1){
+                    db.execSQL("CREATE TABLE [TESTTABLE] ([Id] integer not null primary key autoincrement, [TestId] bigint NULL, [TEXT] nvarchar (12) NULL);");
+                }
+        }
+
+        @Override
+        public int databaseSchemeVersion() {
+            return 1;
+        }
+    };
 }

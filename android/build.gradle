@@ -1,5 +1,17 @@
+apply plugin: 'com.android.application'
+
+
 android {
-    buildToolsVersion "22.0.1"
+    lintOptions {
+        abortOnError false
+    }
+
+
+    defaultConfig {
+        targetSdkVersion 22
+    }
+
+    buildToolsVersion "23.0.1"
     compileSdkVersion 22
     sourceSets {
         main {
@@ -14,7 +26,27 @@ android {
 
         instrumentTest.setRoot('tests')
     }
+
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
 }
+
+configurations {
+    natives
+
+}
+
+
+configurations.compile.exclude module: 'logback-android-classic'  // remove from Util-Modul
+configurations.compile.exclude module: 'logback-classic'  // remove from Util-Modul
+configurations.compile.exclude group: 'com.google.android', module: 'android'  // remove from intern pom.xml
 
 
 // called every time gradle gets executed, takes the native dependencies of

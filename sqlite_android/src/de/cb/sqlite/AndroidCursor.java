@@ -1,7 +1,7 @@
 package de.cb.sqlite;
 
-
 import android.database.Cursor;
+import de.cb.sqlite.CoreCursor;
 
 public class AndroidCursor extends CoreCursor
 {
