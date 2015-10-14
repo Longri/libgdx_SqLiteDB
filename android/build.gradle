@@ -44,9 +44,7 @@ configurations {
 }
 
 
-configurations.compile.exclude module: 'logback-android-classic'  // remove from Util-Modul
-configurations.compile.exclude module: 'logback-classic'  // remove from Util-Modul
-configurations.compile.exclude group: 'com.google.android', module: 'android'  // remove from intern pom.xml
+
 
 
 // called every time gradle gets executed, takes the native dependencies of
