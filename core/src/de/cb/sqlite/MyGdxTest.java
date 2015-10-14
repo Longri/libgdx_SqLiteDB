@@ -3,6 +3,7 @@ package de.cb.sqlite;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -15,8 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-
-import java.io.File;
 
 public class MyGdxTest extends ApplicationAdapter {
     Object[] listEntries = {"This is a list entry1", "And another one1", "The meaning of life1", "Is hard to come by1",
@@ -66,7 +65,15 @@ public class MyGdxTest extends ApplicationAdapter {
         btnCreateDB.addListener(new ClickListener(Input.Buttons.LEFT) {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                createDB();
+
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        createDB();
+                    }
+                });
+                thread.start();
+
             }
         });
         stage.addActor(btnCreateDB);
@@ -271,11 +278,11 @@ public class MyGdxTest extends ApplicationAdapter {
 
     private void createDB() {
 
-        String path = "./testdata/test.db3";
-        File databaseFile=new File(path);
 
-        writeMsg("Create DB instance on " + databaseFile.getAbsolutePath());
-        TestDB test = new TestDB(DatabaseFactory.getInstanz(path, alternate));
+        FileHandle fileHandle = Gdx.files.external("testdata/test.db3");
+
+        writeMsg("Create DB instance on " + fileHandle.toString());
+        TestDB test = new TestDB(DatabaseFactory.getInstance(fileHandle, alternate));
 
         writeMsg("Reset DB");
         test.Reset();
@@ -283,9 +290,16 @@ public class MyGdxTest extends ApplicationAdapter {
         writeMsg("DB Start up");
         test.StartUp();
 
-        if(databaseFile.exists()){
-           writeMsg("DB File exists");
-        }else{
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (fileHandle.exists()) {
+            writeMsg("DB File exists");
+        } else {
             writeMsg("ERROR DB File not exists");
         }
 
@@ -298,15 +312,15 @@ public class MyGdxTest extends ApplicationAdapter {
 
         writeMsg("ALTERNATE DB create table");
 
-        writeMsg("Create DB instance on " + databaseFile.getAbsolutePath());
-        TestDB test2 = new TestDB(DatabaseFactory.getInstanz(path, alternate2));
+        writeMsg("Create DB instance on " + fileHandle.toString());
+        TestDB test2 = new TestDB(DatabaseFactory.getInstance(fileHandle, alternate2));
 
         writeMsg("DB Start up");
         test2.StartUp();
 
-        if(databaseFile.exists()){
+        if (fileHandle.exists()) {
             writeMsg("DB File exists");
-        }else{
+        } else {
             writeMsg("ERROR DB File not exists");
         }
         writeMsg("Databaseschema version:" + test2.db.GetDatabaseSchemeVersion());
@@ -324,17 +338,16 @@ public class MyGdxTest extends ApplicationAdapter {
         writeMsg("read data");
         String resultString = "";
         CoreCursor c = test2.db.rawQuery("select TEXT from TESTTABLE where TestId=?", new String[]
-                { String.valueOf(0) });
+                {String.valueOf(0)});
         c.moveToFirst();
-        while (c.isAfterLast() == false)
-        {
+        while (c.isAfterLast() == false) {
             resultString = c.getString(0);
             break;
         }
 
-        if(resultString.equals("testText")){
+        if (resultString.equals("testText")) {
             writeMsg("Result Ok");
-        }else writeMsg("ERROR wrong result" + resultString);
+        } else writeMsg("ERROR wrong result" + resultString);
         writeMsg("close DB");
         test2.Close();
 
@@ -356,9 +369,9 @@ public class MyGdxTest extends ApplicationAdapter {
     private AlternateDatabase alternate2 = new AlternateDatabase() {
         @Override
         public void alternateDatabase(SQLite db, int databaseSchemeVersion) {
-                if(databaseSchemeVersion<1){
-                    db.execSQL("CREATE TABLE [TESTTABLE] ([Id] integer not null primary key autoincrement, [TestId] bigint NULL, [TEXT] nvarchar (12) NULL);");
-                }
+            if (databaseSchemeVersion < 1) {
+                db.execSQL("CREATE TABLE [TESTTABLE] ([Id] integer not null primary key autoincrement, [TestId] bigint NULL, [TEXT] nvarchar (12) NULL);");
+            }
         }
 
         @Override

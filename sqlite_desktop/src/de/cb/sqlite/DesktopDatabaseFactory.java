@@ -1,5 +1,7 @@
 package de.cb.sqlite;
 
+import com.badlogic.gdx.files.FileHandle;
+
 public class DesktopDatabaseFactory extends DatabaseFactory
 {
 	public DesktopDatabaseFactory()
@@ -8,7 +10,7 @@ public class DesktopDatabaseFactory extends DatabaseFactory
 	}
 
 	@Override
-	protected SQLite createInstanz(String Path, AlternateDatabase alter)
+	protected SQLite createInstance(FileHandle Path, AlternateDatabase alter)
 	{
 		try
 		{

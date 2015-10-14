@@ -1,6 +1,7 @@
 package de.cb.sqlite;
 
 import android.app.Activity;
+import com.badlogic.gdx.files.FileHandle;
 
 public class AndroidDatabaseFactory extends DatabaseFactory
 {
@@ -13,7 +14,7 @@ public class AndroidDatabaseFactory extends DatabaseFactory
 	}
 
 	@Override
-	protected SQLite createInstanz(String Path, AlternateDatabase alter)
+	protected SQLite createInstance(FileHandle Path, AlternateDatabase alter)
 	{
 		try
 		{

@@ -15,6 +15,7 @@
  */
 package de.cb.sqlite;
 
+import com.badlogic.gdx.files.FileHandle;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -26,15 +27,15 @@ public abstract class SQLite {
 
     final static org.slf4j.Logger log = LoggerFactory.getLogger(SQLite.class);
 
-    final protected String databasePath;
+    final protected FileHandle databaseFileHandle;
     protected boolean newDB = false;
-    protected boolean isStartet = false;
+    protected boolean isStarted = false;
 
     private final AlternateDatabase alterNate;
 
-    public SQLite(String databasePath, AlternateDatabase alter) {
+    public SQLite(FileHandle databasePath, AlternateDatabase alter) {
         super();
-        this.databasePath = databasePath;
+        this.databaseFileHandle = databasePath;
         this.alterNate = alter;
     }
 
@@ -70,13 +71,13 @@ public abstract class SQLite {
         return newDB;
     }
 
-    public String getDatabasePath() {
-        return databasePath;
+    public FileHandle getDatabaseFileHandle() {
+        return databaseFileHandle;
     }
 
     public boolean StartUp() {
         try {
-            log.debug("DB Startup : " + databasePath);
+            log.debug("DB Startup : " + databaseFileHandle);
         } catch (Exception e) {
             // gibt beim splash - Start: NPE in Translation.readMissingStringsFile
             // Nachfolgende Starts sollten aber protokolliert werden
@@ -90,13 +91,16 @@ public abstract class SQLite {
         } catch (Exception e) {
         }
 
-        if(databaseSchemeVersion==-1)createConfigTable();
+        if (databaseSchemeVersion == -1) {
+            createConfigTable();
+            databaseSchemeVersion = 0;
+        }
 
         if (databaseSchemeVersion < alterNate.databaseSchemeVersion()) {
             alterNate.alternateDatabase(this, databaseSchemeVersion);
             SetDatabaseSchemeVersion();
         }
-        isStartet = true;
+        isStarted = true;
         return true;
     }
 
@@ -110,6 +114,9 @@ public abstract class SQLite {
         this.execSQL("CREATE INDEX [Key_idx] ON [Config] ([Key] ASC);");
 
         this.endTransaction();
+
+
+        this.SetDatabaseSchemeVersion(0);
     }
 
 
@@ -139,9 +146,14 @@ public abstract class SQLite {
         return result;
     }
 
+
     private void SetDatabaseSchemeVersion() {
+        SetDatabaseSchemeVersion(alterNate.databaseSchemeVersion());
+    }
+
+    private void SetDatabaseSchemeVersion(int version) {
         Parameters val = new Parameters();
-        val.put("Value", alterNate.databaseSchemeVersion());
+        val.put("Value", version);
         long anz = update("Config", val, "[Key] like 'DatabaseSchemeVersionWin'", null);
         if (anz <= 0) {
             // Update not possible because Key does not exist
@@ -149,7 +161,7 @@ public abstract class SQLite {
             insert("Config", val);
         }
         // for Compatibility with WinCB
-        val.put("Value", alterNate.databaseSchemeVersion());
+        val.put("Value", version);
         anz = update("Config", val, "[Key] like 'DatabaseSchemeVersion'", null);
         if (anz <= 0) {
             // Update not possible because Key does not exist
@@ -249,10 +261,10 @@ public abstract class SQLite {
     }
 
     public boolean isStarted() {
-        return isStartet;
+        return isStarted;
     }
 
     public String toString() {
-        return "SQLite DB [" + (isStartet ? "is started" : "not started") + "]:" + databasePath;
+        return "SQLite DB [" + (isStarted ? "is started" : "not started") + "]:" + databaseFileHandle;
     }
 }

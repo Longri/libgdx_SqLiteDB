@@ -15,6 +15,8 @@
  */
 package de.cb.sqlite;
 
+import com.badlogic.gdx.files.FileHandle;
+
 public abstract class DatabaseFactory
 {
 	private final static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DatabaseFactory.class);
@@ -25,9 +27,9 @@ public abstract class DatabaseFactory
 		THAT = this;
 	}
 
-	public static SQLite getInstanz(String Path, AlternateDatabase alter)
+	public static SQLite getInstance(FileHandle Path, AlternateDatabase alter)
 	{
-		return THAT.createInstanz(Path, alter);
+		return THAT.createInstance(Path, alter);
 	}
 
 	public static boolean isInitial()
@@ -35,6 +37,6 @@ public abstract class DatabaseFactory
 		return THAT != null;
 	}
 
-	protected abstract SQLite createInstanz(String Path, AlternateDatabase alter);
+	protected abstract SQLite createInstance(FileHandle Path, AlternateDatabase alter);
 
 }

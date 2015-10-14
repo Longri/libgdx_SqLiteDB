@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import com.badlogic.gdx.files.FileHandle;
 
 import java.io.File;
 import java.util.Map.Entry;
@@ -14,7 +15,7 @@ public class AndroidDB extends SQLite {
     private Activity activity;
     public SQLiteDatabase myDB = null;
 
-    public AndroidDB(Activity activity, String databasePath, AlternateDatabase alternate) throws ClassNotFoundException {
+    public AndroidDB(Activity activity, FileHandle databasePath, AlternateDatabase alternate) throws ClassNotFoundException {
         super(databasePath, alternate);
         this.activity = activity;
 
@@ -24,12 +25,13 @@ public class AndroidDB extends SQLite {
     public void Initialize() {
 
         if (myDB == null) {
-            if (!(new File(databasePath).exists())) {
+            if (!(databaseFileHandle.exists())) {
                 Reset();
             } else {
                 try {
-                    if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("open data base: " + databasePath);
-                    myDB = SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE);
+                    if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("open data base: " + databaseFileHandle);
+                    String absolutePath = databaseFileHandle.file().getAbsolutePath();
+                    myDB = SQLiteDatabase.openDatabase(absolutePath, null, SQLiteDatabase.OPEN_READWRITE);
                 } catch (Exception exc) {
                     return;
                 }
@@ -37,24 +39,27 @@ public class AndroidDB extends SQLite {
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     @Override
     public void Reset() {
 
         // if exists, delete old database file
-        File file = new File(databasePath);
-        if (file.exists()) {
-            if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("RESET DB, delete file: " + databasePath);
-            file.delete();
+        if (databaseFileHandle.exists()) {
+            if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("RESET DB, delete file: " + databaseFileHandle);
+            databaseFileHandle.delete();
         }
 
         // create path, if not exists
-        file.getParentFile().mkdirs();
+        databaseFileHandle.parent().mkdirs();
 
 
         try {
-            if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("create data base: " + databasePath);
+
+            if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("create data base: " + databaseFileHandle);
+            String databasePath = databaseFileHandle.file().getAbsolutePath();
             myDB = activity.openOrCreateDatabase(getDatabasePath(databasePath).getAbsolutePath(), Context.MODE_WORLD_WRITEABLE, null);
+            newDB = true;
+
             newDB = true;
         } catch (Exception exc) {
             log.error("createDB", exc);
@@ -224,7 +229,7 @@ public class AndroidDB extends SQLite {
     @Override
     public void Close() {
         if (LogLevel.isLogLevel(LogLevel.DEBUG)) {
-            log.debug("close DB:" + databasePath);
+            log.debug("close DB:" + databaseFileHandle);
         }
         if (myDB != null) myDB.close();
         myDB = null;

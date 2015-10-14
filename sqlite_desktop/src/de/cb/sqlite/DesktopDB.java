@@ -1,6 +1,7 @@
 package de.cb.sqlite;
 
 import CB_Utils.Log.LogLevel;
+import com.badlogic.gdx.files.FileHandle;
 
 import java.io.File;
 import java.sql.*;
@@ -10,7 +11,7 @@ public class DesktopDB extends SQLite {
 
     Connection myDB = null;
 
-    public DesktopDB(String databasePath, AlternateDatabase alternate) throws ClassNotFoundException {
+    public DesktopDB(FileHandle databasePath, AlternateDatabase alternate) throws ClassNotFoundException {
         super(databasePath, alternate);
         System.setProperty("sqlite.purejava", "true");
         Class.forName("org.sqlite.JDBC");
@@ -20,7 +21,7 @@ public class DesktopDB extends SQLite {
     public void Close() {
         try {
             if (LogLevel.isLogLevel(LogLevel.DEBUG)) {
-                log.debug("close DB:" + databasePath);
+                log.debug("close DB:" + databaseFileHandle);
             }
             if (myDB != null) myDB.close();
             myDB = null;
@@ -32,12 +33,12 @@ public class DesktopDB extends SQLite {
     @Override
     public void Initialize() {
         if (myDB == null) {
-            File dbfile = new File(databasePath);
-            if (!dbfile.exists()) Reset();
+
+            if (!databaseFileHandle.exists()) Reset();
 
             try {
-                if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("open data base: " + dbfile.getAbsolutePath());
-                myDB = DriverManager.getConnection("jdbc:sqlite:" + dbfile.getAbsolutePath());
+                if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("open data base: " + databaseFileHandle.file().getAbsolutePath());
+                myDB = DriverManager.getConnection("jdbc:sqlite:" + databaseFileHandle.file().getAbsolutePath());
             } catch (Exception exc) {
                 return;
             }
@@ -47,19 +48,20 @@ public class DesktopDB extends SQLite {
     @Override
     public void Reset() {
         // if exists, delete old database file
-        File file = new File(databasePath);
-        if (file.exists()) {
-            if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("RESET DB, delete file: " + databasePath);
-            file.delete();
+
+        if (databaseFileHandle.exists()) {
+            if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("RESET DB, delete file: " + databaseFileHandle);
+            databaseFileHandle.delete();
         }
 
 
         // create path, if not exists
-        file.getParentFile().mkdirs();
+        databaseFileHandle.parent().mkdirs();
 
         try {
-            if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("create data base: " + databasePath);
-            myDB = DriverManager.getConnection("jdbc:sqlite:" + databasePath);
+            if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("create data base: " + databaseFileHandle);
+            String databaseAbsolutePath = databaseFileHandle.file().getAbsolutePath();
+            myDB = DriverManager.getConnection("jdbc:sqlite:" + databaseAbsolutePath);
             if (!myDB.getAutoCommit())
                 myDB.commit();
             newDB = true;
