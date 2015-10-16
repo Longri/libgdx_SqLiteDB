@@ -332,6 +332,7 @@ public class MyGdxTest extends ApplicationAdapter {
         para.put("TestId", 0);
         para.put("TEXT", "testText");
         test2.db.insert("TESTTABLE", para);
+        test2.db.setTransactionSuccessful();
         test2.db.endTransaction();
 
         //read

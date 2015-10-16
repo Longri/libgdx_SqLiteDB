@@ -113,6 +113,8 @@ public abstract class SQLite {
         this.execSQL("CREATE TABLE [Config] ([Key] nvarchar (30) NOT NULL, [Value] nvarchar (255) NULL);");
         this.execSQL("CREATE INDEX [Key_idx] ON [Config] ([Key] ASC);");
 
+
+        this.setTransactionSuccessful();
         this.endTransaction();
 
 

@@ -186,19 +186,31 @@ public class AndroidDB extends SQLite {
     @Override
     public void beginTransaction() {
         if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("begin transaction");
-        if (myDB != null) myDB.beginTransaction();
+        try {
+            if (myDB != null) myDB.beginTransaction();
+        } catch (Exception e) {
+            log.error("beginTransaction()", e);
+        }
     }
 
     @Override
     public void setTransactionSuccessful() {
         if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("set Transaction Successful");
-        if (myDB != null) myDB.setTransactionSuccessful();
+        try {
+            if (myDB != null) myDB.setTransactionSuccessful();
+        } catch (Exception e) {
+            log.error("setTransactionSuccessful()", e);
+        }
     }
 
     @Override
     public void endTransaction() {
         if (LogLevel.isLogLevel(LogLevel.DEBUG)) log.debug("endTransaction");
-        if (myDB != null) myDB.endTransaction();
+        try {
+            if (myDB != null) myDB.endTransaction();
+        } catch (Exception e) {
+            log.error("endTransaction()", e);
+        }
     }
 
     @Override
