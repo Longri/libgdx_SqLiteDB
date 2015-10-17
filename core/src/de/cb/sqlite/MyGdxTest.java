@@ -116,12 +116,18 @@ public class MyGdxTest extends ApplicationAdapter {
     }
 
 
+    private void writeMsg(final String msg) {
+
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                msgLabel.setText(msgLabel.getText() + "\n" + msg);
+                msgLabel.setCursorPosition(msgLabel.getText().length());
+                msgLabel.layout();
+            }
+        });
 
 
-    private void writeMsg(String msg) {
-        msgLabel.setText(msgLabel.getText() + "\n" + msg);
-        msgLabel.setCursorPosition(msgLabel.getText().length());
-        msgLabel.layout();
     }
 
 
@@ -262,6 +268,7 @@ public class MyGdxTest extends ApplicationAdapter {
 
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
+
     }
 
     @Override
