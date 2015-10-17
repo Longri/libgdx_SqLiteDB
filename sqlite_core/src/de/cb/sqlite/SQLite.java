@@ -123,6 +123,12 @@ public abstract class SQLite {
 
 
     public int GetDatabaseSchemeVersion() {
+
+        //first, check if config table exist
+        if(!isTableExists("Config")){
+            return -1;
+        }
+
         int result = -1;
         CoreCursor c = null;
         try {
@@ -146,6 +152,22 @@ public abstract class SQLite {
         }
 
         return result;
+    }
+
+    boolean isTableExists( String tableName)
+    {
+        if (tableName == null)
+        {
+            return false;
+        }
+        CoreCursor cursor = rawQuery("SELECT COUNT(*) FROM sqlite_master WHERE type = ? AND name = ?", new String[]{"table", tableName});
+        if (!cursor.moveToFirst())
+        {
+            return false;
+        }
+        int count = cursor.getInt(0);
+        cursor.close();
+        return count > 0;
     }
 
 
