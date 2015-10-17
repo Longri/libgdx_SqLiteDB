@@ -70,6 +70,13 @@ public class MyGdxTest extends ApplicationAdapter {
                     @Override
                     public void run() {
                         createDB();
+                        //change to NativeDatabaseFactory
+                        try {
+                            new NativeDatabaseFactory();
+                            createDB();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
                 thread.start();
@@ -107,6 +114,8 @@ public class MyGdxTest extends ApplicationAdapter {
         selectBox.setY(btnCreateDB.getY() - selectBox.getHeight());
         stage.addActor(selectBox);
     }
+
+
 
 
     private void writeMsg(String msg) {
