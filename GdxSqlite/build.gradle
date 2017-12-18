@@ -2,7 +2,3 @@ apply plugin: 'java'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-dependencies {
-//    compile project(":gdx")
-//    compile project(":extensions:gdx-jnigen")
-}
