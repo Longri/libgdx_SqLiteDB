@@ -25,6 +25,7 @@ public class SQLiteBuild {
         //generate build scripts
         BuildTarget win64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Windows, true);
         win64.compilerPrefix = "";
+        win64.compilerSuffix = ".exe";
 
         BuildConfig config = new BuildConfig("GdxSqlite");
         new AntScriptGenerator().generate(config, win64);
