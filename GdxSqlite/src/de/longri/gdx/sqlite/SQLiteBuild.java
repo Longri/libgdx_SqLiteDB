@@ -16,7 +16,7 @@ public class SQLiteBuild {
 
     public static void main(String[] args) throws Exception {
         // generate native code
-        new NativeCodeGenerator().generate("src", "bin/classes/main", "jni");
+        new NativeCodeGenerator().generate("src", "build/classes/main", "jni");
 
 
     }
