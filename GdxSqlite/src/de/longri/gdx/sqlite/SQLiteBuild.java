@@ -1,6 +1,9 @@
 package de.longri.gdx.sqlite;
 
 
+import com.badlogic.gdx.jnigen.AntScriptGenerator;
+import com.badlogic.gdx.jnigen.BuildConfig;
+import com.badlogic.gdx.jnigen.BuildTarget;
 import com.badlogic.gdx.jnigen.NativeCodeGenerator;
 
 /**
@@ -18,6 +21,13 @@ public class SQLiteBuild {
         // generate native code
         new NativeCodeGenerator().generate("src", "build/classes/main", "jni");
 
+
+        //generate build scripts
+        BuildTarget win64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Windows, true);
+        win64.compilerPrefix = "";
+
+        BuildConfig config = new BuildConfig("GdxSqlite");
+        new AntScriptGenerator().generate(config, win64);
 
     }
 }

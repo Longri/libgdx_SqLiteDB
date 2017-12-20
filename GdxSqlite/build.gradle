@@ -2,3 +2,9 @@ apply plugin: 'java'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
+
+
+dependencies {
+    compile project(":jnigen")
+    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+}

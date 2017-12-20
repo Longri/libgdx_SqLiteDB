@@ -48,15 +48,7 @@ project(":jnigen") {
     }
 }
 
-project(":GdxSqlite") {
-    apply plugin: "java"
 
-
-    dependencies {
-        compile project(":jnigen")
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-    }
-}
 
 project(":desktop") {
     apply plugin: "java"
