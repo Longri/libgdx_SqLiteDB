@@ -1,5 +1,7 @@
 ## Java
 
+/jnigen/build/
+
 *.class
 *.war
 *.ear

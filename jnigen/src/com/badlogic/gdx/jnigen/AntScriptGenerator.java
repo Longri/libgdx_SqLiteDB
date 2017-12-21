@@ -78,10 +78,10 @@ public class AntScriptGenerator {
         copyJniHeaders(config.jniDir.path());
 
         // copy memcpy_wrap.c, needed if your build platform uses the latest glibc, e.g. Ubuntu 12.10
-//        if (config.jniDir.child("memcpy_wrap.c").exists() == false) {
-//            new FileDescriptor("com/badlogic/gdx/jnigen/resources/scripts/memcpy_wrap.c", FileType.Classpath).copyTo(config.jniDir
-//                    .child("memcpy_wrap.c"));
-//        }
+        if (config.jniDir.child("memcpy_wrap.c").exists() == false) {
+            new FileDescriptor("../jnigen/src/com/badlogic/gdx/jnigen/resources/scripts/memcpy_wrap.c", FileType.Classpath).copyTo(config.jniDir
+                    .child("memcpy_wrap.c"));
+        }
 
         ArrayList<String> buildFiles = new ArrayList<String>();
         ArrayList<String> libsDirs = new ArrayList<String>();
@@ -111,8 +111,9 @@ public class AntScriptGenerator {
                 if (sharedLibFilename == null)
                     sharedLibFilename = getSharedLibFilename(target.os, target.is64Bit, config.sharedLibName);
 
-                sharedLibFiles.add(sharedLibFilename);
+
                 if (target.os != TargetOs.Android && target.os != TargetOs.IOS) {
+                    sharedLibFiles.add(sharedLibFilename);
                     libsDirs.add("../" + libsDir.path().replace('\\', '/'));
                 }
             }

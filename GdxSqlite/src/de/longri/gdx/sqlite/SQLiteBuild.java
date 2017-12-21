@@ -44,6 +44,8 @@ public class SQLiteBuild {
         String[] headers = new String[]{"sqlite_src"};
         String[] sources = new String[]{"sqlite_src/sqlite3.c", "sqlite_src/shell.c"};
 
+        File jniPath = new FileDescriptor("jni").file().getAbsoluteFile();
+        String jniPathString = jniPath.getAbsolutePath();
 
         if (true) {
             // generate native code
@@ -82,20 +84,37 @@ public class SQLiteBuild {
             ios32.headerDirs = headers;
             ios32.cIncludes = sources;
 
+            BuildTarget linux32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Linux, false);
+            linux32.compilerPrefix = "";
+            linux32.compilerSuffix = "";
+            linux32.headerDirs = headers;
+            linux32.cIncludes = sources;
+
+            BuildTarget linux64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Linux, true);
+            linux64.compilerPrefix = "";
+            linux64.compilerSuffix = "";
+            linux64.headerDirs = headers;
+            linux64.cIncludes = sources;
+            linux64.linkerFlags = "-shared -m64 -Wl, " + jniPathString + "/memcpy_wrap.c";
+
+
             BuildConfig config = new BuildConfig("GdxSqlite");
-            new AntScriptGenerator().generate(config, mac64, ios32, mac32);
+            new AntScriptGenerator().generate(config, /*win32, win64,*/ mac64, ios32, mac32, linux32, linux64);
 
         }
 
-        File path = new FileDescriptor("jni").file().getAbsoluteFile();
 
-        BuildExecutor.executeAnt("build-macosx64.xml", "-v", path);
-        BuildExecutor.executeAnt("build-macosx32.xml", "-v", path);
-        BuildExecutor.executeAnt("build-ios32.xml", "-v", path);
-        BuildExecutor.executeAnt("build-macosx64.xml", "-v", path);
-        BuildExecutor.executeAnt("build.xml", "-v", path);
+        BuildExecutor.executeAnt("build-linux32.xml", "-v", jniPath);
+        BuildExecutor.executeAnt("build-linux64.xml", "-v", jniPath);
+//        BuildExecutor.executeAnt("build-windows32.xml", "-v", jniPath);
+//        BuildExecutor.executeAnt("build-windows64.xml", "-v", jniPath);
+        BuildExecutor.executeAnt("build-macosx64.xml", "-v", jniPath);
+        BuildExecutor.executeAnt("build-macosx32.xml", "-v", jniPath);
+        BuildExecutor.executeAnt("build-ios32.xml", "-v", jniPath);
+        BuildExecutor.executeAnt("build-macosx64.xml", "-v", jniPath);
+        BuildExecutor.executeAnt("build.xml", "-v", jniPath);
 
-        
+
         new JniGenSharedLibraryLoader("libs/GdxSqlite-natives.jar").load("GdxSqlite");
 
         float[] values = new float[]{1, 2, 3, 4, 5};
