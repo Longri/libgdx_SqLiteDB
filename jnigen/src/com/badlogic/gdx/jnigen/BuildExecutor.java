@@ -34,14 +34,14 @@ public class BuildExecutor {
      *
      * @param buildFile
      * @param params
+     * @param path
      * @return whether the Ant succeeded
      */
-    public static boolean executeAnt(String buildFile, String params) {
-        FileDescriptor build = new FileDescriptor(buildFile);
+    public static boolean executeAnt(String buildFile, String params, File path) {
         String ant = System.getProperty("os.name").contains("Windows") ? "ant.bat" : "ant";
-        String command = ant + " -buildfile \"" + build.file().getAbsolutePath() + "\" " + params;
+        String command = ant + " -f " + buildFile + " " + params;
         System.out.println("Executing '" + command + "'");
-        return startProcess(command, build.parent().file());
+        return startProcess(command, path);
     }
 
     /**
