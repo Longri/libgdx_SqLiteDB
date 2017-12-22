@@ -15,26 +15,12 @@
  */
 package de.longri.gdx.sqlite;
 
+import com.badlogic.gdx.utils.ObjectMap;
+
+import java.util.HashMap;
+
 /**
  * Created by Longri on 22.12.2017.
  */
-public class GdxSqlite {
-
-    //@off
-    /*JNI
-
-        extern "C" {
-            #include "sqlite3.h"
-        }
-
-     */
-
-    public static native String getSqliteVersion(); /*
-        return (env)->NewStringUTF(sqlite3_libversion());
-    */
-
-
-    private long ptr = -1;
-
-
+public class Parameters extends ObjectMap<String, Object> {
 }

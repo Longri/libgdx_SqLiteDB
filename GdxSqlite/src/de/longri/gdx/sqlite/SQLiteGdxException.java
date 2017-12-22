@@ -15,26 +15,25 @@
  */
 package de.longri.gdx.sqlite;
 
+import com.badlogic.gdx.utils.GdxRuntimeException;
+
 /**
+ * Unchecked runtime exception for SQLite used in this extension.
+ *
  * Created by Longri on 22.12.2017.
  */
-public class GdxSqlite {
+public class SQLiteGdxException extends GdxRuntimeException {
 
-    //@off
-    /*JNI
+    public SQLiteGdxException(String message) {
+        super(message);
+    }
 
-        extern "C" {
-            #include "sqlite3.h"
-        }
+    public SQLiteGdxException(Throwable t) {
+        super(t);
+    }
 
-     */
-
-    public static native String getSqliteVersion(); /*
-        return (env)->NewStringUTF(sqlite3_libversion());
-    */
-
-
-    private long ptr = -1;
-
+    public SQLiteGdxException(String message, Throwable t) {
+        super(message, t);
+    }
 
 }
