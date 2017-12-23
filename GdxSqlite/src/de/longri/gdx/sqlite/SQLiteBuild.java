@@ -193,7 +193,7 @@ public class SQLiteBuild {
         db.execSQL(sql);
 
 
-        sql=" INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)    \n" +
+        sql = " INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)    \n" +
                 "          VALUES (1, 'Paul', 32, 'California', 20000.00 );   \n" +
                 "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)    \n" +
                 "          VALUES (2, 'Allen', 25, 'Texas', 15000.00 );       \n" +
@@ -203,6 +203,14 @@ public class SQLiteBuild {
                 "          VALUES (4, 'Mark', 25, 'Rich-Mond ', 65000.00 );";
         db.execSQL(sql);
 
+        sql = "SELECT * from COMPANY";
+
+        db.rawQuery(sql, null, new GdxSqlite.RowCallback() {
+            @Override
+            public void newRow(String columnName, String value) {
+
+            }
+        });
 
         db.closeDatabase();
         System.out.println("Pointer to closed DB: " + db.ptr);

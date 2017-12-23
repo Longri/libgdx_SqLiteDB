@@ -146,5 +146,64 @@ public class GdxSqlite {
         return rc;
     */
 
+    public interface RowCallback{
+        void newRow(String columnName,String value);
+    }
+
+
+    public void rawQuery(String sql, String[] args, RowCallback callback ) throws SQLiteGdxException {
+
+        //replace ? with args
+        if (args != null) {
+            for (String arg : args)
+                sql = sql.replaceFirst("\\?", "'" + arg + "'");
+        }
+        int resultCode = this.query(this.ptr, sql);
+        System.out.println("Query result code: " + resultCode);
+    }
+
+    private native int query(long ptr, String sql); /*
+		sqlite3* db = (sqlite3*)ptr;
+
+
+		sqlite3_stmt *stmt = NULL;
+		int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+		if (rc != SQLITE_OK)
+		    return rc;
+
+		int rowCount = 0;
+		rc = sqlite3_step(stmt);
+		while (rc != SQLITE_DONE && rc != SQLITE_OK){
+			rowCount++;
+			int colCount = sqlite3_column_count(stmt);
+			for (int colIndex = 0; colIndex < colCount; colIndex++){
+				int type = sqlite3_column_type(stmt, colIndex);
+				const char * columnName = sqlite3_column_name(stmt, colIndex);
+				if (type == SQLITE_INTEGER){
+					int valInt = sqlite3_column_int(stmt, colIndex);
+					printf("columnName = %s, Integer val = %d\n" , columnName, valInt);
+				}else if (type == SQLITE_FLOAT){
+					double valDouble = sqlite3_column_double(stmt, colIndex);
+					printf("columnName = %s,Double val = %f\n", columnName, valDouble);
+				}else if (type == SQLITE_TEXT){
+					const unsigned char * valChar = sqlite3_column_text(stmt, colIndex);
+					printf("columnName = %s,Text val = %s\n", columnName, valChar);
+					//free(valChar);
+				}else if (type == SQLITE_BLOB){
+					printf("columnName = %s,BLOB\n", columnName);
+				}else if (type == SQLITE_NULL){
+					printf("columnName = %s,NULL\n", columnName);
+				}
+			}
+
+			printf("Line %d, rowCount = %d\n\n", rowCount, colCount);
+
+			rc = sqlite3_step(stmt);
+		}
+
+		rc = sqlite3_finalize(stmt);
+		return rc;
+
+    */
 
 }
