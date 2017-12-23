@@ -67,7 +67,13 @@ public class GdxSqlite {
         fprintf(stderr, "\n");
         rc = sqlite3_open(path, &db);
 
-        if( rc ) {
+        fprintf(stderr, "Open result:%d", rc);
+        fprintf(stderr, "\n");
+
+        fprintf(stderr, "SQLITE_OK value:%d", SQLITE_OK);
+        fprintf(stderr, "\n");
+
+        if( rc != SQLITE_OK ){
             fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
             return -1;
         } else {
