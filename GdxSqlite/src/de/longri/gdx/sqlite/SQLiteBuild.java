@@ -183,8 +183,28 @@ public class SQLiteBuild {
 
         System.out.println("Pointer to open DB: " + db.ptr);
 
-        db.closeDatabase();
 
+        String sql = "CREATE TABLE COMPANY( \n" +
+                "         ID INT PRIMARY KEY     NOT NULL, \n" +
+                "         NAME           TEXT    NOT NULL, \n" +
+                "         AGE            INT     NOT NULL, \n" +
+                "         ADDRESS        CHAR(50), \n" +
+                "         SALARY         REAL );";
+        db.execSQL(sql);
+
+
+        sql=" INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)    \n" +
+                "          VALUES (1, 'Paul', 32, 'California', 20000.00 );   \n" +
+                "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)    \n" +
+                "          VALUES (2, 'Allen', 25, 'Texas', 15000.00 );       \n" +
+                "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)  \n" +
+                "          VALUES (3, 'Teddy', 23, 'Norway', 20000.00 );  \n" +
+                "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)  \n" +
+                "          VALUES (4, 'Mark', 25, 'Rich-Mond ', 65000.00 );";
+        db.execSQL(sql);
+
+
+        db.closeDatabase();
         System.out.println("Pointer to closed DB: " + db.ptr);
 
     }

@@ -32,6 +32,22 @@ public class GdxSqlite {
             #include "sqlite3.h"
         }
 
+//        static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
+//            // dummy callback!
+//            return 0;
+//        }
+
+        static int callback(void *data, int argc, char **argv, char **azColName){
+            int i;
+            fprintf(stderr, "%s: ", (const char*)data);
+
+            for(i = 0; i<argc; i++) {
+                printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+            }
+            printf("\n");
+            return 0;
+        }
+
      */
 
     public static native String getSqliteVersion(); /*
@@ -100,4 +116,35 @@ public class GdxSqlite {
         sqlite3_close(db);
         fprintf(stderr, "Close database successfully\n");
     */
+
+
+    /**
+     * execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
+     *
+     * @param sql the SQL statement to be executed. Multiple statements separated by semicolons are not supported.
+     * @throws SQLiteGdxException
+     */
+    public void execSQL(String sql) throws SQLiteGdxException {
+        int resultCode = this.exec(this.ptr, sql);
+        System.out.println("Execute result code: " + resultCode);
+    }
+
+    private native int exec(long ptr, String sql); /*
+        char *zErrMsg = 0;
+        int rc;
+        sqlite3* db = (sqlite3*)ptr;
+
+        // Execute SQL statement
+        rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+
+        if( rc != SQLITE_OK ){
+            fprintf(stderr, "SQL error: %s\n", zErrMsg);
+            sqlite3_free(zErrMsg);
+        } else {
+            fprintf(stdout, "Execute sql successfully\n");
+        }
+        return rc;
+    */
+
+
 }
