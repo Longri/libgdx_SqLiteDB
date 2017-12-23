@@ -19,42 +19,20 @@ package de.longri.gdx.sqlite;
 import com.badlogic.gdx.jnigen.*;
 
 import java.io.File;
-import java.util.Arrays;
 
 /**
  * Created by Longri on 18.12.2017.
  */
 public class SQLiteBuild {
 
-
-    //@off
-    /*JNI
-    #include<sqlite3.h>
-
-     */
-
-
-    public native void add(float[] values, int offset, int numElements, float value); /*
-        for(int i = offset; i < numElements; i++){
-            values[i]+= value;
-        }
-    */
-
-
-//    public native int getSqliteVersionNumber(); /*
-//        return sqlite3_libversion_number();
-//    */
-
-
-    public native int getSqliteVersionNumber(); /*
-        int i = 1234;
-        return i;
-    */
+        static final boolean takeDummy = false;
+//    static final boolean takeDummy = true;
+    
 
     public static void main(String[] args) throws Exception {
 
-        boolean takeDummy = false;
 
+        FileDescriptor targetDescriptor = new FileDescriptor("libs");
         FileDescriptor jniDescriptor = new FileDescriptor("jni");
         FileDescriptor dummyDescriptor = new FileDescriptor("sqlite_dummy_src");
         FileDescriptor sqliteDescriptor = new FileDescriptor("sqlite_src");
@@ -69,14 +47,16 @@ public class SQLiteBuild {
         String sqlitePathString = sqlitePath.getAbsolutePath();
 
 
+        //cleanup
+        jniDescriptor.deleteDirectory();
+        targetDescriptor.deleteDirectory();
+
+
         String[] headers;
-        String[] sources;
         if (takeDummy) {
             headers = new String[]{dummyPathString};
-            sources = new String[]{dummyPathString + "/sqlite3.c"};
         } else {
             headers = new String[]{sqlitePathString};
-            sources = new String[]{sqlitePathString + "/sqlite3.c", sqlitePathString + "/shell.c"};
         }
 
 
@@ -89,50 +69,43 @@ public class SQLiteBuild {
         win64.compilerPrefix = "";
         win64.compilerSuffix = "";
         win64.headerDirs = headers;
-        win64.cIncludes = sources;
 
         BuildTarget win32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Windows, false);
         win32.compilerPrefix = "";
         win32.compilerSuffix = "";
         win32.headerDirs = headers;
-        win32.cIncludes = sources;
 
         BuildTarget mac64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.MacOsX, true);
         mac64.compilerPrefix = "";
         mac64.compilerSuffix = "";
         mac64.headerDirs = headers;
-        mac64.cIncludes = sources;
 
 
         BuildTarget mac32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.MacOsX, false);
         mac32.compilerPrefix = "";
         mac32.compilerSuffix = "";
         mac32.headerDirs = headers;
-        mac32.cIncludes = sources;
 
 
         BuildTarget ios32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.IOS, false);
         ios32.compilerPrefix = "";
         ios32.compilerSuffix = "";
         ios32.headerDirs = headers;
-        ios32.cIncludes = sources;
 
         BuildTarget linux32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Linux, false);
         linux32.compilerPrefix = "";
         linux32.compilerSuffix = "";
         linux32.headerDirs = headers;
-        linux32.cIncludes = sources;
 
         BuildTarget linux64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Linux, true);
         linux64.compilerPrefix = "";
         linux64.compilerSuffix = "";
         linux64.headerDirs = headers;
-        linux64.cIncludes = sources;
         linux64.linkerFlags = "-shared -m64 -Wl, " + jniPathString + "/memcpy_wrap.c";
 
 
         BuildConfig config = new BuildConfig("GdxSqlite");
-//        new AntScriptGenerator().generate(config, /*win32, win64, ios32, mac32, linux32, linux64,*/ mac64);
+        new AntScriptGenerator().generate(config, /*win32, win64, ios32, mac32, linux32, linux64,*/ mac64);
 
 
         //copy c/c++ src to 'jni' folder
@@ -160,15 +133,8 @@ public class SQLiteBuild {
 
         new JniGenSharedLibraryLoader("libs/GdxSqlite-natives.jar").load("GdxSqlite");
 
-        float[] values = new float[]{1, 2, 3, 4, 5};
-        SQLiteBuild build = new SQLiteBuild();
-
-        build.add(values, 0, 5, 5);
-        System.out.println(Arrays.toString(values));
-
         System.out.println(GdxSqlite.getSqliteVersion());
 
-        System.out.println(build.getSqliteVersionNumber());
 
     }
 
