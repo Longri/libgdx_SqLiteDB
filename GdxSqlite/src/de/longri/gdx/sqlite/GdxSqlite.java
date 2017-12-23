@@ -15,7 +15,12 @@
  */
 package de.longri.gdx.sqlite;
 
+import com.badlogic.gdx.files.FileHandle;
+
 /**
+ * SQLite native wrapper
+ * <p>
+ * <p>
  * Created by Longri on 22.12.2017.
  */
 public class GdxSqlite {
@@ -34,7 +39,59 @@ public class GdxSqlite {
     */
 
 
-    private long ptr = -1;
+    private final FileHandle fileHandle;
+    long ptr = -1;
 
 
+    public GdxSqlite(FileHandle fileHandle) {
+        this.fileHandle = fileHandle;
+    }
+
+
+    /**
+     * Opens an already existing database or creates a new database if it doesn't already exist.
+     *
+     * @throws SQLiteGdxException
+     */
+    public void openOrCreateDatabase() throws SQLiteGdxException {
+        this.ptr = open(this.fileHandle.file().getAbsolutePath());
+    }
+
+    private native long open(String path) throws SQLiteGdxException; /*
+        sqlite3 *db;
+        char *zErrMsg = 0;
+        int rc;
+
+        fprintf(stderr, "Opened database \n");
+        fprintf(stderr, path);
+        fprintf(stderr, "\n");
+        rc = sqlite3_open(path, &db);
+
+        if( rc ) {
+            fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+            return -1;
+        } else {
+            fprintf(stderr, "Opened database successfully\n");
+            return (long)db;
+        }
+    */
+
+
+    /**
+     * Closes the opened database and releases all the resources related to this database.
+     *
+     * @throws SQLiteGdxException
+     */
+    void closeDatabase() throws SQLiteGdxException {
+        if (this.ptr >= 0) {
+            close(this.ptr);
+            this.ptr = -1;
+        }
+    }
+
+    private native void close(long ptr) throws SQLiteGdxException; /*
+        sqlite3* db = (sqlite3*)ptr;
+        sqlite3_close(db);
+        fprintf(stderr, "Close database successfully\n");
+    */
 }

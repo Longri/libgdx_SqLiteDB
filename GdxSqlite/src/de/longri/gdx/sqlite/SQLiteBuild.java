@@ -16,6 +16,7 @@
 package de.longri.gdx.sqlite;
 
 
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.jnigen.*;
 import com.badlogic.gdx.utils.Array;
 import org.apache.commons.cli.*;
@@ -146,22 +147,45 @@ public class SQLiteBuild {
         }
 
 
-        if (all || cmd.hasOption("linux32")) BuildExecutor.executeAnt("build-linux32.xml", "-v -Dhas-compiler=true", jniPath);
-        if (all || cmd.hasOption("linux64")) BuildExecutor.executeAnt("build-linux64.xml", "-v -Dhas-compiler=true", jniPath);
+        if (all || cmd.hasOption("linux32"))
+            BuildExecutor.executeAnt("build-linux32.xml", "-v -Dhas-compiler=true", jniPath);
+        if (all || cmd.hasOption("linux64"))
+            BuildExecutor.executeAnt("build-linux64.xml", "-v -Dhas-compiler=true", jniPath);
         if (all || cmd.hasOption("win32")) BuildExecutor.executeAnt("build-windows32.xml", "-v", jniPath);
         if (all || cmd.hasOption("win64")) BuildExecutor.executeAnt("build-windows64.xml", "-v", jniPath);
         if (all || cmd.hasOption("mac64")) BuildExecutor.executeAnt("build-macosx64.xml", "-v", jniPath);
         if (all || cmd.hasOption("mac32")) BuildExecutor.executeAnt("build-macosx32.xml", "-v", jniPath);
-        if (all || cmd.hasOption("ios32")) BuildExecutor.executeAnt("build-ios32.xml", "-v -Dhas-compiler=true", jniPath);
+        if (all || cmd.hasOption("ios32"))
+            BuildExecutor.executeAnt("build-ios32.xml", "-v -Dhas-compiler=true", jniPath);
 
 
         BuildExecutor.executeAnt("build.xml", "-v", jniPath);
 
 
+        //##############################################
+        // Test native SQLite
+        //##############################################
+
+        //delete alt test folder
+        FileHandle clear = new FileHandle("test");
+        clear.deleteDirectory();
+
+
         new JniGenSharedLibraryLoader("libs/GdxSqlite-natives.jar").load("GdxSqlite");
+
 
         System.out.println(GdxSqlite.getSqliteVersion());
 
+        FileHandle fileHandle = new FileHandle("test/testDB.db3");
+        fileHandle.parent().mkdirs();
+        GdxSqlite db = new GdxSqlite(fileHandle);
+        db.openOrCreateDatabase();
+
+        System.out.println("Pointer to open DB: " + db.ptr);
+
+        db.closeDatabase();
+
+        System.out.println("Pointer to closed DB: " + db.ptr);
 
     }
 
