@@ -18,6 +18,7 @@ package com.badlogic.gdx.jnigen;
 
 import com.badlogic.gdx.jnigen.BuildTarget.TargetOs;
 import com.badlogic.gdx.jnigen.FileDescriptor.FileType;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 
@@ -63,7 +64,7 @@ public class AntScriptGenerator {
      * @param config  the {@link BuildConfig}
      * @param targets list of {@link BuildTarget} instances
      */
-    public void generate(BuildConfig config, BuildTarget... targets) {
+    public void generate(BuildConfig config, Array<BuildTarget> targets) {
         // create all the directories for outputing object files, shared libs and natives jar as well as build scripts.
         if (!config.libsDir.exists()) {
             if (!config.libsDir.mkdirs())

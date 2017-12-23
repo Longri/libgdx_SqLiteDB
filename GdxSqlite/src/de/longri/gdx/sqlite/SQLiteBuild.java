@@ -17,6 +17,8 @@ package de.longri.gdx.sqlite;
 
 
 import com.badlogic.gdx.jnigen.*;
+import com.badlogic.gdx.utils.Array;
+import org.apache.commons.cli.*;
 
 import java.io.File;
 
@@ -25,11 +27,11 @@ import java.io.File;
  */
 public class SQLiteBuild {
 
-        static final boolean takeDummy = false;
-//    static final boolean takeDummy = true;
-    
-
     public static void main(String[] args) throws Exception {
+
+        CommandLine cmd = getCommandLine(args);
+
+        boolean takeDummy = Boolean.parseBoolean(cmd.getOptionValue("dummy"));
 
 
         FileDescriptor targetDescriptor = new FileDescriptor("libs");
@@ -65,47 +67,73 @@ public class SQLiteBuild {
 
 
         //generate build scripts
-        BuildTarget win64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Windows, true);
-        win64.compilerPrefix = "";
-        win64.compilerSuffix = "";
-        win64.headerDirs = headers;
-
-        BuildTarget win32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Windows, false);
-        win32.compilerPrefix = "";
-        win32.compilerSuffix = "";
-        win32.headerDirs = headers;
-
-        BuildTarget mac64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.MacOsX, true);
-        mac64.compilerPrefix = "";
-        mac64.compilerSuffix = "";
-        mac64.headerDirs = headers;
+        boolean all = cmd.hasOption("all");
+        Array<BuildTarget> targets = new Array<>();
 
 
-        BuildTarget mac32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.MacOsX, false);
-        mac32.compilerPrefix = "";
-        mac32.compilerSuffix = "";
-        mac32.headerDirs = headers;
+        if (all || cmd.hasOption("win64")) {
+            BuildTarget win64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Windows, true);
+            win64.compilerPrefix = "";
+            win64.compilerSuffix = "";
+            win64.headerDirs = headers;
+            targets.add(win64);
+        }
+
+        if (all || cmd.hasOption("win32")) {
+            BuildTarget win32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Windows, false);
+            win32.compilerPrefix = "";
+            win32.compilerSuffix = "";
+            win32.headerDirs = headers;
+            targets.add(win32);
+        }
+
+        BuildTarget mac64 = null;
+        if (all || cmd.hasOption("mac64")) {
+            mac64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.MacOsX, true);
+            mac64.compilerPrefix = "";
+            mac64.compilerSuffix = "";
+            mac64.headerDirs = headers;
+            targets.add(mac64);
+        }
 
 
-        BuildTarget ios32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.IOS, false);
-        ios32.compilerPrefix = "";
-        ios32.compilerSuffix = "";
-        ios32.headerDirs = headers;
+        if (all || cmd.hasOption("win32")) {
+            BuildTarget mac32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.MacOsX, false);
+            mac32.compilerPrefix = "";
+            mac32.compilerSuffix = "";
+            mac32.headerDirs = headers;
+            targets.add(mac32);
+        }
 
-        BuildTarget linux32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Linux, false);
-        linux32.compilerPrefix = "";
-        linux32.compilerSuffix = "";
-        linux32.headerDirs = headers;
 
-        BuildTarget linux64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Linux, true);
-        linux64.compilerPrefix = "";
-        linux64.compilerSuffix = "";
-        linux64.headerDirs = headers;
-        linux64.linkerFlags = "-shared -m64 -Wl, " + jniPathString + "/memcpy_wrap.c";
+        if (all || cmd.hasOption("ios32")) {
+            BuildTarget ios32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.IOS, false);
+            ios32.compilerPrefix = "";
+            ios32.compilerSuffix = "";
+            ios32.headerDirs = headers;
+            targets.add(ios32);
+        }
+
+        if (all || cmd.hasOption("linux32")) {
+            BuildTarget linux32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Linux, false);
+            linux32.compilerPrefix = "";
+            linux32.compilerSuffix = "";
+            linux32.headerDirs = headers;
+            targets.add(linux32);
+        }
+
+        if (all || cmd.hasOption("linux64")) {
+            BuildTarget linux64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Linux, true);
+            linux64.compilerPrefix = "";
+            linux64.compilerSuffix = "";
+            linux64.headerDirs = headers;
+            linux64.linkerFlags = "-shared -m64 -Wl, " + jniPathString + "/memcpy_wrap.c";
+            targets.add(linux64);
+        }
 
 
         BuildConfig config = new BuildConfig("GdxSqlite");
-        new AntScriptGenerator().generate(config, /*win32, win64, ios32, mac32, linux32, linux64,*/ mac64);
+        new AntScriptGenerator().generate(config, targets);
 
 
         //copy c/c++ src to 'jni' folder
@@ -118,14 +146,13 @@ public class SQLiteBuild {
         }
 
 
-//        BuildExecutor.executeAnt("build-linux32.xml", "-v -Dhas-compiler=true", jniPath);
-//        BuildExecutor.executeAnt("build-linux64.xml", "-v -Dhas-compiler=true", jniPath);
-//        BuildExecutor.executeAnt("build-windows32.xml", "-v", jniPath);
-//        BuildExecutor.executeAnt("build-windows64.xml", "-v", jniPath);
-//        BuildExecutor.executeAnt("build-macosx64.xml", "-v -Dhas-compiler=true", jniPath);
-//        BuildExecutor.executeAnt("build-macosx32.xml", "-v -Dhas-compiler=true", jniPath);
-//        BuildExecutor.executeAnt("build-ios32.xml", "-v -Dhas-compiler=true", jniPath);
-        BuildExecutor.executeAnt("build-macosx64.xml", "-v", jniPath);
+        if (all || cmd.hasOption("linux32")) BuildExecutor.executeAnt("build-linux32.xml", "-v -Dhas-compiler=true", jniPath);
+        if (all || cmd.hasOption("linux64")) BuildExecutor.executeAnt("build-linux64.xml", "-v -Dhas-compiler=true", jniPath);
+        if (all || cmd.hasOption("win32")) BuildExecutor.executeAnt("build-windows32.xml", "-v", jniPath);
+        if (all || cmd.hasOption("win64")) BuildExecutor.executeAnt("build-windows64.xml", "-v", jniPath);
+        if (all || cmd.hasOption("mac64")) BuildExecutor.executeAnt("build-macosx64.xml", "-v", jniPath);
+        if (all || cmd.hasOption("mac32")) BuildExecutor.executeAnt("build-macosx32.xml", "-v", jniPath);
+        if (all || cmd.hasOption("ios32")) BuildExecutor.executeAnt("build-ios32.xml", "-v -Dhas-compiler=true", jniPath);
 
 
         BuildExecutor.executeAnt("build.xml", "-v", jniPath);
@@ -138,5 +165,62 @@ public class SQLiteBuild {
 
     }
 
+
+    private static CommandLine getCommandLine(String[] args) {
+        Options options = new Options();
+
+        Option dummy = new Option("d", "dummy", true, "dummySQLite or real SQLite (true/false");
+        dummy.setRequired(true);
+        options.addOption(dummy);
+
+
+        Option all = new Option("a", "all", false, "compile for all platforms");
+        all.setRequired(false);
+        options.addOption(all);
+
+        Option mac64 = new Option(null, "mac64", false, "compile for mac 64 bit");
+        mac64.setRequired(false);
+        options.addOption(mac64);
+
+        Option mac32 = new Option(null, "mac32", false, "compile for mac 32 bit");
+        mac32.setRequired(false);
+        options.addOption(mac32);
+
+        Option linux32 = new Option(null, "linux32", false, "compile for linux 32 bit");
+        linux32.setRequired(false);
+        options.addOption(linux32);
+
+        Option linux64 = new Option(null, "linux64", false, "compile for linux 64 bit");
+        linux64.setRequired(false);
+        options.addOption(linux64);
+
+        Option win32 = new Option(null, "win32", false, "compile for windows 32 bit");
+        win32.setRequired(false);
+        options.addOption(win32);
+
+        Option win64 = new Option(null, "win64", false, "compile for windows 64 bit");
+        win64.setRequired(false);
+        options.addOption(win64);
+
+        Option ios32 = new Option(null, "ios32", false, "compile for iOs bit");
+        ios32.setRequired(false);
+        options.addOption(ios32);
+
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("SQLite native builder", options);
+
+            System.exit(1);
+            return null;
+        }
+        return cmd;
+    }
 
 }
