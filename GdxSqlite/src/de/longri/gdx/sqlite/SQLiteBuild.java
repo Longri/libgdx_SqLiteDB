@@ -207,7 +207,7 @@ public class SQLiteBuild {
 
         db.rawQuery(sql, null, new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String columnName, String value) {
+            public void newRow(String[] columnName, Object[] value) {
 
             }
         });

@@ -16,6 +16,9 @@
 package de.longri.gdx.sqlite;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.StringBuilder;
 
 /**
  * SQLite native wrapper
@@ -32,19 +35,10 @@ public class GdxSqlite {
             #include "sqlite3.h"
         }
 
-//        static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
-//            // dummy callback!
-//            return 0;
-//        }
+        #include <vector>
 
-        static int callback(void *data, int argc, char **argv, char **azColName){
-            int i;
-            fprintf(stderr, "%s: ", (const char*)data);
-
-            for(i = 0; i<argc; i++) {
-                printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-            }
-            printf("\n");
+        static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
+            // dummy callback!
             return 0;
         }
 
@@ -146,64 +140,140 @@ public class GdxSqlite {
         return rc;
     */
 
-    public interface RowCallback{
-        void newRow(String columnName,String value);
+    public interface RowCallback {
+        void newRow(String[] columnName, Object[] value);
     }
 
 
-    public void rawQuery(String sql, String[] args, RowCallback callback ) throws SQLiteGdxException {
+    ObjectMap<Integer, RowCallback> callbackMap = new ObjectMap<>();
+    static int statiCallbackPtr = 0;
+
+    public void rawQuery(String sql, String[] args, RowCallback callback) throws SQLiteGdxException {
 
         //replace ? with args
         if (args != null) {
             for (String arg : args)
                 sql = sql.replaceFirst("\\?", "'" + arg + "'");
         }
-        int resultCode = this.query(this.ptr, sql);
+
+        //register callback
+        int callbackPtr = statiCallbackPtr++;
+        callbackMap.put(callbackPtr, callback);
+
+        int resultCode = this.query(this.ptr, sql, callbackPtr);
         System.out.println("Query result code: " + resultCode);
     }
 
-    private native int query(long ptr, String sql); /*
-		sqlite3* db = (sqlite3*)ptr;
+
+    private native int query(long ptr, String sql, int callBackPtr); /*
+                sqlite3* db = (sqlite3*)ptr;
 
 
-		sqlite3_stmt *stmt = NULL;
-		int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-		if (rc != SQLITE_OK)
-		    return rc;
+                sqlite3_stmt *stmt = NULL;
+                int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+                if (rc == SQLITE_OK){
 
-		int rowCount = 0;
-		rc = sqlite3_step(stmt);
-		while (rc != SQLITE_DONE && rc != SQLITE_OK){
-			rowCount++;
-			int colCount = sqlite3_column_count(stmt);
-			for (int colIndex = 0; colIndex < colCount; colIndex++){
-				int type = sqlite3_column_type(stmt, colIndex);
-				const char * columnName = sqlite3_column_name(stmt, colIndex);
-				if (type == SQLITE_INTEGER){
-					int valInt = sqlite3_column_int(stmt, colIndex);
-					printf("columnName = %s, Integer val = %d\n" , columnName, valInt);
-				}else if (type == SQLITE_FLOAT){
-					double valDouble = sqlite3_column_double(stmt, colIndex);
-					printf("columnName = %s,Double val = %f\n", columnName, valDouble);
-				}else if (type == SQLITE_TEXT){
-					const unsigned char * valChar = sqlite3_column_text(stmt, colIndex);
-					printf("columnName = %s,Text val = %s\n", columnName, valChar);
-					//free(valChar);
-				}else if (type == SQLITE_BLOB){
-					printf("columnName = %s,BLOB\n", columnName);
-				}else if (type == SQLITE_NULL){
-					printf("columnName = %s,NULL\n", columnName);
-				}
-			}
+                    int rowCount = 0;
+                    rc = sqlite3_step(stmt);
 
-			printf("Line %d, rowCount = %d\n\n", rowCount, colCount);
 
-			rc = sqlite3_step(stmt);
-		}
+                jclass cls = (env)->GetObjectClass( object);
+                jmethodID mid = (env)->GetMethodID( cls, "nativeCallback", "(I[Ljava/lang/String;[Ljava/lang/Object;)V");
 
-		rc = sqlite3_finalize(stmt);
-		return rc;
+                if (mid == 0){
+                    fprintf(stderr, "Java Methode not found!\n");
+                }else{
+                    fprintf(stdout, "Java Methode found!\n");
+                }
+
+                    std::vector<const char *> names;
+                    int colCount = sqlite3_column_count(stmt);
+
+
+                    while (rc != SQLITE_DONE && rc != SQLITE_OK){
+                        rowCount++;
+
+
+
+
+                        for (int colIndex = 0; colIndex < colCount; colIndex++){
+                            int type = sqlite3_column_type(stmt, colIndex);
+                            const char * columnName = sqlite3_column_name(stmt, colIndex);
+
+                            names.push_back(columnName);
+                            printf("push columnName = %s :%s \n " , columnName, names[colIndex]);
+
+                            if (type == SQLITE_INTEGER){
+                                int valInt = sqlite3_column_int(stmt, colIndex);
+                                printf("columnName = %s, Integer val = %d\n" , columnName, valInt);
+                            }else if (type == SQLITE_FLOAT){
+                                double valDouble = sqlite3_column_double(stmt, colIndex);
+                                printf("columnName = %s,Double val = %f\n", columnName, valDouble);
+                            }else if (type == SQLITE_TEXT){
+                                const unsigned char * valChar = sqlite3_column_text(stmt, colIndex);
+                                printf("columnName = %s,Text val = %s\n", columnName, valChar);
+                                //free(valChar);
+                            }else if (type == SQLITE_BLOB){
+                                printf("columnName = %s,BLOB\n", columnName);
+                            }else if (type == SQLITE_NULL){
+                                printf("columnName = %s,NULL\n", columnName);
+                            }
+                        }
+
+                        printf("Line %d, rowCount = %d\n\n", rowCount, colCount);
+
+                        // callback to Java
+
+                        // Find the String class
+                        jclass stringClass = (env)->FindClass("java/lang/String");
+
+                        // Create a String[2]
+                        jobjectArray arr = (env)->NewObjectArray( colCount, stringClass, NULL);
+
+                        // Add name items
+                        for (int colIndex = 0; colIndex < colCount; colIndex++){
+                            printf("Fill Array columnName = %s\n", names[colIndex]);
+                            jstring jstrName = (env)->NewStringUTF( names[colIndex]);
+                            (env)->SetObjectArrayElement( arr, colIndex, jstrName);
+                        }
+
+
+                        (env)->CallVoidMethod(object, mid, callBackPtr, arr, NULL);
+
+                        names.clear();
+                        rc = sqlite3_step(stmt);
+                    }
+
+                    rc = sqlite3_finalize(stmt);
+                }
+
+                return rc;
 
     */
 
+    // called from C SQLIte
+    private void nativeCallback(int callbackPointer, String[] collnames, Object[] values) {
+
+        System.out.println("Native Callback pointer: " + callbackPointer + " => " + arrayToString(collnames));
+
+
+//        RowCallback callback = callbackMap.get(callbackPointer);
+//        callback.newRow(collnames, values);
+    }
+
+
+    public String arrayToString(Object[] items) {
+        if (items.length == 0) return "[]";
+        StringBuilder buffer = new StringBuilder(32);
+        buffer.append('[');
+        buffer.append(items[0]);
+        for (int i = 1; i < items.length; i++) {
+            buffer.append(", ");
+            buffer.append(items[i]);
+        }
+        buffer.append(']');
+        return buffer.toString();
+    }
+
+//    callback example => http://vorm.io/android-ndk-passing-complex-data-not-scary-anymore/
 }
