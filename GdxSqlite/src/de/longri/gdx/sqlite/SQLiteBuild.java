@@ -198,7 +198,7 @@ public class SQLiteBuild {
                 "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)    \n" +
                 "          VALUES (2, 'Allen', 25, 'Texas', 15000.00 );       \n" +
                 "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)  \n" +
-                "          VALUES (3, 'Teddy', 23, 'Norway', 20000.00 );  \n" +
+                "          VALUES (3, 'Teddy', 23, 'Norway', NULL );  \n" +
                 "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)  \n" +
                 "          VALUES (4, 'Mark', 25, 'Rich-Mond ', 65000.00 );";
         db.execSQL(sql);

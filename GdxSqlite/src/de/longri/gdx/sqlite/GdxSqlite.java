@@ -189,12 +189,13 @@ public class GdxSqlite {
                     std::vector<const char *> names;
                     int colCount = sqlite3_column_count(stmt);
 
+                    // Create a String[colCount]
+                    jclass objectClass = (env)->FindClass("java/lang/Object");
+                    jobjectArray valArr = (env)->NewObjectArray( colCount, objectClass, NULL);
+
 
                     while (rc != SQLITE_DONE && rc != SQLITE_OK){
                         rowCount++;
-
-
-
 
                         for (int colIndex = 0; colIndex < colCount; colIndex++){
                             int type = sqlite3_column_type(stmt, colIndex);
@@ -206,16 +207,30 @@ public class GdxSqlite {
                             if (type == SQLITE_INTEGER){
                                 int valInt = sqlite3_column_int(stmt, colIndex);
                                 printf("columnName = %s, Integer val = %d\n" , columnName, valInt);
+
+                                jclass cls = (env)->FindClass("java/lang/Integer");
+                                jmethodID midInit = (env)->GetMethodID(cls, "<init>", "(I)V");
+                                jobject intObj = (env)->NewObject(cls, midInit, valInt);
+                                (env)->SetObjectArrayElement( valArr, colIndex, intObj);
                             }else if (type == SQLITE_FLOAT){
                                 double valDouble = sqlite3_column_double(stmt, colIndex);
                                 printf("columnName = %s,Double val = %f\n", columnName, valDouble);
+
+                                jclass cls = (env)->FindClass("java/lang/Double");
+                                jmethodID midDouble = (env)->GetMethodID(cls, "<init>", "(D)V");
+                                jobject idoubleObj = (env)->NewObject(cls, midDouble, valDouble);
+                                (env)->SetObjectArrayElement( valArr, colIndex, idoubleObj);
                             }else if (type == SQLITE_TEXT){
                                 const unsigned char * valChar = sqlite3_column_text(stmt, colIndex);
+                                const char * val = reinterpret_cast < const char* >( valChar );
+                                jstring jstrValue = (env)->NewStringUTF(val);
+                                (env)->SetObjectArrayElement( valArr, colIndex, jstrValue);
                                 printf("columnName = %s,Text val = %s\n", columnName, valChar);
                                 //free(valChar);
                             }else if (type == SQLITE_BLOB){
                                 printf("columnName = %s,BLOB\n", columnName);
                             }else if (type == SQLITE_NULL){
+                                (env)->SetObjectArrayElement( valArr, colIndex, NULL);
                                 printf("columnName = %s,NULL\n", columnName);
                             }
                         }
@@ -224,11 +239,9 @@ public class GdxSqlite {
 
                         // callback to Java
 
-                        // Find the String class
+                        // Create a String[colCount]
                         jclass stringClass = (env)->FindClass("java/lang/String");
-
-                        // Create a String[2]
-                        jobjectArray arr = (env)->NewObjectArray( colCount, stringClass, NULL);
+                        jobjectArray arr = (env)->NewObjectArray( colCount, stringClass, valArr);
 
                         // Add name items
                         for (int colIndex = 0; colIndex < colCount; colIndex++){
@@ -238,7 +251,7 @@ public class GdxSqlite {
                         }
 
 
-                        (env)->CallVoidMethod(object, mid, callBackPtr, arr, NULL);
+                        (env)->CallVoidMethod(object, mid, callBackPtr, arr, valArr);
 
                         names.clear();
                         rc = sqlite3_step(stmt);
@@ -254,7 +267,10 @@ public class GdxSqlite {
     // called from C SQLIte
     private void nativeCallback(int callbackPointer, String[] collnames, Object[] values) {
 
-        System.out.println("Native Callback pointer: " + callbackPointer + " => " + arrayToString(collnames));
+        System.out.println("Native Callback pointer: " + callbackPointer
+                + " => " + arrayToString(collnames)
+                + " => " + arrayToString(values)
+        );
 
 
 //        RowCallback callback = callbackMap.get(callbackPointer);
@@ -263,6 +279,9 @@ public class GdxSqlite {
 
 
     public String arrayToString(Object[] items) {
+
+        if (items == null) return "NULL";
+
         if (items.length == 0) return "[]";
         StringBuilder buffer = new StringBuilder(32);
         buffer.append('[');
