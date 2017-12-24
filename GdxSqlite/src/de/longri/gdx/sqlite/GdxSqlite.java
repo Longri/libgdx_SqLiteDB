@@ -157,11 +157,43 @@ public class GdxSqlite {
         }
 
         //register callback
-        int callbackPtr = statiCallbackPtr++;
-        callbackMap.put(callbackPtr, callback);
+        int callbackPtr;
+        synchronized (callbackMap) {
+            callbackPtr = statiCallbackPtr++;
+            callbackMap.put(callbackPtr, callback);
+        }
 
         int resultCode = this.query(this.ptr, sql, callbackPtr);
+        //TODO handle resultCode (Error Msg)
+
+        //remove callBack
+        synchronized (callbackMap) {
+            callbackMap.remove(callbackPtr);
+        }
         System.out.println("Query result code: " + resultCode);
+    }
+
+    /**
+     * Runs the provided SQL and returns a {@link SQLiteGdxDatabaseCursor} over the result set.
+     *
+     * @param sql  the SQL query. The SQL string must not be ; terminated
+     * @param args
+     * @return {@link SQLiteGdxDatabaseCursor}
+     * @throws SQLiteGdxException
+     */
+    SQLiteGdxDatabaseCursor rawQuery(String sql, String[] args) throws SQLiteGdxException {
+        final GdxSqlitCursor cursor = new GdxSqlitCursor();
+
+        //fill cursor over callback
+        rawQuery(sql, args, new RowCallback() {
+            @Override
+            public void newRow(String[] columnNames, Object[] values) {
+                cursor.addRow(columnNames,values);
+            }
+        });
+
+
+        return cursor;
     }
 
 
@@ -266,33 +298,10 @@ public class GdxSqlite {
 
     // called from C SQLIte
     private void nativeCallback(int callbackPointer, String[] collnames, Object[] values) {
-
-        System.out.println("Native Callback pointer: " + callbackPointer
-                + " => " + arrayToString(collnames)
-                + " => " + arrayToString(values)
-        );
-
-
-//        RowCallback callback = callbackMap.get(callbackPointer);
-//        callback.newRow(collnames, values);
-    }
-
-
-    public String arrayToString(Object[] items) {
-
-        if (items == null) return "NULL";
-
-        if (items.length == 0) return "[]";
-        StringBuilder buffer = new StringBuilder(32);
-        buffer.append('[');
-        buffer.append(items[0]);
-        for (int i = 1; i < items.length; i++) {
-            buffer.append(", ");
-            buffer.append(items[i]);
+        synchronized (callbackMap) {
+            RowCallback callback = callbackMap.get(callbackPointer);
+            callback.newRow(collnames, values);
         }
-        buffer.append(']');
-        return buffer.toString();
     }
 
-//    callback example => http://vorm.io/android-ndk-passing-complex-data-not-scary-anymore/
 }
