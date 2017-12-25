@@ -16,14 +16,16 @@
 package de.longri.gdx.sqlite;
 
 
+import com.badlogic.gdx.utils.Array;
+
 /**
- * This  interface contains all the methods to expose results from a query on a SQLiteDatabase.
- * This is not thread-safe.
- *
- *
  * Created by Longri on 22.12.2017.
  */
- interface SQLiteGdxDatabaseCursor {
+public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
+
+    private Array<Object[]> valueRows = new Array<>();
+    private int actRow = 0;
+    private Object[] actRowValues;
 
     /**
      * Returns the value of the requested column as a byte array.
@@ -31,7 +33,11 @@ package de.longri.gdx.sqlite;
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a byte array.
      */
-     byte[] getBlob(int columnIndex);
+    @Override
+    public byte[] getBlob(int columnIndex) {
+        if (isNull(columnIndex)) return null;
+        return new byte[0];
+    }
 
     /**
      * Returns the value of the requested column as a double.
@@ -39,7 +45,10 @@ package de.longri.gdx.sqlite;
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a double.
      */
-     double getDouble(int columnIndex);
+    @Override
+    public double getDouble(int columnIndex) {
+        return (double) actRowValues[columnIndex];
+    }
 
     /**
      * Returns the value of the requested column as a float.
@@ -47,7 +56,10 @@ package de.longri.gdx.sqlite;
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a float.
      */
-     float getFloat(int columnIndex);
+    @Override
+    public float getFloat(int columnIndex) {
+        return (float) actRowValues[columnIndex];
+    }
 
     /**
      * Returns the value of the requested column as a int.
@@ -55,7 +67,10 @@ package de.longri.gdx.sqlite;
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a int.
      */
-     int getInt(int columnIndex);
+    @Override
+    public int getInt(int columnIndex) {
+        return (int) actRowValues[columnIndex];
+    }
 
     /**
      * Returns the value of the requested column as a long.
@@ -63,7 +78,10 @@ package de.longri.gdx.sqlite;
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a long.
      */
-     long getLong(int columnIndex);
+    @Override
+    public long getLong(int columnIndex) {
+        return (long) actRowValues[columnIndex];
+    }
 
     /**
      * Returns the value of the requested column as a short.
@@ -71,7 +89,10 @@ package de.longri.gdx.sqlite;
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a short.
      */
-     short getShort(int columnIndex);
+    @Override
+    public short getShort(int columnIndex) {
+        return (short) actRowValues[columnIndex];
+    }
 
     /**
      * Returns the value of the requested column as a string.
@@ -79,14 +100,33 @@ package de.longri.gdx.sqlite;
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a string.
      */
-     String getString(int columnIndex);
+    @Override
+    public String getString(int columnIndex) {
+        if (isNull(columnIndex)) return null;
+        return (String) actRowValues[columnIndex];
+    }
+
+    /**
+     * Returns TRUE if the value of the requested column are NULL
+     */
+    @Override
+    public boolean isNull(int columnIndex) {
+        return actRowValues[columnIndex] == null;
+    }
 
     /**
      * Move the cursor to the next row.
      *
      * @return whether the move was successful.
      */
-     boolean next();
+    @Override
+    public boolean next() {
+        this.actRow++;
+        boolean re = !isAfterLast();
+        if (re)
+            actRowValues = valueRows.get(this.actRow);
+        return re;
+    }
 
     /**
      * Returns the numbers of rows in the cursor.
@@ -94,17 +134,32 @@ package de.longri.gdx.sqlite;
      * @return number of rows
      * @throws SQLiteGdxException
      */
-     int getCount();
+    @Override
+    public int getCount() {
+        return valueRows.size;
+    }
 
     /**
      * Closes the Cursor, releasing all of its resources and making it completely invalid.
      */
-     void close();
+    @Override
+    public void close() {
+        actRowValues = null;
+        for (int i = 0; i < valueRows.size; i++) {
+            valueRows.pop(); // with pop the Array item will set to NULL!
+        }
+        valueRows.clear();
+        valueRows = null;
+    }
 
     /**
      * Shifts the cursor position to the first row.
      */
-     void moveToFirst();
+    @Override
+    public void moveToFirst() {
+        this.actRow = 0;
+        actRowValues = valueRows.get(this.actRow);
+    }
 
     /**
      * Gets if the cursor is after the last row.
@@ -112,15 +167,30 @@ package de.longri.gdx.sqlite;
      * @return {@code true} if the cursor is after the last row,
      * {@code false} if the cursor is at any other position.
      */
-     boolean isAfterLast();
+    @Override
+    public boolean isAfterLast() {
+        return this.actRow >= valueRows.size;
+    }
 
     /**
      * Move the cursor to the next row.
      */
-     void moveToNext();
+    @Override
+    public void moveToNext() {
+        this.actRow++;
+        if (!isAfterLast())
+            actRowValues = valueRows.get(this.actRow);
 
-    /**
-     * Returns TRUE if the value of the requested column are NULL
-     */
-     boolean isNull(int columnIndex);
+    }
+
+
+    void addRow(String[] columnNames, Object[] values) {
+        //TODO store column names
+
+        // the Object array is every time the same, so we must copy the values
+        int length = values.length;
+        Object[] newValues = new Object[values.length];
+        System.arraycopy(values, 0, newValues, 0, length);
+        valueRows.add(newValues);
+    }
 }

@@ -16,9 +16,7 @@
 package de.longri.gdx.sqlite;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.StringBuilder;
 
 /**
  * SQLite native wrapper
@@ -182,7 +180,7 @@ public class GdxSqlite {
      * @throws SQLiteGdxException
      */
     SQLiteGdxDatabaseCursor rawQuery(String sql, String[] args) throws SQLiteGdxException {
-        final GdxSqlitCursor cursor = new GdxSqlitCursor();
+        final GdxSqliteCursor cursor = new GdxSqliteCursor();
 
         //fill cursor over callback
         rawQuery(sql, args, new RowCallback() {

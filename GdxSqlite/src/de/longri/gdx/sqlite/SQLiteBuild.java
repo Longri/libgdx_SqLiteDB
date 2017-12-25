@@ -19,6 +19,7 @@ package de.longri.gdx.sqlite;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.jnigen.*;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.StringBuilder;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -207,14 +208,51 @@ public class SQLiteBuild {
 
         db.rawQuery(sql, null, new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
-
+            public void newRow(String[] columnNames, Object[] values) {
+                System.out.println("Native Callback : "
+                        + " => " + arrayToString(columnNames)
+                        + " => " + arrayToString(values)
+                );
             }
         });
+
+
+        SQLiteGdxDatabaseCursor cursor = db.rawQuery(sql, null);
+
+        cursor.moveToFirst();
+        StringBuilder sb = new StringBuilder();
+        while (cursor.isAfterLast() == false) {
+            sb.append("Cursor row : => [");
+            sb.append(cursor.getInt(0)).append(", ");
+            sb.append(cursor.getString(1)).append(", ");
+            sb.append(cursor.getInt(2)).append(", ");
+            sb.append(cursor.getString(3)).append(", ");
+            sb.append(cursor.isNull(4) ? "NULL" : cursor.getDouble(4)).append("] ");
+            System.out.println(sb.toString());
+            sb.length = 0; //clear
+            cursor.moveToNext();
+        }
+        cursor.close();
 
         db.closeDatabase();
         System.out.println("Pointer to closed DB: " + db.ptr);
 
+    }
+
+    private static String arrayToString(Object[] items) {
+
+        if (items == null) return "NULL";
+
+        if (items.length == 0) return "[]";
+        StringBuilder buffer = new StringBuilder(32);
+        buffer.append('[');
+        buffer.append(items[0]);
+        for (int i = 1; i < items.length; i++) {
+            buffer.append(", ");
+            buffer.append(items[i]);
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
