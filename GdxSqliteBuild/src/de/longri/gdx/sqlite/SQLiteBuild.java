@@ -38,6 +38,7 @@ public class SQLiteBuild {
 
         FileDescriptor targetDescriptor = new FileDescriptor("libs");
         FileDescriptor jniDescriptor = new FileDescriptor("jni");
+        FileDescriptor buildDescriptor = new FileDescriptor("../GdxSqlite/build/classes/main");
         FileDescriptor dummyDescriptor = new FileDescriptor("sqlite_dummy_src");
         FileDescriptor sqliteDescriptor = new FileDescriptor("sqlite_src");
 
@@ -49,6 +50,9 @@ public class SQLiteBuild {
 
         File sqlitePath = sqliteDescriptor.file().getAbsoluteFile();
         String sqlitePathString = sqlitePath.getAbsolutePath();
+
+        File buildPath = buildDescriptor.file().getAbsoluteFile();
+        String buildPathString = buildPath.getAbsolutePath();
 
 
         //cleanup
@@ -64,8 +68,9 @@ public class SQLiteBuild {
         }
 
 
+
         // generate native code
-        new NativeCodeGenerator().generate("src", "build/classes/main", "jni");
+        new NativeCodeGenerator().generate("../GdxSqlite/src", buildPathString, jniPathString);
 
 
         //generate build scripts
