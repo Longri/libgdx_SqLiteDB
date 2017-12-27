@@ -127,26 +127,10 @@ public class AntScriptGenerator {
         StringBuffer compile = new StringBuffer();
         StringBuffer pack = new StringBuffer();
 
-        for (int i = 0; i < buildFiles.size(); i++) {
-            clean.append("\t\t<ant antfile=\"" + buildFiles.get(i) + "\" target=\"clean\"/>\n");
-            compile.append("\t\t<ant antfile=\"" + buildFiles.get(i) + "\"/>\n");
-        }
-        for (int i = 0; i < libsDirs.size(); i++) {
-            pack.append("\t\t\t<fileset dir=\"" + libsDirs.get(i) + "\" includes=\"" + sharedLibFiles.get(i) + "\"/>\n");
-        }
-
-        if (config.sharedLibs != null) {
-            for (String sharedLib : config.sharedLibs) {
-                pack.append("\t\t\t<fileset dir=\"" + sharedLib + "\"/>\n");
-            }
-        }
 
         template = template.replace("%projectName%", config.sharedLibName + "-natives");
-        template = template.replace("<clean/>", clean.toString());
-        template = template.replace("<compile/>", compile.toString());
-        template = template.replace("%packFile%", "../" + config.libsDir.path().replace('\\', '/') + "/" + config.sharedLibName
-                + "-natives.jar");
-        template = template.replace("<pack/>", pack);
+        template = template.replace("%version%", "1.0");
+
 
         config.jniDir.child("build.xml").writeString(template, false);
         System.out.println("Wrote master build script '" + config.jniDir.child("build.xml") + "'");

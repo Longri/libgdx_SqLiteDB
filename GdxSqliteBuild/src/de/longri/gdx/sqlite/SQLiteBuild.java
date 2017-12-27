@@ -57,7 +57,7 @@ public class SQLiteBuild {
 
         //cleanup
         jniDescriptor.deleteDirectory();
-        targetDescriptor.deleteDirectory();
+//        targetDescriptor.deleteDirectory();
 
 
         String[] headers;
@@ -66,7 +66,6 @@ public class SQLiteBuild {
         } else {
             headers = new String[]{sqlitePathString};
         }
-
 
 
         // generate native code
@@ -104,7 +103,7 @@ public class SQLiteBuild {
         }
 
 
-        if (all || cmd.hasOption("win32")) {
+        if (all || cmd.hasOption("mac32")) {
             BuildTarget mac32 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.MacOsX, false);
             mac32.compilerPrefix = "";
             mac32.compilerSuffix = "";
@@ -177,7 +176,7 @@ public class SQLiteBuild {
         clear.deleteDirectory();
 
 
-        new JniGenSharedLibraryLoader("libs/GdxSqlite-natives.jar").load("GdxSqlite");
+        new JniGenSharedLibraryLoader("libs/GdxSqlite-platform-1.0-natives-desktop.jar").load("GdxSqlite");
 
 
         System.out.println(GdxSqlite.getSqliteVersion());
@@ -241,6 +240,20 @@ public class SQLiteBuild {
 
         db.closeDatabase();
         System.out.println("Pointer to closed DB: " + db.ptr);
+
+
+        //copy libs to local modules
+
+        FileDescriptor projectPath = new FileDescriptor("../");
+
+        FileDescriptor core = projectPath.child("core");
+        FileDescriptor coreJar= projectPath.child("GdxSqlite/build/libs");
+        coreJar.copyTo(core);
+
+        FileDescriptor desktop = projectPath.child("desktop/libs/GdxSqlite-platform-1.0-natives-desktop.jar");
+        FileDescriptor desktopNative= projectPath.child("GdxSqliteBuild/libs/GdxSqlite-platform-1.0-natives-desktop.jar");
+        desktopNative.copyTo(desktop);
+
 
     }
 

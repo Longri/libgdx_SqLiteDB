@@ -1,17 +1,14 @@
 <project name="%projectName%" basedir="." default="all">
-	<target name="clean">
-<clean/>
-	</target>
-	
-	<target name="compile-natives">
-<compile/>
-	</target>
+
 	
 	<target name="pack-natives">
-		<jar destfile="%packFile%">
-<pack/>
-		</jar>
+		<jar destfile="../libs/GdxSqlite-platform-%version%-natives-desktop.jar">
+        			<fileset dir="../libs/macosx64" erroronmissingdir="false" includes="libGdxSqlite64.dylib"/>
+        			<fileset dir="../libs/macosx32" erroronmissingdir="false" includes="libGdxSqlite.dylib"/>
+        			<fileset dir="../libs/linux32" erroronmissingdir="false" includes="libGdxSqlite.so"/>
+        			<fileset dir="../libs/linux64" erroronmissingdir="false" includes="libGdxSqlite64.so"/>
+        </jar>
 	</target>
 
-	<target name="all" depends="compile-natives,pack-natives"/>
+	<target name="all" depends="pack-natives"/>
 </project>
