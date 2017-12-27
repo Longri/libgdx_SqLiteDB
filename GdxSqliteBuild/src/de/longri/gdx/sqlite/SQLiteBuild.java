@@ -33,20 +33,15 @@ public class SQLiteBuild {
 
         CommandLine cmd = getCommandLine(args);
 
-        boolean takeDummy = Boolean.parseBoolean(cmd.getOptionValue("dummy"));
-
 
         FileDescriptor targetDescriptor = new FileDescriptor("libs");
         FileDescriptor jniDescriptor = new FileDescriptor("jni");
         FileDescriptor buildDescriptor = new FileDescriptor("../GdxSqlite/build/classes/main");
-        FileDescriptor dummyDescriptor = new FileDescriptor("sqlite_dummy_src");
         FileDescriptor sqliteDescriptor = new FileDescriptor("sqlite_src");
 
         File jniPath = jniDescriptor.file().getAbsoluteFile();
         String jniPathString = jniPath.getAbsolutePath();
 
-        File dummyPath = dummyDescriptor.file().getAbsoluteFile();
-        String dummyPathString = dummyPath.getAbsolutePath();
 
         File sqlitePath = sqliteDescriptor.file().getAbsoluteFile();
         String sqlitePathString = sqlitePath.getAbsolutePath();
@@ -60,13 +55,7 @@ public class SQLiteBuild {
 //        targetDescriptor.deleteDirectory();
 
 
-        String[] headers;
-        if (takeDummy) {
-            headers = new String[]{dummyPathString};
-        } else {
-            headers = new String[]{sqlitePathString};
-        }
-
+        String[] headers = new String[]{sqlitePathString};
 
         // generate native code
         new NativeCodeGenerator().generate("../GdxSqlite/src", buildPathString, jniPathString);
@@ -276,10 +265,6 @@ public class SQLiteBuild {
 
     private static CommandLine getCommandLine(String[] args) {
         Options options = new Options();
-
-        Option dummy = new Option("d", "dummy", true, "dummySQLite or real SQLite (true/false");
-        dummy.setRequired(true);
-        options.addOption(dummy);
 
 
         Option all = new Option("a", "all", false, "compile for all platforms");
