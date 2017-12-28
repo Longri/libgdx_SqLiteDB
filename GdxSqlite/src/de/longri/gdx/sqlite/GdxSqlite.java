@@ -69,23 +69,11 @@ public class GdxSqlite {
         sqlite3 *db;
         char *zErrMsg = 0;
         int rc;
-
-        fprintf(stderr, "Opened database \n");
-        fprintf(stderr, path);
-        fprintf(stderr, "\n");
         rc = sqlite3_open(path, &db);
-
-        fprintf(stderr, "Open result:%d", rc);
-        fprintf(stderr, "\n");
-
-        fprintf(stderr, "SQLITE_OK value:%d", SQLITE_OK);
-        fprintf(stderr, "\n");
-
         if( rc != SQLITE_OK ){
             fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
             return -1;
         } else {
-            fprintf(stderr, "Opened database successfully\n");
             return (long)db;
         }
     */
@@ -106,7 +94,6 @@ public class GdxSqlite {
     private native void close(long ptr) throws SQLiteGdxException; /*
         sqlite3* db = (sqlite3*)ptr;
         sqlite3_close(db);
-        fprintf(stderr, "Close database successfully\n");
     */
 
 
@@ -132,8 +119,6 @@ public class GdxSqlite {
         if( rc != SQLITE_OK ){
             fprintf(stderr, "SQL error: %s\n", zErrMsg);
             sqlite3_free(zErrMsg);
-        } else {
-            fprintf(stdout, "Execute sql successfully\n");
         }
         return rc;
     */
@@ -212,10 +197,7 @@ public class GdxSqlite {
 
                 if (mid == 0){
                     fprintf(stderr, "Java Methode not found!\n");
-                }else{
-                    fprintf(stdout, "Java Methode found!\n");
                 }
-
                     std::vector<const char *> names;
                     int colCount = sqlite3_column_count(stmt);
 
@@ -232,11 +214,9 @@ public class GdxSqlite {
                             const char * columnName = sqlite3_column_name(stmt, colIndex);
 
                             names.push_back(columnName);
-                            printf("push columnName = %s :%s \n " , columnName, names[colIndex]);
 
                             if (type == SQLITE_INTEGER){
                                 int valInt = sqlite3_column_int(stmt, colIndex);
-                                printf("columnName = %s, Integer val = %d\n" , columnName, valInt);
 
                                 jclass cls = (env)->FindClass("java/lang/Integer");
                                 jmethodID midInit = (env)->GetMethodID(cls, "<init>", "(I)V");
@@ -244,7 +224,6 @@ public class GdxSqlite {
                                 (env)->SetObjectArrayElement( valArr, colIndex, intObj);
                             }else if (type == SQLITE_FLOAT){
                                 double valDouble = sqlite3_column_double(stmt, colIndex);
-                                printf("columnName = %s,Double val = %f\n", columnName, valDouble);
 
                                 jclass cls = (env)->FindClass("java/lang/Double");
                                 jmethodID midDouble = (env)->GetMethodID(cls, "<init>", "(D)V");
@@ -255,17 +234,13 @@ public class GdxSqlite {
                                 const char * val = reinterpret_cast < const char* >( valChar );
                                 jstring jstrValue = (env)->NewStringUTF(val);
                                 (env)->SetObjectArrayElement( valArr, colIndex, jstrValue);
-                                printf("columnName = %s,Text val = %s\n", columnName, valChar);
                                 //free(valChar);
                             }else if (type == SQLITE_BLOB){
                                 printf("columnName = %s,BLOB\n", columnName);
                             }else if (type == SQLITE_NULL){
                                 (env)->SetObjectArrayElement( valArr, colIndex, NULL);
-                                printf("columnName = %s,NULL\n", columnName);
                             }
                         }
-
-                        printf("Line %d, rowCount = %d\n\n", rowCount, colCount);
 
                         // callback to Java
 
@@ -275,7 +250,6 @@ public class GdxSqlite {
 
                         // Add name items
                         for (int colIndex = 0; colIndex < colCount; colIndex++){
-                            printf("Fill Array columnName = %s\n", names[colIndex]);
                             jstring jstrName = (env)->NewStringUTF( names[colIndex]);
                             (env)->SetObjectArrayElement( arr, colIndex, jstrName);
                         }

@@ -106,6 +106,7 @@ public class SQLiteBuild {
             ios32.compilerPrefix = "";
             ios32.compilerSuffix = "";
             ios32.headerDirs = headers;
+            ios32.cppFlags += " -stdlib=libc++";
             targets.add(ios32);
         }
 
@@ -149,8 +150,10 @@ public class SQLiteBuild {
         if (all || cmd.hasOption("win64")) BuildExecutor.executeAnt("build-windows64.xml", "-v", jniPath);
         if (all || cmd.hasOption("mac64")) BuildExecutor.executeAnt("build-macosx64.xml", "-v", jniPath);
         if (all || cmd.hasOption("mac32")) BuildExecutor.executeAnt("build-macosx32.xml", "-v", jniPath);
-        if (all || cmd.hasOption("ios32"))
-            BuildExecutor.executeAnt("build-ios32.xml", "-v -Dhas-compiler=true", jniPath);
+        if (all || cmd.hasOption("ios32")){
+            BuildExecutor.executeAnt("build-ios32.xml", "-v", jniPath);
+        }
+
 
 
         BuildExecutor.executeAnt("build.xml", "-v", jniPath);
