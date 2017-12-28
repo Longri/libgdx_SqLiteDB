@@ -7094,7 +7094,8 @@ static int do_meta_command(char *zLine, ShellState *p){
       zCmd = sqlite3_mprintf(strchr(azArg[i],' ')==0?"%z %s":"%z \"%s\"",
                              zCmd, azArg[i]);
     }
-    x = system(zCmd);
+    //x = system(zCmd);
+    x = -1;
     sqlite3_free(zCmd);
     if( x ) raw_printf(stderr, "System command returns %d\n", x);
   }else
