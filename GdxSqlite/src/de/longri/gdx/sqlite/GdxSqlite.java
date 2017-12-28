@@ -96,7 +96,7 @@ public class GdxSqlite {
      *
      * @throws SQLiteGdxException
      */
-    void closeDatabase() throws SQLiteGdxException {
+    public void closeDatabase() throws SQLiteGdxException {
         if (this.ptr >= 0) {
             close(this.ptr);
             this.ptr = -1;

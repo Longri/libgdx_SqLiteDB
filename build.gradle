@@ -101,6 +101,9 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
 
+        //include libs
+        compile fileTree(dir: 'libs', include: ['*.jar'])
+
     }
 }
 

@@ -1,16 +1,31 @@
-package de.longri.gdx.sqlite;
+/*
+ * Copyright (C) 2017 team-cachebox.de
+ *
+ * Licensed under the : GNU General  License (GPL);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.gnu.org/licenses/gpl.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.longri.gdx.sqlite.tests;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.*;
+import de.longri.gdx.sqlite.GdxSqlite;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static de.longri.gdx.sqlite.tests.TestMain.assertEquals;
+import static de.longri.gdx.sqlite.tests.TestMain.assertThat;
 
-
-class GdxSqliteTest {
+/**
+ * Created by Longri on 18.12.2017.
+ */
+public class GdxSqliteTest {
 
     public GdxSqliteTest(){} //constructor for core test reflection
 
@@ -19,7 +34,7 @@ class GdxSqliteTest {
     @BeforeAll
     static void setUp() {
         //load natives
-        new SharedLibraryLoader("GdxSqlite/testNatives/GdxSqlite-platform-1.0-natives-desktop.jar").load("GdxSqlite");
+        new SharedLibraryLoader().load("GdxSqlite");
         testFolder.mkdirs();
     }
 
