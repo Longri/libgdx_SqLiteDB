@@ -8,6 +8,21 @@
         			<fileset dir="../libs/linux32" erroronmissingdir="false" includes="libGdxSqlite.so"/>
         			<fileset dir="../libs/linux64" erroronmissingdir="false" includes="libGdxSqlite64.so"/>
         </jar>
+        <jar destfile="../libs/GdxSqlite-platform-1.0-natives-arm64-v8a.jar">
+        	<fileset dir="../libs/arm64-v8a" erroronmissingdir="false" includes="libGdxSqlite.so"/>
+        </jar>
+        <jar destfile="../libs/GdxSqlite-platform-1.0-natives-armeabi-v7a.jar">
+        	<fileset dir="../libs/armeabi-v7a" erroronmissingdir="false" includes="libGdxSqlite.so"/>
+        </jar>
+        <jar destfile="../libs/GdxSqlite-platform-1.0-natives-x86_64.jar">
+        	<fileset dir="../libs/x86_64" erroronmissingdir="false" includes="libGdxSqlite.so"/>
+        </jar>
+        <jar destfile="../libs/GdxSqlite-platform-1.0-natives-armeabi.jar">
+        	<fileset dir="../libs/armeabi" erroronmissingdir="false" includes="libGdxSqlite.so"/>
+        </jar>
+        <jar destfile="../libs/GdxSqlite-platform-1.0-natives-x86.jar">
+        	<fileset dir="../libs/x86" erroronmissingdir="false" includes="libGdxSqlite.so"/>
+        </jar>
 	</target>
 
 	<target name="all" depends="pack-natives"/>

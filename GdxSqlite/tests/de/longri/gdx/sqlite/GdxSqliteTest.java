@@ -15,6 +15,7 @@
  */
 package de.longri.gdx.sqlite;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import org.junit.jupiter.api.AfterAll;
@@ -29,15 +30,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class GdxSqliteTest {
 
+    static {
+        TestUtils.initialGdx();
+    }
+
     public GdxSqliteTest() {
     } //constructor for core test reflection
 
-    static FileHandle testFolder = new FileHandle("GdxSqlite/testResources");
+    static FileHandle testFolder = Gdx.files.local("GdxSqlite/testResources");
 
     @BeforeAll
     static void setUp() {
         //load natives
-        new SharedLibraryLoader("GdxSqlite/testNatives/GdxSqlite-platform-1.0-natives-desktop.jar").load("GdxSqlite");
+        TestUtils.loadSharedLib("GdxSqlite");
         testFolder.mkdirs();
     }
 

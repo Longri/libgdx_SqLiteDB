@@ -157,11 +157,10 @@ public class SQLiteBuild {
         if (all || cmd.hasOption("win64")) BuildExecutor.executeAnt("build-windows64.xml", "-v", jniPath);
         if (all || cmd.hasOption("mac64")) BuildExecutor.executeAnt("build-macosx64.xml", "-v", jniPath);
         if (all || cmd.hasOption("mac32")) BuildExecutor.executeAnt("build-macosx32.xml", "-v", jniPath);
-        if (all || cmd.hasOption("ios32")){
+        if (all || cmd.hasOption("ios32")) {
             BuildExecutor.executeAnt("build-ios32.xml", "-v", jniPath);
         }
         if (all || cmd.hasOption("android")) BuildExecutor.executeAnt("build-android32.xml", "-v", jniPath);
-
 
 
         BuildExecutor.executeAnt("build.xml", "-v", jniPath);
@@ -247,16 +246,29 @@ public class SQLiteBuild {
         FileDescriptor projectPath = new FileDescriptor("../");
 
         FileDescriptor core = projectPath.child("core");
-        FileDescriptor coreJar= projectPath.child("GdxSqlite/build/libs");
+        FileDescriptor coreJar = projectPath.child("GdxSqlite/build/libs");
         coreJar.copyTo(core);
 
         FileDescriptor desktop = projectPath.child("desktop/libs/GdxSqlite-platform-1.0-natives-desktop.jar");
-        FileDescriptor desktopNative= projectPath.child("GdxSqliteBuild/libs/GdxSqlite-platform-1.0-natives-desktop.jar");
+        FileDescriptor desktopNative = projectPath.child("GdxSqliteBuild/libs/GdxSqlite-platform-1.0-natives-desktop.jar");
         FileDescriptor test = projectPath.child("GdxSqlite/testNatives/GdxSqlite-platform-1.0-natives-desktop.jar");
 
         desktopNative.copyTo(desktop);
         desktopNative.copyTo(test);
 
+        FileDescriptor androidNative_arm64 = projectPath.child("GdxSqliteBuild/libs/arm64-v8a/libGdxSqlite.so");
+        FileDescriptor androidNative_arm = projectPath.child("GdxSqliteBuild/libs/armeabi/libGdxSqlite.so");
+        FileDescriptor androidNative_armv7 = projectPath.child("GdxSqliteBuild/libs/armeabi-v7a/libGdxSqlite.so");
+        FileDescriptor androidNative_x86 = projectPath.child("GdxSqliteBuild/libs/x86/libGdxSqlite.so");
+        FileDescriptor androidNative_x86_64 = projectPath.child("GdxSqliteBuild/libs/x86_64/libGdxSqlite.so");
+
+        FileDescriptor androidLibs = projectPath.child("android/libs/");
+
+        androidNative_arm64.copyTo(androidLibs.child("arm64-v8a/libGdxSqlite.so"));
+        androidNative_arm.copyTo(androidLibs.child("armeabi/libGdxSqlite.so"));
+        androidNative_armv7.copyTo(androidLibs.child("armeabi-v7a/libGdxSqlite.so"));
+        androidNative_x86.copyTo(androidLibs.child("x86/libGdxSqlite.so"));
+        androidNative_x86_64.copyTo(androidLibs.child("x86_64/libGdxSqlite.so"));
 
     }
 

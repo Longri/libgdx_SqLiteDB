@@ -21,6 +21,8 @@ dependencies {
     testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
     testCompile("org.junit.jupiter:junit-jupiter-params:5.0.0")
+    testCompile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+
 
 
     testCompile("junit:junit:${junit4Version}")

@@ -15,11 +15,13 @@
  */
 package de.longri.gdx.sqlite;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import de.longri.gdx.sqlite.tests.AfterAll;
 import de.longri.gdx.sqlite.tests.BeforeAll;
 import de.longri.gdx.sqlite.tests.Test;
+import de.longri.gdx.sqlite.tests.TestUtils;
 
 import static de.longri.gdx.sqlite.tests.TestMain.assertEquals;
 import static de.longri.gdx.sqlite.tests.TestMain.assertThat;
@@ -29,16 +31,19 @@ import static de.longri.gdx.sqlite.tests.TestMain.assertThat;
  */
 public class GdxSqliteTest {
 
+    static {
+        TestUtils.initialGdx();
+    }
 
     public GdxSqliteTest() {
     } //constructor for core test reflection
 
-    static FileHandle testFolder = new FileHandle("GdxSqlite/testResources");
+    static FileHandle testFolder = Gdx.files.local("GdxSqlite/testResources");
 
     @BeforeAll
     static void setUp() {
         //load natives
-        new SharedLibraryLoader().load("GdxSqlite");
+        TestUtils.loadSharedLib("GdxSqlite");
         testFolder.mkdirs();
     }
 
@@ -70,7 +75,6 @@ public class GdxSqliteTest {
 
         String dbFileString = dbFileHandle.readString();
         assertThat("DB file must created", dbFileString.startsWith("SQLite format 3"));
-
     }
 
     @Test
