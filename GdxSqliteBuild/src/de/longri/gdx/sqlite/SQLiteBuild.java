@@ -61,6 +61,15 @@ public class SQLiteBuild {
         new NativeCodeGenerator().generate("../GdxSqlite/src", buildPathString, jniPathString);
 
 
+        //copy c/c++ src to 'jni' folder
+        for (String headerPath : headers) {
+            FileDescriptor fd = new FileDescriptor(headerPath);
+            FileDescriptor[] list = fd.list();
+            for (FileDescriptor descriptor : list) {
+                descriptor.copyTo(jniDescriptor.child(descriptor.name()));
+            }
+        }
+
         //generate build scripts
         boolean all = cmd.hasOption("all");
         Array<BuildTarget> targets = new Array<>();
@@ -107,6 +116,7 @@ public class SQLiteBuild {
             ios32.compilerSuffix = "";
             ios32.headerDirs = headers;
             ios32.cppFlags += " -stdlib=libc++";
+
             targets.add(ios32);
         }
 
@@ -127,19 +137,16 @@ public class SQLiteBuild {
             targets.add(linux64);
         }
 
+        if (all || cmd.hasOption("android")) {
+            BuildTarget android = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Android, false);
+            android.headerDirs = headers;
+//            android.cIncludes=new String[]{"shell.c","sqlite3.c"};
+            targets.add(android);
+        }
+
 
         BuildConfig config = new BuildConfig("GdxSqlite");
         new AntScriptGenerator().generate(config, targets);
-
-
-        //copy c/c++ src to 'jni' folder
-        for (String headerPath : headers) {
-            FileDescriptor fd = new FileDescriptor(headerPath);
-            FileDescriptor[] list = fd.list();
-            for (FileDescriptor descriptor : list) {
-                descriptor.copyTo(jniDescriptor.child(descriptor.name()));
-            }
-        }
 
 
         if (all || cmd.hasOption("linux32"))
@@ -153,6 +160,7 @@ public class SQLiteBuild {
         if (all || cmd.hasOption("ios32")){
             BuildExecutor.executeAnt("build-ios32.xml", "-v", jniPath);
         }
+        if (all || cmd.hasOption("android")) BuildExecutor.executeAnt("build-android32.xml", "-v", jniPath);
 
 
 
@@ -301,9 +309,13 @@ public class SQLiteBuild {
         win64.setRequired(false);
         options.addOption(win64);
 
-        Option ios32 = new Option(null, "ios32", false, "compile for iOs bit");
+        Option ios32 = new Option(null, "ios32", false, "compile for iOs");
         ios32.setRequired(false);
         options.addOption(ios32);
+
+        Option android = new Option(null, "android", false, "compile for Android");
+        android.setRequired(false);
+        options.addOption(android);
 
 
         CommandLineParser parser = new DefaultParser();

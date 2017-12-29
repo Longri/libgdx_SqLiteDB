@@ -1,5 +1,6 @@
 <project name="android-natives" basedir="." default="postcompile">
 	<property environment="env" />
+	<property name="env.NDK_HOME" value="/Volumes/HDD_DATA/android-ndk-r16b"/>
 	<!--  the suffix ndk-build executable -->	
 	<property name="ndkSuffix" value="" />
 
