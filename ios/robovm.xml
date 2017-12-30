@@ -1,4 +1,5 @@
 <config>
+
   <executableName>${app.executable}</executableName>
   <mainClass>${app.mainclass}</mainClass>
   <os>ios</os>
@@ -18,6 +19,7 @@
     </resource>
   </resources>
   <forceLinkClasses>
+    <pattern>de.longri.gdx.sqlite.GdxSqlite</pattern>
     <pattern>com.badlogic.gdx.scenes.scene2d.ui.*</pattern>
     <pattern>com.badlogic.gdx.graphics.g3d.particles.**</pattern>
     <pattern>com.android.okhttp.HttpHandler</pattern>
@@ -31,10 +33,12 @@
     <pattern>com.android.org.bouncycastle.crypto.digests.AndroidDigestFactoryOpenSSL</pattern>
     <pattern>org.apache.harmony.security.provider.cert.DRLCertFactory</pattern>
     <pattern>org.apache.harmony.security.provider.crypto.CryptoProvider</pattern>
+    <pattern>java.util.logging.ConsoleHandler</pattern>
+    <pattern>java.util.logging.SimpleFormatter</pattern>
   </forceLinkClasses>
   <libs>
     <lib>z</lib>
-    <lib>build/native/libGdxSqlite.a</lib>
+    <lib>libs/libGdxSqlite.a</lib>
   </libs>
   <frameworks>
     <framework>UIKit</framework>
@@ -44,5 +48,7 @@
     <framework>OpenAL</framework>
     <framework>AudioToolbox</framework>
     <framework>AVFoundation</framework>
+    <framework>CoreLocation</framework>
+    <framework>WebKit</framework>
   </frameworks>
 </config>

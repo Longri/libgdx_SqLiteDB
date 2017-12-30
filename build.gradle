@@ -58,6 +58,9 @@ project(":desktop") {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+        //include libs
+        compile fileTree(dir: 'libs', include: ['*.jar'])
         
     }
 }
@@ -96,7 +99,9 @@ project(":ios") {
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
-        
+
+        //include libs
+        compile fileTree(dir: 'libs', include: ['*.jar'])
     }
 }
 

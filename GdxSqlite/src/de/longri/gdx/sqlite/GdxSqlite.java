@@ -62,20 +62,36 @@ public class GdxSqlite {
      * @throws SQLiteGdxException
      */
     public void openOrCreateDatabase() throws SQLiteGdxException {
-        this.ptr = open(this.fileHandle.file().getAbsolutePath());
+        GdxSqliteResult result = open(this.fileHandle.file().getAbsolutePath());
+        this.ptr = result.ptr;
+        if (result.retValue > 0) {
+            throwLastErr(result);
+        }
     }
 
-    private native long open(String path) throws SQLiteGdxException; /*
+    private void throwLastErr(GdxSqliteResult result) {
+        String errMsg = result.errorMsg;
+        throw new SQLiteGdxException(errMsg);
+    }
+
+    private native String getErrorMsg(long ptr); /*
+         sqlite3* db = (sqlite3*)ptr;
+         return (env)->NewStringUTF(sqlite3_errmsg(db));
+    */
+
+
+    private native GdxSqliteResult open(String path) throws SQLiteGdxException; /*
         sqlite3 *db;
-        char *zErrMsg = 0;
+        const char *zErrMsg = 0;
         int rc;
         rc = sqlite3_open(path, &db);
+
         if( rc != SQLITE_OK ){
-            fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-            return -1;
-        } else {
-            return (long)db;
+            zErrMsg = sqlite3_errmsg(db);
         }
+        jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
+        jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
+        return (env)->NewObject(objectClass, cid, (long)db, rc, (env)->NewStringUTF(zErrMsg));
     */
 
 
@@ -104,11 +120,11 @@ public class GdxSqlite {
      * @throws SQLiteGdxException
      */
     public void execSQL(String sql) throws SQLiteGdxException {
-        int resultCode = this.exec(this.ptr, sql);
-        System.out.println("Execute result code: " + resultCode);
+        GdxSqliteResult result = this.exec(this.ptr, sql);
+        System.out.println("Execute result code: " + result.retValue);
     }
 
-    private native int exec(long ptr, String sql); /*
+    private native GdxSqliteResult exec(long ptr, String sql); /*
         char *zErrMsg = 0;
         int rc;
         sqlite3* db = (sqlite3*)ptr;
@@ -116,11 +132,9 @@ public class GdxSqlite {
         // Execute SQL statement
         rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
-        if( rc != SQLITE_OK ){
-            fprintf(stderr, "SQL error: %s\n", zErrMsg);
-            sqlite3_free(zErrMsg);
-        }
-        return rc;
+        jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
+        jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
+        return (env)->NewObject(objectClass, cid, (long)db, rc, (env)->NewStringUTF(zErrMsg));
     */
 
     public interface RowCallback {
@@ -146,14 +160,19 @@ public class GdxSqlite {
             callbackMap.put(callbackPtr, callback);
         }
 
-        int resultCode = this.query(this.ptr, sql, callbackPtr);
+        GdxSqliteResult result = this.query(this.ptr, sql, callbackPtr);
         //TODO handle resultCode (Error Msg)
 
         //remove callBack
         synchronized (callbackMap) {
             callbackMap.remove(callbackPtr);
         }
-        System.out.println("Query result code: " + resultCode);
+
+        if (result.retValue > 0) {
+            throwLastErr(result);
+        }
+
+        System.out.println("Query result code: " + result.retValue);
     }
 
     /**
@@ -171,17 +190,16 @@ public class GdxSqlite {
         rawQuery(sql, args, new RowCallback() {
             @Override
             public void newRow(String[] columnNames, Object[] values) {
-                cursor.addRow(columnNames,values);
+                cursor.addRow(columnNames, values);
             }
         });
-
-
         return cursor;
     }
 
 
-    private native int query(long ptr, String sql, int callBackPtr); /*
+    private native GdxSqliteResult query(long ptr, String sql, int callBackPtr); /*
                 sqlite3* db = (sqlite3*)ptr;
+                const char *zErrMsg = 0;
 
 
                 sqlite3_stmt *stmt = NULL;
@@ -260,11 +278,14 @@ public class GdxSqlite {
                         names.clear();
                         rc = sqlite3_step(stmt);
                     }
-
                     rc = sqlite3_finalize(stmt);
+                }else{
+                   zErrMsg = sqlite3_errmsg(db);
                 }
 
-                return rc;
+        jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
+        jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
+        return (env)->NewObject(objectClass, cid, (long)db, rc, (env)->NewStringUTF(zErrMsg));
 
     */
 

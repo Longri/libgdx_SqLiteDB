@@ -180,6 +180,15 @@ public class SQLiteBuild {
 
         System.out.println(GdxSqlite.getSqliteVersion());
 
+        try {
+            FileHandle fileHandleExc = new FileHandle("test/fail/testDB.db3");
+            GdxSqlite dbexc = new GdxSqlite(fileHandleExc);
+            dbexc.openOrCreateDatabase();
+        } catch (SQLiteGdxException e) {
+            e.printStackTrace();
+        }
+
+
         FileHandle fileHandle = new FileHandle("test/testDB.db3");
         fileHandle.parent().mkdirs();
         GdxSqlite db = new GdxSqlite(fileHandle);
@@ -264,11 +273,15 @@ public class SQLiteBuild {
 
         FileDescriptor androidLibs = projectPath.child("android/libs/");
 
-        androidNative_arm64.copyTo(androidLibs.child("arm64-v8a/libGdxSqlite.so"));
-        androidNative_arm.copyTo(androidLibs.child("armeabi/libGdxSqlite.so"));
-        androidNative_armv7.copyTo(androidLibs.child("armeabi-v7a/libGdxSqlite.so"));
-        androidNative_x86.copyTo(androidLibs.child("x86/libGdxSqlite.so"));
-        androidNative_x86_64.copyTo(androidLibs.child("x86_64/libGdxSqlite.so"));
+        try {
+            androidNative_arm64.copyTo(androidLibs.child("arm64-v8a/libGdxSqlite.so"));
+            androidNative_arm.copyTo(androidLibs.child("armeabi/libGdxSqlite.so"));
+            androidNative_armv7.copyTo(androidLibs.child("armeabi-v7a/libGdxSqlite.so"));
+            androidNative_x86.copyTo(androidLibs.child("x86/libGdxSqlite.so"));
+            androidNative_x86_64.copyTo(androidLibs.child("x86_64/libGdxSqlite.so"));
+        } catch (Exception e) {
+//            e.printStackTrace();
+        }
 
     }
 
