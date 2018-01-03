@@ -264,9 +264,10 @@ public class SQLiteBuild {
         FileDescriptor coreJar = projectPath.child("GdxSqlite/build/libs");
         coreJar.copyTo(core);
 
-        FileDescriptor desktop = projectPath.child("desktop/libs/GdxSqlite-platform-1.0-natives-desktop.jar");
+        FileDescriptor desktop = projectPath.child("desktop/libs/");
+        FileDescriptor test = projectPath.child("GdxSqlite/testNatives/");
         FileDescriptor desktopNative = projectPath.child("GdxSqliteBuild/libs/GdxSqlite-platform-1.0-natives-desktop.jar");
-        FileDescriptor test = projectPath.child("GdxSqlite/testNatives/GdxSqlite-platform-1.0-natives-desktop.jar");
+
 
         desktop.mkdirs();
         test.mkdirs();
