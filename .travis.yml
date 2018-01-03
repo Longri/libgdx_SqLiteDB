@@ -1,6 +1,19 @@
 sudo: true
 
-language: java
+
+language: android
+
+android:
+  components:
+    - tools
+    - tools
+    - platform-tools
+    - build-tools-24.0.2
+    - android-24
+    - extra-google-m2repository
+    - extra-android-m2repository
+  licenses:
+    - 'android-sdk-license-.+'
 
 jdk:
   - oraclejdk8
@@ -11,6 +24,8 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+
+
 
 global: GRADLE_OPTS="-Xmx2048m"
 before_install: chmod +x gradlew
