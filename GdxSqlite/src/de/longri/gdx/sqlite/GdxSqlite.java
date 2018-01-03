@@ -40,6 +40,20 @@ public class GdxSqlite {
             return 0;
         }
 
+        static jobject javaResult(JNIEnv* env,long ptr, int sqliteResult, const char *errMsg) {
+            jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
+
+        jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
+
+        jlong retPtr = ptr;
+        jint retResult = sqliteResult;
+        jstring retErrMsg = (env)->NewStringUTF(errMsg);
+
+
+       return (env)->NewObject(objectClass, cid, retPtr, retResult, retErrMsg);
+
+        }
+
      */
 
     public static native String getSqliteVersion(); /*
@@ -89,9 +103,7 @@ public class GdxSqlite {
         if( rc != SQLITE_OK ){
             zErrMsg = sqlite3_errmsg(db);
         }
-        jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
-        jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
-        return (env)->NewObject(objectClass, cid, (long)db, rc, (env)->NewStringUTF(zErrMsg));
+        return javaResult(env, (long)db, rc, zErrMsg);
     */
 
 
@@ -131,12 +143,9 @@ public class GdxSqlite {
         int rc;
         sqlite3* db = (sqlite3*)ptr;
 
-        // Execute SQL statement
         rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
-        jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
-        jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
-        return (env)->NewObject(objectClass, cid, (long)db, rc, (env)->NewStringUTF(zErrMsg));
+        return javaResult(env, (long)db, rc, zErrMsg);
     */
 
     public interface RowCallback {
@@ -262,7 +271,7 @@ public class GdxSqlite {
 
                         // Create a String[colCount]
                         jclass stringClass = (env)->FindClass("java/lang/String");
-                        jobjectArray arr = (env)->NewObjectArray( colCount, stringClass, valArr);
+                        jobjectArray arr = (env)->NewObjectArray( colCount, stringClass, NULL);
 
                         // Add name items
                         for (int colIndex = 0; colIndex < colCount; colIndex++){
@@ -281,13 +290,10 @@ public class GdxSqlite {
                    zErrMsg = sqlite3_errmsg(db);
                 }
 
-        jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
-        jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
-        return (env)->NewObject(objectClass, cid, (long)db, rc, (env)->NewStringUTF(zErrMsg));
-
+        return javaResult(env, (long)db, rc, zErrMsg);
     */
 
-    // called from C SQLIte
+    // called from C
     private void nativeCallback(int callbackPointer, String[] collnames, Object[] values) {
         synchronized (callbackMap) {
             RowCallback callback = callbackMap.get(callbackPointer);

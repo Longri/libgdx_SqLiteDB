@@ -23,11 +23,20 @@ package de.longri.gdx.sqlite;
  */
 public class GdxSqliteResult {
 
-    public final long ptr;
-    public final int retValue;
-    public final String errorMsg;
+    public long ptr;
+    public int retValue;
+    public String errorMsg;
 
-    GdxSqliteResult(long ptr, int retValue, String errorMsg) {
+    public GdxSqliteResult() {
+    }
+
+    public void setValues(long ptr, int retValue, String errorMsg) {
+        this.ptr = ptr;
+        this.retValue = retValue;
+        this.errorMsg = errorMsg;
+    }
+
+    public GdxSqliteResult(long ptr, int retValue, String errorMsg) {
         this.ptr = ptr;
         this.retValue = retValue;
         this.errorMsg = errorMsg;

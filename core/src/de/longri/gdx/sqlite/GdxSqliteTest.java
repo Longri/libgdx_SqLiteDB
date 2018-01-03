@@ -47,6 +47,10 @@ public class GdxSqliteTest {
         //load natives
         TestUtils.loadSharedLib("GdxSqlite");
         testFolder.mkdirs();
+
+        //delete old tests
+        testFolder.deleteDirectory();
+        testFolder.mkdirs();
     }
 
     @AfterAll
