@@ -28,36 +28,35 @@ public class GdxSqlite {
 
     //@off
     /*JNI
+		extern "C" {
+		#include "sqlite3.h"
+		}
 
-        extern "C" {
-            #include "sqlite3.h"
-        }
+		#include <vector>
 
-        #include <vector>
+		static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
+		    // dummy callback!
+		    return 0;
+		}
 
-        static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
-            // dummy callback!
-            return 0;
-        }
+		static jobject javaResult(JNIEnv* env,long ptr, int sqliteResult, const char *errMsg) {
+		    jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
 
-        static jobject javaResult(JNIEnv* env,long ptr, int sqliteResult, const char *errMsg) {
-            jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
+		    jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
 
-        jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
-
-        jlong retPtr = ptr;
-        jint retResult = sqliteResult;
-        jstring retErrMsg = (env)->NewStringUTF(errMsg);
+		    jlong retPtr = ptr;
+		    jint retResult = sqliteResult;
+		    jstring retErrMsg = (env)->NewStringUTF(errMsg);
 
 
-       return (env)->NewObject(objectClass, cid, retPtr, retResult, retErrMsg);
+		    return (env)->NewObject(objectClass, cid, retPtr, retResult, retErrMsg);
 
-        }
+		}
 
-     */
+    */
 
     public static native String getSqliteVersion(); /*
-        return (env)->NewStringUTF(sqlite3_libversion());
+            return (env)->NewStringUTF(sqlite3_libversion());
     */
 
 
@@ -89,21 +88,21 @@ public class GdxSqlite {
     }
 
     private native String getErrorMsg(long ptr); /*
-         sqlite3* db = (sqlite3*)ptr;
-         return (env)->NewStringUTF(sqlite3_errmsg(db));
+            sqlite3* db = (sqlite3*)ptr;
+            return (env)->NewStringUTF(sqlite3_errmsg(db));
     */
 
 
     private native GdxSqliteResult open(String path) throws SQLiteGdxException; /*
-        sqlite3 *db;
-        const char *zErrMsg = 0;
-        int rc;
-        rc = sqlite3_open(path, &db);
+            sqlite3 *db;
+            const char *zErrMsg = 0;
+            int rc;
+            rc = sqlite3_open(path, &db);
 
-        if( rc != SQLITE_OK ){
-            zErrMsg = sqlite3_errmsg(db);
-        }
-        return javaResult(env, (long)db, rc, zErrMsg);
+            if( rc != SQLITE_OK ){
+                zErrMsg = sqlite3_errmsg(db);
+            }
+            return javaResult(env, (long)db, rc, zErrMsg);
     */
 
 
@@ -120,8 +119,8 @@ public class GdxSqlite {
     }
 
     private native void close(long ptr) throws SQLiteGdxException; /*
-        sqlite3* db = (sqlite3*)ptr;
-        sqlite3_close(db);
+            sqlite3* db = (sqlite3*)ptr;
+            sqlite3_close(db);
     */
 
 
@@ -139,13 +138,13 @@ public class GdxSqlite {
     }
 
     private native GdxSqliteResult exec(long ptr, String sql); /*
-        char *zErrMsg = 0;
-        int rc;
-        sqlite3* db = (sqlite3*)ptr;
+            char *zErrMsg = 0;
+            int rc;
+            sqlite3* db = (sqlite3*)ptr;
 
-        rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+            rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
-        return javaResult(env, (long)db, rc, zErrMsg);
+            return javaResult(env, (long)db, rc, zErrMsg);
     */
 
     public interface RowCallback {
@@ -205,92 +204,88 @@ public class GdxSqlite {
 
 
     private native GdxSqliteResult query(long ptr, String sql, int callBackPtr); /*
-                sqlite3* db = (sqlite3*)ptr;
-                const char *zErrMsg = 0;
+		sqlite3* db = (sqlite3*)ptr;
+		const char *zErrMsg = 0;
 
 
-                sqlite3_stmt *stmt = NULL;
-                int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-                if (rc == SQLITE_OK){
+		sqlite3_stmt *stmt = NULL;
+		int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+		if (rc == SQLITE_OK) {
 
-                    int rowCount = 0;
-                    rc = sqlite3_step(stmt);
-
-
-                jclass cls = (env)->GetObjectClass( object);
-                jmethodID mid = (env)->GetMethodID( cls, "nativeCallback", "(I[Ljava/lang/String;[Ljava/lang/Object;)V");
-
-                if (mid == 0){
-                    fprintf(stderr, "Java Methode not found!\n");
-                }
-                    std::vector<const char *> names;
-                    int colCount = sqlite3_column_count(stmt);
-
-                    // Create a String[colCount]
-                    jclass objectClass = (env)->FindClass("java/lang/Object");
-                    jobjectArray valArr = (env)->NewObjectArray( colCount, objectClass, NULL);
+		    int rowCount = 0;
+		    rc = sqlite3_step(stmt);
 
 
-                    while (rc != SQLITE_DONE && rc != SQLITE_OK){
-                        rowCount++;
+		    jclass cls = (env)->GetObjectClass( object);
+		    jmethodID mid = (env)->GetMethodID( cls, "nativeCallback", "(I[Ljava/lang/String;[Ljava/lang/Object;)V");
 
-                        for (int colIndex = 0; colIndex < colCount; colIndex++){
-                            int type = sqlite3_column_type(stmt, colIndex);
-                            const char * columnName = sqlite3_column_name(stmt, colIndex);
+		    std::vector<const char *> names;
+		    int colCount = sqlite3_column_count(stmt);
 
-                            names.push_back(columnName);
-
-                            if (type == SQLITE_INTEGER){
-                                int valInt = sqlite3_column_int(stmt, colIndex);
-
-                                jclass cls = (env)->FindClass("java/lang/Integer");
-                                jmethodID midInit = (env)->GetMethodID(cls, "<init>", "(I)V");
-                                jobject intObj = (env)->NewObject(cls, midInit, valInt);
-                                (env)->SetObjectArrayElement( valArr, colIndex, intObj);
-                            }else if (type == SQLITE_FLOAT){
-                                double valDouble = sqlite3_column_double(stmt, colIndex);
-
-                                jclass cls = (env)->FindClass("java/lang/Double");
-                                jmethodID midDouble = (env)->GetMethodID(cls, "<init>", "(D)V");
-                                jobject idoubleObj = (env)->NewObject(cls, midDouble, valDouble);
-                                (env)->SetObjectArrayElement( valArr, colIndex, idoubleObj);
-                            }else if (type == SQLITE_TEXT){
-                                const unsigned char * valChar = sqlite3_column_text(stmt, colIndex);
-                                const char * val = reinterpret_cast < const char* >( valChar );
-                                jstring jstrValue = (env)->NewStringUTF(val);
-                                (env)->SetObjectArrayElement( valArr, colIndex, jstrValue);
-                                //free(valChar);
-                            }else if (type == SQLITE_BLOB){
-                                printf("columnName = %s,BLOB\n", columnName);
-                            }else if (type == SQLITE_NULL){
-                                (env)->SetObjectArrayElement( valArr, colIndex, NULL);
-                            }
-                        }
-
-                        // callback to Java
-
-                        // Create a String[colCount]
-                        jclass stringClass = (env)->FindClass("java/lang/String");
-                        jobjectArray arr = (env)->NewObjectArray( colCount, stringClass, NULL);
-
-                        // Add name items
-                        for (int colIndex = 0; colIndex < colCount; colIndex++){
-                            jstring jstrName = (env)->NewStringUTF( names[colIndex]);
-                            (env)->SetObjectArrayElement( arr, colIndex, jstrName);
-                        }
+		    // Create a String[colCount]
+		    jclass objectClass = (env)->FindClass("java/lang/Object");
+		    jobjectArray valArr = (env)->NewObjectArray( colCount, objectClass, NULL);
 
 
-                        (env)->CallVoidMethod(object, mid, callBackPtr, arr, valArr);
+		    while (rc != SQLITE_DONE && rc != SQLITE_OK) {
+	            rowCount++;
 
-                        names.clear();
-                        rc = sqlite3_step(stmt);
-                    }
-                    rc = sqlite3_finalize(stmt);
-                }else{
-                   zErrMsg = sqlite3_errmsg(db);
-                }
+				for (int colIndex = 0; colIndex < colCount; colIndex++) {
+					int type = sqlite3_column_type(stmt, colIndex);
+					const char * columnName = sqlite3_column_name(stmt, colIndex);
 
-        return javaResult(env, (long)db, rc, zErrMsg);
+					names.push_back(columnName);
+
+					if (type == SQLITE_INTEGER) {
+					    int valInt = sqlite3_column_int(stmt, colIndex);
+
+					    jclass cls = (env)->FindClass("java/lang/Integer");
+					    jmethodID midInit = (env)->GetMethodID(cls, "<init>", "(I)V");
+					    jobject intObj = (env)->NewObject(cls, midInit, valInt);
+					    (env)->SetObjectArrayElement( valArr, colIndex, intObj);
+					} else if (type == SQLITE_FLOAT) {
+					    double valDouble = sqlite3_column_double(stmt, colIndex);
+
+					    jclass cls = (env)->FindClass("java/lang/Double");
+					    jmethodID midDouble = (env)->GetMethodID(cls, "<init>", "(D)V");
+					    jobject idoubleObj = (env)->NewObject(cls, midDouble, valDouble);
+					    (env)->SetObjectArrayElement( valArr, colIndex, idoubleObj);
+					} else if (type == SQLITE_TEXT) {
+					    const unsigned char * valChar = sqlite3_column_text(stmt, colIndex);
+					    const char * val = reinterpret_cast < const char* >( valChar );
+					    jstring jstrValue = (env)->NewStringUTF(val);
+					    (env)->SetObjectArrayElement( valArr, colIndex, jstrValue);
+					    //free(valChar);
+					} else if (type == SQLITE_BLOB) {
+					    printf("columnName = %s,BLOB\n", columnName);
+					} else if (type == SQLITE_NULL) {
+					    (env)->SetObjectArrayElement( valArr, colIndex, NULL);
+					}
+				}
+
+				// callback to Java
+
+				// Create a String[colCount]
+				jclass stringClass = (env)->FindClass("java/lang/String");
+				jobjectArray arr = (env)->NewObjectArray( colCount, stringClass, NULL);
+
+				// Add name items
+				for (int colIndex = 0; colIndex < colCount; colIndex++) {
+				    jstring jstrName = (env)->NewStringUTF( names[colIndex]);
+				    (env)->SetObjectArrayElement( arr, colIndex, jstrName);
+				}
+
+				(env)->CallVoidMethod(object, mid, callBackPtr, arr, valArr);
+
+				names.clear();
+				rc = sqlite3_step(stmt);
+		    }
+		    rc = sqlite3_finalize(stmt);
+		} else {
+		    zErrMsg = sqlite3_errmsg(db);
+		}
+
+		return javaResult(env, (long)db, rc, zErrMsg);
     */
 
     // called from C
