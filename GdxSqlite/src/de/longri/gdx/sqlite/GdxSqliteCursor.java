@@ -27,6 +27,12 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
     private int actRow = 0;
     private Object[] actRowValues;
 
+    private void chkCursorposition() {
+        if (actRowValues == null)
+            throw new SQLiteGdxException("Invalid cursor position, try moveToFirst");
+    }
+
+
     /**
      * Returns the value of the requested column as a byte array.
      *
@@ -35,6 +41,7 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      */
     @Override
     public byte[] getBlob(int columnIndex) {
+        chkCursorposition();
         if (isNull(columnIndex)) return null;
         return new byte[0];
     }
@@ -47,6 +54,7 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      */
     @Override
     public double getDouble(int columnIndex) {
+        chkCursorposition();
         return (double) actRowValues[columnIndex];
     }
 
@@ -58,6 +66,7 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      */
     @Override
     public float getFloat(int columnIndex) {
+        chkCursorposition();
         return (float) actRowValues[columnIndex];
     }
 
@@ -69,6 +78,7 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      */
     @Override
     public int getInt(int columnIndex) {
+        chkCursorposition();
         return (int) actRowValues[columnIndex];
     }
 
@@ -80,6 +90,7 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      */
     @Override
     public long getLong(int columnIndex) {
+        chkCursorposition();
         return (long) actRowValues[columnIndex];
     }
 
@@ -91,6 +102,7 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      */
     @Override
     public short getShort(int columnIndex) {
+        chkCursorposition();
         return (short) actRowValues[columnIndex];
     }
 
@@ -102,6 +114,7 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      */
     @Override
     public String getString(int columnIndex) {
+        chkCursorposition();
         if (isNull(columnIndex)) return null;
         return (String) actRowValues[columnIndex];
     }

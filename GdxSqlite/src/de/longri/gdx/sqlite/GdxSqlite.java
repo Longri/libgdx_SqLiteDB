@@ -121,7 +121,9 @@ public class GdxSqlite {
      */
     public void execSQL(String sql) throws SQLiteGdxException {
         GdxSqliteResult result = this.exec(this.ptr, sql);
-        System.out.println("Execute result code: " + result.retValue);
+        if (result.retValue > 0) {
+            throwLastErr(result);
+        }
     }
 
     private native GdxSqliteResult exec(long ptr, String sql); /*
@@ -159,9 +161,7 @@ public class GdxSqlite {
             callbackPtr = statiCallbackPtr++;
             callbackMap.put(callbackPtr, callback);
         }
-
         GdxSqliteResult result = this.query(this.ptr, sql, callbackPtr);
-        //TODO handle resultCode (Error Msg)
 
         //remove callBack
         synchronized (callbackMap) {
@@ -171,8 +171,6 @@ public class GdxSqlite {
         if (result.retValue > 0) {
             throwLastErr(result);
         }
-
-        System.out.println("Query result code: " + result.retValue);
     }
 
     /**

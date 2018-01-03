@@ -116,6 +116,7 @@ public class SQLiteBuild {
             ios32.compilerSuffix = "";
             ios32.headerDirs = headers;
             ios32.cppFlags += " -stdlib=libc++";
+            ios32.cExcludes = new String[]{"shell.c", "sqlite3.c"};
 
             targets.add(ios32);
         }
@@ -175,84 +176,89 @@ public class SQLiteBuild {
         clear.deleteDirectory();
 
 
-        new JniGenSharedLibraryLoader("libs/GdxSqlite-platform-1.0-natives-desktop.jar").load("GdxSqlite");
-
-
-        System.out.println(GdxSqlite.getSqliteVersion());
-
         try {
-            FileHandle fileHandleExc = new FileHandle("test/fail/testDB.db3");
-            GdxSqlite dbexc = new GdxSqlite(fileHandleExc);
-            dbexc.openOrCreateDatabase();
-        } catch (SQLiteGdxException e) {
+            new JniGenSharedLibraryLoader("libs/GdxSqlite-platform-1.0-natives-desktop.jar").load("GdxSqlite");
+
+
+            System.out.println(GdxSqlite.getSqliteVersion());
+
+            try {
+                FileHandle fileHandleExc = new FileHandle("test/fail/testDB.db3");
+                GdxSqlite dbexc = new GdxSqlite(fileHandleExc);
+                dbexc.openOrCreateDatabase();
+            } catch (SQLiteGdxException e) {
+                e.printStackTrace();
+            }
+
+
+            FileHandle fileHandle = new FileHandle("test/testDB.db3");
+            fileHandle.parent().mkdirs();
+            GdxSqlite db = new GdxSqlite(fileHandle);
+            db.openOrCreateDatabase();
+
+            System.out.println("Pointer to open DB: " + db.ptr);
+
+
+            String sql = "CREATE TABLE COMPANY( \n" +
+                    "         ID INT PRIMARY KEY     NOT NULL, \n" +
+                    "         NAME           TEXT    NOT NULL, \n" +
+                    "         AGE            INT     NOT NULL, \n" +
+                    "         ADDRESS        CHAR(50), \n" +
+                    "         SALARY         REAL );";
+            db.execSQL(sql);
+
+
+            sql = " INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)    \n" +
+                    "          VALUES (1, 'Paul', 32, 'California', 20000.00 );   \n" +
+                    "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)    \n" +
+                    "          VALUES (2, 'Allen', 25, 'Texas', 15000.00 );       \n" +
+                    "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)  \n" +
+                    "          VALUES (3, 'Teddy', 23, 'Norway', NULL );  \n" +
+                    "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)  \n" +
+                    "          VALUES (4, 'Mark', 25, 'Rich-Mond ', 65000.00 );";
+            db.execSQL(sql);
+
+            sql = "SELECT * from COMPANY";
+
+            db.rawQuery(sql, null, new GdxSqlite.RowCallback() {
+                @Override
+                public void newRow(String[] columnNames, Object[] values) {
+                    System.out.println("Native Callback : "
+                            + " => " + arrayToString(columnNames)
+                            + " => " + arrayToString(values)
+                    );
+                }
+            });
+
+
+            SQLiteGdxDatabaseCursor cursor = db.rawQuery(sql, null);
+
+            cursor.moveToFirst();
+            StringBuilder sb = new StringBuilder();
+            while (cursor.isAfterLast() == false) {
+                sb.append("Cursor row : => [");
+                sb.append(cursor.getInt(0)).append(", ");
+                sb.append(cursor.getString(1)).append(", ");
+                sb.append(cursor.getInt(2)).append(", ");
+                sb.append(cursor.getString(3)).append(", ");
+                sb.append(cursor.isNull(4) ? "NULL" : cursor.getDouble(4)).append("] ");
+                System.out.println(sb.toString());
+                sb.length = 0; //clear
+                cursor.moveToNext();
+            }
+            cursor.close();
+
+            db.closeDatabase();
+            System.out.println("Pointer to closed DB: " + db.ptr);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-        FileHandle fileHandle = new FileHandle("test/testDB.db3");
-        fileHandle.parent().mkdirs();
-        GdxSqlite db = new GdxSqlite(fileHandle);
-        db.openOrCreateDatabase();
-
-        System.out.println("Pointer to open DB: " + db.ptr);
-
-
-        String sql = "CREATE TABLE COMPANY( \n" +
-                "         ID INT PRIMARY KEY     NOT NULL, \n" +
-                "         NAME           TEXT    NOT NULL, \n" +
-                "         AGE            INT     NOT NULL, \n" +
-                "         ADDRESS        CHAR(50), \n" +
-                "         SALARY         REAL );";
-        db.execSQL(sql);
-
-
-        sql = " INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)    \n" +
-                "          VALUES (1, 'Paul', 32, 'California', 20000.00 );   \n" +
-                "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)    \n" +
-                "          VALUES (2, 'Allen', 25, 'Texas', 15000.00 );       \n" +
-                "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)  \n" +
-                "          VALUES (3, 'Teddy', 23, 'Norway', NULL );  \n" +
-                "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)  \n" +
-                "          VALUES (4, 'Mark', 25, 'Rich-Mond ', 65000.00 );";
-        db.execSQL(sql);
-
-        sql = "SELECT * from COMPANY";
-
-        db.rawQuery(sql, null, new GdxSqlite.RowCallback() {
-            @Override
-            public void newRow(String[] columnNames, Object[] values) {
-                System.out.println("Native Callback : "
-                        + " => " + arrayToString(columnNames)
-                        + " => " + arrayToString(values)
-                );
-            }
-        });
-
-
-        SQLiteGdxDatabaseCursor cursor = db.rawQuery(sql, null);
-
-        cursor.moveToFirst();
-        StringBuilder sb = new StringBuilder();
-        while (cursor.isAfterLast() == false) {
-            sb.append("Cursor row : => [");
-            sb.append(cursor.getInt(0)).append(", ");
-            sb.append(cursor.getString(1)).append(", ");
-            sb.append(cursor.getInt(2)).append(", ");
-            sb.append(cursor.getString(3)).append(", ");
-            sb.append(cursor.isNull(4) ? "NULL" : cursor.getDouble(4)).append("] ");
-            System.out.println(sb.toString());
-            sb.length = 0; //clear
-            cursor.moveToNext();
-        }
-        cursor.close();
-
-        db.closeDatabase();
-        System.out.println("Pointer to closed DB: " + db.ptr);
 
 
         //copy libs to local modules
 
         FileDescriptor projectPath = new FileDescriptor("../");
+        FileDescriptor java = projectPath.child("GdxSqlite/build/libs/GdxSqlite-1.0.jar");
 
         FileDescriptor core = projectPath.child("core");
         FileDescriptor coreJar = projectPath.child("GdxSqlite/build/libs");
@@ -262,6 +268,8 @@ public class SQLiteBuild {
         FileDescriptor desktopNative = projectPath.child("GdxSqliteBuild/libs/GdxSqlite-platform-1.0-natives-desktop.jar");
         FileDescriptor test = projectPath.child("GdxSqlite/testNatives/GdxSqlite-platform-1.0-natives-desktop.jar");
 
+        desktop.mkdirs();
+        test.mkdirs();
         desktopNative.copyTo(desktop);
         desktopNative.copyTo(test);
 
@@ -274,13 +282,28 @@ public class SQLiteBuild {
         FileDescriptor androidLibs = projectPath.child("android/libs/");
 
         try {
+            androidLibs.mkdirs();
             androidNative_arm64.copyTo(androidLibs.child("arm64-v8a/libGdxSqlite.so"));
             androidNative_arm.copyTo(androidLibs.child("armeabi/libGdxSqlite.so"));
             androidNative_armv7.copyTo(androidLibs.child("armeabi-v7a/libGdxSqlite.so"));
             androidNative_x86.copyTo(androidLibs.child("x86/libGdxSqlite.so"));
             androidNative_x86_64.copyTo(androidLibs.child("x86_64/libGdxSqlite.so"));
+            java.copyTo(androidLibs.child(java.name()));
         } catch (Exception e) {
-//            e.printStackTrace();
+            e.printStackTrace();
+        }
+
+
+        //copy to iOS
+        try {
+            FileDescriptor iOSLibs = projectPath.child("ios/libs/");
+
+            FileDescriptor iOSNative = projectPath.child("GdxSqliteBuild/libs/ios32/libGdxSqlite.a");
+            iOSLibs.mkdirs();
+            java.copyTo(iOSLibs.child(java.name()));
+            iOSNative.copyTo(iOSLibs.child(iOSNative.name()));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
