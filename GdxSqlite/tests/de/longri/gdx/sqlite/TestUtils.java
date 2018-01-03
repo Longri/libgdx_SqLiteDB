@@ -14,7 +14,17 @@ public class TestUtils {
     }
 
     public static void loadSharedLib(String gdxSqlite) {
-        new SharedLibraryLoader("GdxSqlite/testNatives/GdxSqlite-platform-1.0-natives-desktop.jar").load(gdxSqlite);
+
+        String localPath = Gdx.files.local("").file().getAbsolutePath();
+        String nativePath;
+        if (localPath.endsWith("GdxSqlite")) {
+            nativePath = localPath + "/testNatives/GdxSqlite-platform-1.0-natives-desktop.jar";
+        } else {
+            nativePath = localPath + "/GdxSqlite/testNatives/GdxSqlite-platform-1.0-natives-desktop.jar";
+        }
+
+        System.out.println("Native path = " + nativePath);
+        new SharedLibraryLoader(nativePath).load(gdxSqlite);
     }
 
 
