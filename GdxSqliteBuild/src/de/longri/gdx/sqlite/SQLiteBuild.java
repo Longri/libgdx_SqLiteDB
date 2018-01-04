@@ -273,6 +273,40 @@ public class SQLiteBuild {
             e.printStackTrace();
         }
 
+        //Test prepared statement
+        try {
+            FileHandle fileHandle = new FileHandle("test/testDB2.db3");
+            fileHandle.parent().mkdirs();
+            GdxSqlite db = new GdxSqlite(fileHandle);
+            db.openOrCreateDatabase();
+
+
+            String sql = "CREATE TABLE COMPANY( \n" +
+                    "  NAME  TEXT PRIMARY KEY  NOT NULL);";
+            db.execSQL(sql);
+
+            String statement = "INSERT INTO COMPANY VALUES (?)";
+            GdxSqlitePreparedStatement preparedStatement = db.prepare(statement);
+
+            preparedStatement.bind("Test1").commit().reset();
+            preparedStatement.bind("Test2").commit().reset();
+            preparedStatement.bind("Test3").commit().reset();
+            preparedStatement.bind("Test4").commit().reset();
+
+            preparedStatement.close();
+
+            try {
+                preparedStatement.bind("Test5").commit().reset();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            db.closeDatabase();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         //copy libs to local modules
 
