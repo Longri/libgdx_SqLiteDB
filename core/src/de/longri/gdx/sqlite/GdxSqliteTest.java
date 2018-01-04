@@ -205,15 +205,14 @@ public class GdxSqliteTest {
 
         boolean exceptionThrowed = false;
         try {
-            SQLiteGdxDatabaseCursor cursor = db.rawQuery("SELECT * FROM CHRISTMAS", null);
+            SQLiteGdxDatabaseCursor cursor = db.rawQuery("SELECT * FROM CHRISTMAS");
         } catch (SQLiteGdxException e) {
-//            e.printStackTrace();
             exceptionThrowed = true;
         }
         assertThat("Query on not exist Table must throw a exception", exceptionThrowed);
 
 
-        SQLiteGdxDatabaseCursor cursor = db.rawQuery("SELECT * FROM COMPANY", null);
+        SQLiteGdxDatabaseCursor cursor = db.rawQuery("SELECT * FROM COMPANY");
         assertThat("Cursor count must be 4", cursor.getCount() == 4);
         assertThat("Cursor must not after last", !cursor.isAfterLast());
         exceptionThrowed = false;
@@ -287,7 +286,7 @@ public class GdxSqliteTest {
         db.execSQL(INSERT);
 
         final AtomicInteger rowCount = new AtomicInteger(-1);
-        db.rawQuery("SELECT * FROM COMPANY", null, new GdxSqlite.RowCallback() {
+        db.rawQuery("SELECT * FROM COMPANY", new GdxSqlite.RowCallback() {
             @Override
             public void newRow(String[] columnName, Object[] value) {
 

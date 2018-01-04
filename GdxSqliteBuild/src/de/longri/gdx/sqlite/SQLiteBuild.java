@@ -239,7 +239,7 @@ public class SQLiteBuild {
 
             sql = "SELECT * from COMPANY";
 
-            db.rawQuery(sql, null, new GdxSqlite.RowCallback() {
+            db.rawQuery(sql, new GdxSqlite.RowCallback() {
                 @Override
                 public void newRow(String[] columnNames, Object[] values) {
                     System.out.println("Native Callback : "
@@ -250,7 +250,7 @@ public class SQLiteBuild {
             });
 
 
-            SQLiteGdxDatabaseCursor cursor = db.rawQuery(sql, null);
+            SQLiteGdxDatabaseCursor cursor = db.rawQuery(sql);
 
             cursor.moveToFirst();
             StringBuilder sb = new StringBuilder();

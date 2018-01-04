@@ -155,13 +155,7 @@ public class GdxSqlite {
     ObjectMap<Integer, RowCallback> callbackMap = new ObjectMap<>();
     static int statiCallbackPtr = 0;
 
-    public void rawQuery(String sql, String[] args, RowCallback callback) throws SQLiteGdxException {
-
-        //replace ? with args
-        if (args != null) {
-            for (String arg : args)
-                sql = sql.replaceFirst("\\?", "'" + arg + "'");
-        }
+    public void rawQuery(String sql, RowCallback callback) throws SQLiteGdxException {
 
         //register callback
         int callbackPtr;
@@ -189,11 +183,11 @@ public class GdxSqlite {
      * @return {@link SQLiteGdxDatabaseCursor}
      * @throws SQLiteGdxException
      */
-    SQLiteGdxDatabaseCursor rawQuery(String sql, String[] args) throws SQLiteGdxException {
+    SQLiteGdxDatabaseCursor rawQuery(String sql) throws SQLiteGdxException {
         final GdxSqliteCursor cursor = new GdxSqliteCursor();
 
         //fill cursor over callback
-        rawQuery(sql, args, new RowCallback() {
+        rawQuery(sql, new RowCallback() {
             @Override
             public void newRow(String[] columnNames, Object[] values) {
                 cursor.addRow(columnNames, values);
