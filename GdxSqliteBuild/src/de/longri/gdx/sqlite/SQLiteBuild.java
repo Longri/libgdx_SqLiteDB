@@ -55,6 +55,19 @@ public class SQLiteBuild {
 //        targetDescriptor.deleteDirectory();
 
 
+        String cFlags = " -DSQLITE_ENABLE_API_ARMOR" +
+                " -DSQLITE_ENABLE_FTS3" +
+                " -DSQLITE_ENABLE_FTS3_PARENTHESIS" +
+                " -DSQLITE_ENABLE_RTREE" +
+                " -DSQLITE_ENABLE_UPDATE_DELETE_LIMIT" +
+                " -DSQLITE_OMIT_AUTORESET" +
+                " -DSQLITE_OMIT_BUILTIN_TEST" +
+                " -DSQLITE_OMIT_LOAD_EXTENSION" +
+                " -DSQLITE_SYSTEM_MALLOC" +
+                " -DSQLITE_THREADSAFE=2" +
+                " -DSQLITE_OS_UNIX=1";
+
+
         String[] headers = new String[]{sqlitePathString};
 
         // generate native code
@@ -80,6 +93,7 @@ public class SQLiteBuild {
             win64.compilerPrefix = "";
             win64.compilerSuffix = "";
             win64.headerDirs = headers;
+            win64.cFlags += cFlags;
             targets.add(win64);
         }
 
@@ -88,6 +102,7 @@ public class SQLiteBuild {
             win32.compilerPrefix = "";
             win32.compilerSuffix = "";
             win32.headerDirs = headers;
+            win32.cFlags += cFlags;
             targets.add(win32);
         }
 
@@ -97,6 +112,7 @@ public class SQLiteBuild {
             mac64.compilerPrefix = "";
             mac64.compilerSuffix = "";
             mac64.headerDirs = headers;
+            mac64.cFlags += cFlags;
             targets.add(mac64);
         }
 
@@ -106,6 +122,7 @@ public class SQLiteBuild {
             mac32.compilerPrefix = "";
             mac32.compilerSuffix = "";
             mac32.headerDirs = headers;
+            mac32.cFlags += cFlags;
             targets.add(mac32);
         }
 
@@ -126,6 +143,7 @@ public class SQLiteBuild {
             linux32.compilerPrefix = "";
             linux32.compilerSuffix = "";
             linux32.headerDirs = headers;
+            linux32.cFlags += cFlags;
             targets.add(linux32);
         }
 
@@ -135,13 +153,14 @@ public class SQLiteBuild {
             linux64.compilerSuffix = "";
             linux64.headerDirs = headers;
             linux64.linkerFlags = "-shared -m64 -Wl, " + jniPathString + "/memcpy_wrap.c";
+            linux64.cFlags += cFlags;
             targets.add(linux64);
         }
 
         if (all || cmd.hasOption("android")) {
             BuildTarget android = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Android, false);
             android.headerDirs = headers;
-//            android.cIncludes=new String[]{"shell.c","sqlite3.c"};
+            android.cFlags += cFlags;
             targets.add(android);
         }
 
