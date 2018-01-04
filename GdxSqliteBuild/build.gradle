@@ -1,0 +1,12 @@
+apply plugin: 'java'
+
+sourceSets.main.java.srcDirs = [ "src/" ]
+
+
+
+dependencies {
+    compile project(":jnigen")
+    compile project(":GdxSqlite")
+    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+}
