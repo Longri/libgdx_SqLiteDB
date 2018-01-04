@@ -78,17 +78,20 @@ public class GdxSqlitePreparedStatement {
     public GdxSqlitePreparedStatement bind(Object... values) {
         chkClosed();
         int idx = 1;
+        GdxSqliteResult result = null;
         for (Object value : values) {
             if (value instanceof String) {
-                GdxSqliteResult result = bindNativeString(this.ptr, this.db.ptr, idx, (String) value);
-                if (result.retValue > 0)
-                    db.throwLastErr(result);
+                result = bindNativeString(this.ptr, this.db.ptr, idx, (String) value);
+            } else {
+                String error = "Bind value for class " + value.getClass().getSimpleName() + "not implemented";
+                db.throwLastErr(new GdxSqliteResult(-1, -1, error));
             }
 
+            if (result != null && result.retValue > 0)
+                db.throwLastErr(result);
 
             idx++;
         }
-
         return this;
     }
 

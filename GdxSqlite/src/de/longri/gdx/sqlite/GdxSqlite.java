@@ -28,7 +28,7 @@ public class GdxSqlite {
 
     //@off
     /*JNI
-		extern "C" {
+        extern "C" {
 		#include "sqlite3.h"
 		}
 
@@ -82,7 +82,7 @@ public class GdxSqlite {
         }
     }
 
-    private void throwLastErr(GdxSqliteResult result) {
+    void throwLastErr(GdxSqliteResult result) {
         String errMsg = result.errorMsg;
         throw new SQLiteGdxException(errMsg);
     }
@@ -179,7 +179,6 @@ public class GdxSqlite {
      * Runs the provided SQL and returns a {@link SQLiteGdxDatabaseCursor} over the result set.
      *
      * @param sql  the SQL query. The SQL string must not be ; terminated
-     * @param args
      * @return {@link SQLiteGdxDatabaseCursor}
      * @throws SQLiteGdxException
      */
@@ -198,7 +197,7 @@ public class GdxSqlite {
 
 
     private native GdxSqliteResult query(long ptr, String sql, int callBackPtr); /*
-		sqlite3* db = (sqlite3*)ptr;
+        sqlite3* db = (sqlite3*)ptr;
 		const char *zErrMsg = 0;
 
 
@@ -289,5 +288,30 @@ public class GdxSqlite {
             callback.newRow(collnames, values);
         }
     }
+
+
+    public GdxSqlitePreparedStatement prepare(String sql) {
+        GdxSqliteResult result = prepareNative(this.ptr, sql);
+        if (result.retValue > 0)
+            throwLastErr(result);
+
+        return new GdxSqlitePreparedStatement(result.ptr, this, sql);
+    }
+
+    private native GdxSqliteResult prepareNative(long ptr, String sql); /*
+        sqlite3* db = (sqlite3*)ptr;
+		const char *zErrMsg = 0;
+		const char *pzTest;
+        sqlite3_stmt* stmt;
+
+        int rc = sqlite3_prepare(db, sql, strlen(sql), &stmt, &pzTest);
+
+        if( rc != SQLITE_OK ){
+            zErrMsg = sqlite3_errmsg(db);
+        }
+
+        return javaResult(env, (long)stmt, rc, zErrMsg);
+    */
+
 
 }

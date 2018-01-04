@@ -143,6 +143,7 @@ public class SQLiteBuild {
             linux32.compilerPrefix = "";
             linux32.compilerSuffix = "";
             linux32.headerDirs = headers;
+            linux32.linkerFlags="-shared -m32 -z execstack";
             linux32.cFlags += cFlags;
             targets.add(linux32);
         }
@@ -152,7 +153,7 @@ public class SQLiteBuild {
             linux64.compilerPrefix = "";
             linux64.compilerSuffix = "";
             linux64.headerDirs = headers;
-            linux64.linkerFlags = "-shared -m64 -Wl, " + jniPathString + "/memcpy_wrap.c";
+            linux64.linkerFlags = "-z execstack -shared -m64 -Wl, " + jniPathString + "/memcpy_wrap.c";
             linux64.cFlags += cFlags;
             targets.add(linux64);
         }
