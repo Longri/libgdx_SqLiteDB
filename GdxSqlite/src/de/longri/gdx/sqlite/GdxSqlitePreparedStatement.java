@@ -60,11 +60,11 @@ public class GdxSqlitePreparedStatement {
         this.statement = statement;
 
         // initial
-        try {
-            this.commit();
-        } catch (Exception e) {
-            // this will throw a 'SQL logic error' exception but is required for initialization
-        }
+//        try {
+//            this.commit();
+//        } catch (Exception e) {
+//            // this will throw a 'SQL logic error' exception but is required for initialization
+//        }
         this.reset();
     }
 
@@ -78,33 +78,79 @@ public class GdxSqlitePreparedStatement {
     public GdxSqlitePreparedStatement bind(Object... values) {
         chkClosed();
         int idx = 1;
-        GdxSqliteResult result = null;
         for (Object value : values) {
-            if (value instanceof String) {
-                result = bindNativeString(this.ptr, this.db.ptr, idx, (String) value);
-            } else {
-                String error = "Bind value for class " + value.getClass().getSimpleName() + "not implemented";
-                db.throwLastErr(new GdxSqliteResult(-1, -1, error));
-            }
-
-            if (result != null && result.retValue > 0)
-                db.throwLastErr(result);
-
-            idx++;
+            bind(idx++, value);
         }
         return this;
     }
 
-    private native GdxSqliteResult bindNativeString(long stmtPtr, long dbPtr, int idx, String value); /*
+    public GdxSqlitePreparedStatement bind(int idx, Object value) {
+        GdxSqliteResult result = null;
+        if (value instanceof String) {
+            result = bind_text(this.ptr, this.db.ptr, idx, (String) value);
+        } else if (value instanceof Integer || value instanceof Short) {
+            result = bind_int(this.ptr, this.db.ptr, idx, (int) value);
+        } else if (value instanceof Long) {
+            result = bind_long(this.ptr, this.db.ptr, idx, (long) value);
+        } else if (value instanceof Double || value instanceof Float) {
+            result = bind_double(this.ptr, this.db.ptr, idx, (double) value);
+        } else {
+            String error = "Bind value for class '" + value.getClass().getSimpleName() + "' not implemented";
+            db.throwLastErr(new GdxSqliteResult(-1, -1, error));
+        }
+
+        if (result != null && result.retValue > 0)
+            db.throwLastErr(result);
+
+        return this;
+    }
+
+//    Binding Values To Prepared Statements
+//    https://sqlite.org/c3ref/bind_blob.html
+//
+//    sqlite3_bind_text
+//    sqlite3_bind_int
+//    sqlite3_bind_blob
+//    sqlite3_bind_double
+//    sqlite3_bind_null
+
+    private native GdxSqliteResult bind_text(long stmtPtr, long dbPtr, int idx, String value); /*
             sqlite3* db = (sqlite3*)dbPtr;
             sqlite3_stmt* stmt = (sqlite3_stmt*)stmtPtr;
             const char *zErrMsg = 0;
-
             int rc = sqlite3_bind_text( stmt, idx, value, -1, 0);
-            if( rc != SQLITE_OK ){
+            if( rc != SQLITE_OK )
                 zErrMsg = sqlite3_errmsg(db);
-            }
+            return javaResult(env, (long)stmt, rc, zErrMsg);
+    */
 
+    private native GdxSqliteResult bind_int(long stmtPtr, long dbPtr, int idx, int value); /*
+            sqlite3* db = (sqlite3*)dbPtr;
+            sqlite3_stmt* stmt = (sqlite3_stmt*)stmtPtr;
+            const char *zErrMsg = 0;
+            int rc = sqlite3_bind_int( stmt, idx, value);
+            if( rc != SQLITE_OK )
+                zErrMsg = sqlite3_errmsg(db);
+            return javaResult(env, (long)stmt, rc, zErrMsg);
+    */
+
+    private native GdxSqliteResult bind_double(long stmtPtr, long dbPtr, int idx, double value); /*
+            sqlite3* db = (sqlite3*)dbPtr;
+            sqlite3_stmt* stmt = (sqlite3_stmt*)stmtPtr;
+            const char *zErrMsg = 0;
+            int rc = sqlite3_bind_double( stmt, idx, value);
+            if( rc != SQLITE_OK )
+                zErrMsg = sqlite3_errmsg(db);
+            return javaResult(env, (long)stmt, rc, zErrMsg);
+    */
+
+    private native GdxSqliteResult bind_long(long stmtPtr, long dbPtr, int idx, long value); /*
+            sqlite3* db = (sqlite3*)dbPtr;
+            sqlite3_stmt* stmt = (sqlite3_stmt*)stmtPtr;
+            const char *zErrMsg = 0;
+            int rc = sqlite3_bind_int( stmt, idx, value);
+            if( rc != SQLITE_OK )
+                zErrMsg = sqlite3_errmsg(db);
             return javaResult(env, (long)stmt, rc, zErrMsg);
     */
 
@@ -141,6 +187,7 @@ public class GdxSqlitePreparedStatement {
 
     private native void nativeReset(long stmtPtr); /*
          sqlite3_stmt* stmt = (sqlite3_stmt*)stmtPtr;
+         sqlite3_clear_bindings( stmt );
          sqlite3_reset(stmt);
     */
 

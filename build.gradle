@@ -110,6 +110,7 @@ project(":core") {
 
 
     dependencies {
+        compile project(":GdxSqlite")
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
 
         //include libs
