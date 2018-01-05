@@ -250,7 +250,34 @@ public class GdxSqlite {
 					    (env)->SetObjectArrayElement( valArr, colIndex, jstrValue);
 					    //free(valChar);
 					} else if (type == SQLITE_BLOB) {
-					    printf("columnName = %s,BLOB\n", columnName);
+				        int type;
+				        int length;
+				        jbyteArray jBlob;
+				        const void *blob;
+
+						type = sqlite3_column_type(stmt, colIndex);
+						blob = sqlite3_column_blob(stmt, colIndex);
+
+						if (!blob) {
+						    if (type == SQLITE_NULL) {
+							jBlob = NULL;
+						    }
+						    else {
+							// The return value from sqlite3_column_blob() for a zero-length BLOB is a NULL pointer.
+							jBlob = (env)->NewByteArray(0);
+						    }
+						}else{
+							length = sqlite3_column_bytes(stmt, colIndex);
+							jBlob = (env)->NewByteArray(length);
+							if (!jBlob) {
+								jBlob = NULL;
+							}else{
+								(env)->SetByteArrayRegion(jBlob, (jsize) 0, (jsize) length, (const jbyte*) blob);
+							}
+						}
+
+                        (env)->SetObjectArrayElement( valArr, colIndex, jBlob);
+
 					} else if (type == SQLITE_NULL) {
 					    (env)->SetObjectArrayElement( valArr, colIndex, NULL);
 					}

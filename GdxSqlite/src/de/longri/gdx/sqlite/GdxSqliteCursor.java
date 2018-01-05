@@ -43,7 +43,7 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
     public byte[] getBlob(int columnIndex) {
         chkCursorposition();
         if (isNull(columnIndex)) return null;
-        return new byte[0];
+        return (byte[]) actRowValues[columnIndex];
     }
 
     /**

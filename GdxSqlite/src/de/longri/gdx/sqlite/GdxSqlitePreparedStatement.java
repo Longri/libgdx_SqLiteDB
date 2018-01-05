@@ -46,6 +46,23 @@ public class GdxSqlitePreparedStatement {
 
 		}
 
+		JNIEXPORT jobject JNICALL Java_de_longri_gdx_sqlite_GdxSqlitePreparedStatement_bind_1blob(JNIEnv* env, jobject object, jlong stmtPtr, jlong dbPtr, jint idx, jbyteArray obj_value) {
+			sqlite3* db = (sqlite3*)dbPtr;
+			sqlite3_stmt* stmt = (sqlite3_stmt*)stmtPtr;
+			jsize size;
+
+			const char *zErrMsg = 0;
+			size = (env)->GetArrayLength(obj_value);
+
+			char* value = (char*)env->GetPrimitiveArrayCritical(obj_value, 0);
+			int rc = sqlite3_bind_blob(stmt, idx, value, size, SQLITE_TRANSIENT);
+			env->ReleasePrimitiveArrayCritical(obj_value, value, 0);
+
+			if( rc != SQLITE_OK )
+				zErrMsg = sqlite3_errmsg(db);
+			return javaResult(env, (long)stmt, rc, zErrMsg);
+		}
+
     */
 
 
@@ -89,6 +106,10 @@ public class GdxSqlitePreparedStatement {
             result = bind_long(this.ptr, this.db.ptr, idx, (long) value);
         } else if (value instanceof Double || value instanceof Float) {
             result = bind_double(this.ptr, this.db.ptr, idx, (double) value);
+        } else if (value instanceof Byte[]) {
+            result = bind_blob(this.ptr, this.db.ptr, idx, toPrimitives(((Byte[]) value)));
+        } else if (value instanceof byte[]) {
+            result = bind_blob(this.ptr, this.db.ptr, idx, (byte[]) value);
         } else {
             String error = "Bind value for class '" + value.getClass().getSimpleName() + "' not implemented";
             db.throwLastErr(new GdxSqliteResult(-1, -1, error));
@@ -98,6 +119,16 @@ public class GdxSqlitePreparedStatement {
             db.throwLastErr(result);
 
         return this;
+    }
+
+
+    private static byte[] toPrimitives(Byte[] oBytes) {
+        byte[] bytes = new byte[oBytes.length];
+        for (int i = 0; i < oBytes.length; i++) {
+            bytes[i] = oBytes[i];
+        }
+        return bytes;
+
     }
 
 //    Binding Values To Prepared Statements
@@ -148,6 +179,8 @@ public class GdxSqlitePreparedStatement {
                 zErrMsg = sqlite3_errmsg(db);
             return javaResult(env, (long)stmt, rc, zErrMsg);
     */
+
+    private native GdxSqliteResult bind_blob(long stmtPtr, long dbPtr, int idx, byte[] value);
 
 
     public GdxSqlitePreparedStatement commit() {
