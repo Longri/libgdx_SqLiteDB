@@ -143,7 +143,7 @@ public class GdxSqlitePreparedStatement {
             sqlite3* db = (sqlite3*)dbPtr;
             sqlite3_stmt* stmt = (sqlite3_stmt*)stmtPtr;
             const char *zErrMsg = 0;
-            int rc = sqlite3_bind_int( stmt, idx, value);
+            int rc = sqlite3_bind_int64( stmt, idx, value);
             if( rc != SQLITE_OK )
                 zErrMsg = sqlite3_errmsg(db);
             return javaResult(env, (long)stmt, rc, zErrMsg);

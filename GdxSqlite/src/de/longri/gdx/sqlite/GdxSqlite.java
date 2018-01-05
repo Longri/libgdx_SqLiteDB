@@ -230,10 +230,10 @@ public class GdxSqlite {
 					names.push_back(columnName);
 
 					if (type == SQLITE_INTEGER) {
-					    int valInt = sqlite3_column_int(stmt, colIndex);
+					    jlong valInt = sqlite3_column_int64(stmt, colIndex);
 
-					    jclass cls = (env)->FindClass("java/lang/Integer");
-					    jmethodID midInit = (env)->GetMethodID(cls, "<init>", "(I)V");
+					    jclass cls = (env)->FindClass("java/lang/Long");
+					    jmethodID midInit = (env)->GetMethodID(cls, "<init>", "(J)V");
 					    jobject intObj = (env)->NewObject(cls, midInit, valInt);
 					    (env)->SetObjectArrayElement( valArr, colIndex, intObj);
 					} else if (type == SQLITE_FLOAT) {

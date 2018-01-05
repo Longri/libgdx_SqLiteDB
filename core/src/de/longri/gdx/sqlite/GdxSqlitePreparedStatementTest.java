@@ -113,14 +113,76 @@ class GdxSqlitePreparedStatementTest {
                 double val = Double.valueOf(num + "." + num);
                 String name = "row" + num;
 
-                assertThat("Id of row ? must be ?".replace("?", num), (Integer) value[0] == id);
+                assertThat("Id of row ? must be ?".replace("?", num), ((Long) value[0]).intValue() == id);
                 assertThat("Value of row ? must be #".replace("?", num).replace("#", Double.toString(val)), (Double) value[1] == val);
                 assertThat("Name of row ? must be #".replace("?", num).replace("#", name), value[2].equals(name));
 
             }
         });
+    }
 
+    @Test
+    void bindLong() {
+        FileHandle dbFileHandle = testFolder.child("statementTest2.db3");
+        GdxSqlite db = new GdxSqlite(dbFileHandle);
+        db.openOrCreateDatabase();
 
+        String sql = "CREATE TABLE Test (\n" +
+                "Id INTEGER NOT NULL PRIMARY KEY,\n" +
+                "longValue  INTEGER,\n" +
+                "Name TEXT)";
+
+        db.execSQL(sql);
+
+        Object[][] values = new Object[10][];
+        values[0] = new Object[]{0, Long.MAX_VALUE, "row0"};
+        values[1] = new Object[]{1, Long.MAX_VALUE - 1, "row1"};
+        values[2] = new Object[]{2, Long.MAX_VALUE - 2, "row2"};
+        values[3] = new Object[]{3, Long.MAX_VALUE - 3, "row3"};
+        values[4] = new Object[]{4, Long.MAX_VALUE - 4, "row4"};
+        values[5] = new Object[]{5, Long.MAX_VALUE - 5, "row5"};
+        values[6] = new Object[]{6, Long.MAX_VALUE - 6, "row6"};
+        values[7] = new Object[]{7, Long.MAX_VALUE - 7, "row7"};
+        values[8] = new Object[]{8, Long.MAX_VALUE - 8, "row8"};
+        values[9] = new Object[]{9, Long.MAX_VALUE - 9, "row9"};
+
+        String statement = "INSERT INTO test VALUES(?,?,?)";
+        GdxSqlitePreparedStatement preparedStatement = db.prepare(statement);
+
+        for (Object[] rowValues : values) {
+            if ((Integer) rowValues[0] == 9) break;
+            preparedStatement.bind(rowValues);
+            try {
+                preparedStatement.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            preparedStatement.reset();
+        }
+
+        // bind separately
+        preparedStatement.bind(1, values[9][0]);
+        preparedStatement.bind(2, values[9][1]);
+        preparedStatement.bind(3, values[9][2]);
+
+        preparedStatement.commit().reset();
+        preparedStatement.close();
+
+        final AtomicInteger cnt = new AtomicInteger(-1);
+        db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
+            @Override
+            public void newRow(String[] columnName, Object[] value) {
+                int id = cnt.incrementAndGet();
+                String num = Integer.toString(id);
+                long val = Long.MAX_VALUE - id;
+                String name = "row" + num;
+
+                assertThat("Id of row ? must be ?".replace("?", num), ((Long) value[0]).intValue() == id);
+                assertThat("Value of row ? must be #".replace("?", num).replace("#", Long.toString(val)), ((Long) value[1]) == val);
+                assertThat("Name of row ? must be #".replace("?", num).replace("#", name), value[2].equals(name));
+
+            }
+        });
     }
 
 }

@@ -79,7 +79,7 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
     @Override
     public int getInt(int columnIndex) {
         chkCursorposition();
-        return (int) actRowValues[columnIndex];
+        return ((Long) actRowValues[columnIndex]).intValue();
     }
 
     /**

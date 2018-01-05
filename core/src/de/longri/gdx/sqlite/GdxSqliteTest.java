@@ -115,7 +115,6 @@ public class GdxSqliteTest {
         try {
             db.execSQL(CREATE);
         } catch (SQLiteGdxException e) {
-//            e.printStackTrace();
             exceptionThrowed = true;
         }
 
@@ -207,6 +206,7 @@ public class GdxSqliteTest {
         try {
             SQLiteGdxDatabaseCursor cursor = db.rawQuery("SELECT * FROM CHRISTMAS");
         } catch (SQLiteGdxException e) {
+//            e.printStackTrace();
             exceptionThrowed = true;
         }
         assertThat("Query on not exist Table must throw a exception", exceptionThrowed);
@@ -219,7 +219,6 @@ public class GdxSqliteTest {
         try {
             assertThat("Cursor column 1 must be a Integer : 1", cursor.getInt(0) == 1);
         } catch (Exception e) {
-//            e.printStackTrace();
             exceptionThrowed = true;
         }
         assertThat("Invalid cursor position must throw a exception", exceptionThrowed);
@@ -298,9 +297,9 @@ public class GdxSqliteTest {
                         assertThat("ColumnName must be ADDRESS", columnName[3].equals("ADDRESS"));
                         assertThat("ColumnName must be SALARY", columnName[4].equals("SALARY"));
 
-                        assertThat("Value 0 must Instance of Integer and 1", value[0] instanceof Integer && (Integer) value[0] == 1);
+                        assertThat("Value 0 must Instance of Long and 1", value[0] instanceof Long && (Long) value[0] == 1);
                         assertThat("Value 1 must Instance of String and Paul", value[1] instanceof String && value[1].equals("Paul"));
-                        assertThat("Value 2 must Instance of Integer and 32", value[2] instanceof Integer && (Integer) value[2] == 32);
+                        assertThat("Value 2 must Instance of Long and 32", value[2] instanceof Long && ((Long) value[2]).intValue() == 32);
                         assertThat("Value 3 must Instance of String and California", value[3] instanceof String && value[3].equals("California"));
                         assertThat("Value 4 must Instance of Double and 20000.12", value[4] instanceof Double && (Double) value[4] == 20000.12);
                         break;
@@ -311,9 +310,9 @@ public class GdxSqliteTest {
                         assertThat("ColumnName must be ADDRESS", columnName[3].equals("ADDRESS"));
                         assertThat("ColumnName must be SALARY", columnName[4].equals("SALARY"));
 
-                        assertThat("Value 0 must Instance of Integer and 2", value[0] instanceof Integer && (Integer) value[0] == 2);
+                        assertThat("Value 0 must Instance of Long and 2", value[0] instanceof Long && (Long) value[0] == 2);
                         assertThat("Value 1 must Instance of String and Allen", value[1] instanceof String && value[1].equals("Allen"));
-                        assertThat("Value 2 must Instance of Integer and 25", value[2] instanceof Integer && (Integer) value[2] == 25);
+                        assertThat("Value 2 must Instance of Long and 25", value[2] instanceof Long && ((Long) value[2]).intValue() == 25);
                         assertThat("Value 3 must Instance of String and Texas", value[3] instanceof String && value[3].equals("Texas"));
                         assertThat("Value 4 must Instance of Double and 15000.00", value[4] instanceof Double && (Double) value[4] == 15000.00);
                         break;
@@ -324,9 +323,9 @@ public class GdxSqliteTest {
                         assertThat("ColumnName must be ADDRESS", columnName[3].equals("ADDRESS"));
                         assertThat("ColumnName must be SALARY", columnName[4].equals("SALARY"));
 
-                        assertThat("Value 0 must Instance of Integer and 3", value[0] instanceof Integer && (Integer) value[0] == 3);
+                        assertThat("Value 0 must Instance of Long and 3", value[0] instanceof Long && (Long) value[0] == 3);
                         assertThat("Value 1 must Instance of String and Teddy", value[1] instanceof String && value[1].equals("Teddy"));
-                        assertThat("Value 2 must Instance of Integer and 23", value[2] instanceof Integer && (Integer) value[2] == 23);
+                        assertThat("Value 2 must Instance of Long and 23", value[2] instanceof Long && ((Long) value[2]).intValue() == 23);
                         assertThat("Value 3 must Instance of String and Norway", value[3] instanceof String && value[3].equals("Norway"));
                         assertThat("Value 4 must be NULL", value[4] == null);
                         break;
@@ -337,9 +336,9 @@ public class GdxSqliteTest {
                         assertThat("ColumnName must be ADDRESS", columnName[3].equals("ADDRESS"));
                         assertThat("ColumnName must be SALARY", columnName[4].equals("SALARY"));
 
-                        assertThat("Value 0 must Instance of Integer and 4", value[0] instanceof Integer && (Integer) value[0] == 4);
+                        assertThat("Value 0 must Instance of Long and 4", value[0] instanceof Long && (Long) value[0] == 4);
                         assertThat("Value 1 must Instance of String and Mark", value[1] instanceof String && value[1].equals("Mark"));
-                        assertThat("Value 2 must Instance of Integer and 25", value[2] instanceof Integer && (Integer) value[2] == 25);
+                        assertThat("Value 2 must Instance of Long and 25", value[2] instanceof Long && ((Long) value[2]).intValue() == 25);
                         assertThat("Value 3 must Instance of String and Rich-Mond ", value[3] instanceof String && value[3].equals("Rich-Mond "));
                         assertThat("Value 4 must Instance of Double and 65000.00", value[4] instanceof Double && (Double) value[4] == 65000.00);
                         break;
