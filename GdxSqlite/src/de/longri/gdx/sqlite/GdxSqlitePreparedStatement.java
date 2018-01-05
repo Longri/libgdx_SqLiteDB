@@ -60,11 +60,6 @@ public class GdxSqlitePreparedStatement {
         this.statement = statement;
 
         // initial
-//        try {
-//            this.commit();
-//        } catch (Exception e) {
-//            // this will throw a 'SQL logic error' exception but is required for initialization
-//        }
         this.reset();
     }
 
@@ -118,7 +113,7 @@ public class GdxSqlitePreparedStatement {
             sqlite3* db = (sqlite3*)dbPtr;
             sqlite3_stmt* stmt = (sqlite3_stmt*)stmtPtr;
             const char *zErrMsg = 0;
-            int rc = sqlite3_bind_text( stmt, idx, value, -1, 0);
+            int rc = sqlite3_bind_text( stmt, idx, value, strlen(value), SQLITE_TRANSIENT);
             if( rc != SQLITE_OK )
                 zErrMsg = sqlite3_errmsg(db);
             return javaResult(env, (long)stmt, rc, zErrMsg);
@@ -187,8 +182,8 @@ public class GdxSqlitePreparedStatement {
 
     private native void nativeReset(long stmtPtr); /*
          sqlite3_stmt* stmt = (sqlite3_stmt*)stmtPtr;
-         sqlite3_clear_bindings( stmt );
          sqlite3_reset(stmt);
+         sqlite3_clear_bindings( stmt );
     */
 
     public void close() {
