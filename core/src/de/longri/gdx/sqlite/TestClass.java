@@ -25,13 +25,6 @@ import com.badlogic.gdx.utils.async.AsyncExecutor;
 import com.badlogic.gdx.utils.async.AsyncTask;
 import de.longri.gdx.sqlite.tests.TestMain;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
 /**
  * Created by Longri on 18.12.2017.
  */
@@ -54,7 +47,7 @@ public class TestClass extends ApplicationAdapter {
             public void run() {
                 state = 0;
 
-                if (TestMain.runTests(GdxSqliteTest.class, GdxSqlitePreparedStatementTest.class)) {
+                if (TestMain.runTests(GdxSqliteTest.class, GdxSqlitePreparedStatementTest.class, GdxSqliteTransactionTest.class)) {
                     state = 1;
                 } else {
                     state = 2;

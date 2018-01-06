@@ -79,6 +79,11 @@ public class TestMain {
 
         Gdx.app.setLogLevel(LOG_DEBUG);
         Gdx.app.debug("TEST", sb.toString());
+
+
+        //TODO print SQLIte 'PRAGMA compile_options'
+
+
         return !beforeFailer && !afterFailer && tests == passed;
     }
 
