@@ -59,13 +59,10 @@ public class SQLiteBuild {
                 " -DSQLITE_ENABLE_FTS3" +
                 " -DSQLITE_ENABLE_FTS3_PARENTHESIS" +
                 " -DSQLITE_ENABLE_RTREE" +
-//                " -DSQLITE_ENABLE_UPDATE_DELETE_LIMIT" +
                 " -DSQLITE_OMIT_AUTORESET" +
-                " -DSQLITE_OMIT_BUILTIN_TEST" +
                 " -DSQLITE_OMIT_LOAD_EXTENSION" +
                 " -DSQLITE_SYSTEM_MALLOC" +
-                " -DSQLITE_THREADSAFE=2" +
-                " -DSQLITE_OS_UNIX=1";
+                " -DSQLITE_THREADSAFE=2";
 
 
         String[] headers = new String[]{sqlitePathString};

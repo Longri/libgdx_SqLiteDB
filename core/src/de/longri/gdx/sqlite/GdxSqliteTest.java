@@ -17,6 +17,7 @@ package de.longri.gdx.sqlite;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import de.longri.gdx.sqlite.tests.AfterAll;
 import de.longri.gdx.sqlite.tests.BeforeAll;
@@ -350,4 +351,65 @@ public class GdxSqliteTest {
         db.closeDatabase();
 
     }
+
+    @Test
+    void inMemoryTest() {
+
+        //Default Constructor opened a in memory DataBase
+        GdxSqlite db = new GdxSqlite();
+        db.openOrCreateDatabase();
+
+        System.out.println("\n\nCompileOptions:\n");
+        System.out.println(db.getCompileOptions());
+        System.out.println();
+        db.closeDatabase();
+    }
+
+    @Test
+    void compileOptionTest() {
+
+        Array<String> expectedOptions = new Array<>();
+        expectedOptions.add("ENABLE_API_ARMOR");
+        expectedOptions.add("ENABLE_FTS3");
+        expectedOptions.add("ENABLE_FTS3_PARENTHESIS");
+        expectedOptions.add("ENABLE_RTREE");
+        expectedOptions.add("OMIT_AUTORESET");
+        expectedOptions.add("OMIT_LOAD_EXTENSION");
+        expectedOptions.add("SYSTEM_MALLOC");
+        expectedOptions.add("THREADSAFE=2");
+
+
+        //Default Constructor opened a in memory DataBase
+        GdxSqlite db = new GdxSqlite();
+        db.openOrCreateDatabase();
+
+        String[] otions = db.getCompileOptions().split("\n");
+        Array<String> includedOptions = new Array<>(otions);
+
+        // remove 'COMPILER=clang.....'
+        String remove = null;
+        for (String option : includedOptions) {
+            if (option.startsWith("COMPILER=")) {
+                remove = option;
+                break;
+            }
+        }
+        if (remove != null) {
+            includedOptions.removeValue(remove, false);
+        }
+
+        for (String option : expectedOptions) {
+            assertThat(option + " must included", includedOptions.contains(option, false));
+            includedOptions.removeValue(option, false);
+        }
+
+        if (includedOptions.size > 0) {
+            String toMutchOptions = includedOptions.toString();
+            assertThat("Compile options has options that not expected\n" + toMutchOptions, false);
+        }
+
+        db.closeDatabase();
+
+    }
+
 }

@@ -17,6 +17,7 @@ package de.longri.gdx.sqlite;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.StringBuilder;
 
 /**
  * SQLite native wrapper
@@ -25,6 +26,9 @@ import com.badlogic.gdx.utils.ObjectMap;
  * Created by Longri on 22.12.2017.
  */
 public class GdxSqlite {
+
+    private static final String BEGIN_TRANSACTION = "BEGIN TRANSACTION";
+    private static final String END_TRANSACTION = "END TRANSACTION";
 
     //@off
     /*JNI
@@ -60,12 +64,16 @@ public class GdxSqlite {
     */
 
 
-    private final FileHandle fileHandle;
-    long ptr = -1;
+    private final String path;
+    Long ptr = null;
 
 
     public GdxSqlite(FileHandle fileHandle) {
-        this.fileHandle = fileHandle;
+        this.path = fileHandle.file().getAbsolutePath();
+    }
+
+    public GdxSqlite() {
+        this.path = ":memory:";
     }
 
 
@@ -75,7 +83,8 @@ public class GdxSqlite {
      * @throws SQLiteGdxException
      */
     public void openOrCreateDatabase() throws SQLiteGdxException {
-        GdxSqliteResult result = open(this.fileHandle.file().getAbsolutePath());
+        if (isOpen()) return;
+        GdxSqliteResult result = open(this.path);
         this.ptr = result.ptr;
         if (result.retValue > 0) {
             throwLastErr(result);
@@ -114,7 +123,7 @@ public class GdxSqlite {
     public void closeDatabase() throws SQLiteGdxException {
         if (this.ptr >= 0) {
             close(this.ptr);
-            this.ptr = -1;
+            this.ptr = null;
         }
     }
 
@@ -131,6 +140,7 @@ public class GdxSqlite {
      * @throws SQLiteGdxException
      */
     public void execSQL(String sql) throws SQLiteGdxException {
+        checkOpen();
         GdxSqliteResult result = this.exec(this.ptr, sql);
         if (result.retValue > 0) {
             throwLastErr(result);
@@ -156,7 +166,7 @@ public class GdxSqlite {
     static int statiCallbackPtr = 0;
 
     public void rawQuery(String sql, RowCallback callback) throws SQLiteGdxException {
-
+        checkOpen();
         //register callback
         int callbackPtr;
         synchronized (callbackMap) {
@@ -178,7 +188,7 @@ public class GdxSqlite {
     /**
      * Runs the provided SQL and returns a {@link SQLiteGdxDatabaseCursor} over the result set.
      *
-     * @param sql  the SQL query. The SQL string must not be ; terminated
+     * @param sql the SQL query. The SQL string must not be ; terminated
      * @return {@link SQLiteGdxDatabaseCursor}
      * @throws SQLiteGdxException
      */
@@ -318,6 +328,7 @@ public class GdxSqlite {
 
 
     public GdxSqlitePreparedStatement prepare(String sql) {
+        checkOpen();
         GdxSqliteResult result = prepareNative(this.ptr, sql);
         if (result.retValue > 0)
             throwLastErr(result);
@@ -340,5 +351,36 @@ public class GdxSqlite {
         return javaResult(env, (long)stmt, rc, zErrMsg);
     */
 
+    public void beginTransaction() {
+        checkOpen();
+        execSQL(BEGIN_TRANSACTION);
+    }
 
+    public void endTransaction() {
+        checkOpen();
+        execSQL(END_TRANSACTION);
+    }
+
+    public String getCompileOptions() {
+        checkOpen();
+        StringBuilder sb = new StringBuilder();
+        rawQuery("PRAGMA compile_options", new RowCallback() {
+            @Override
+            public void newRow(String[] columnName, Object[] value) {
+                sb.append(value[0]).append("\n");
+            }
+        });
+
+        return sb.toString();
+    }
+
+    public boolean isOpen() {
+        return this.ptr != null;
+    }
+
+    private void checkOpen() {
+        if (!isOpen()) {
+            throw new SQLiteGdxException("Database connection is closed");
+        }
+    }
 }
