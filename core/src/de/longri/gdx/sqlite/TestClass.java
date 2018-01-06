@@ -54,7 +54,7 @@ public class TestClass extends ApplicationAdapter {
             public void run() {
                 state = 0;
 
-                if (TestMain.runTests(GdxSqliteTest.class)) {
+                if (TestMain.runTests(GdxSqliteTest.class, GdxSqlitePreparedStatementTest.class)) {
                     state = 1;
                 } else {
                     state = 2;

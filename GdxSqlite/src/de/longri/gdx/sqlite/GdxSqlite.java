@@ -28,7 +28,7 @@ public class GdxSqlite {
 
     //@off
     /*JNI
-		extern "C" {
+        extern "C" {
 		#include "sqlite3.h"
 		}
 
@@ -82,7 +82,7 @@ public class GdxSqlite {
         }
     }
 
-    private void throwLastErr(GdxSqliteResult result) {
+    void throwLastErr(GdxSqliteResult result) {
         String errMsg = result.errorMsg;
         throw new SQLiteGdxException(errMsg);
     }
@@ -179,7 +179,6 @@ public class GdxSqlite {
      * Runs the provided SQL and returns a {@link SQLiteGdxDatabaseCursor} over the result set.
      *
      * @param sql  the SQL query. The SQL string must not be ; terminated
-     * @param args
      * @return {@link SQLiteGdxDatabaseCursor}
      * @throws SQLiteGdxException
      */
@@ -198,7 +197,7 @@ public class GdxSqlite {
 
 
     private native GdxSqliteResult query(long ptr, String sql, int callBackPtr); /*
-		sqlite3* db = (sqlite3*)ptr;
+        sqlite3* db = (sqlite3*)ptr;
 		const char *zErrMsg = 0;
 
 
@@ -231,10 +230,10 @@ public class GdxSqlite {
 					names.push_back(columnName);
 
 					if (type == SQLITE_INTEGER) {
-					    int valInt = sqlite3_column_int(stmt, colIndex);
+					    jlong valInt = sqlite3_column_int64(stmt, colIndex);
 
-					    jclass cls = (env)->FindClass("java/lang/Integer");
-					    jmethodID midInit = (env)->GetMethodID(cls, "<init>", "(I)V");
+					    jclass cls = (env)->FindClass("java/lang/Long");
+					    jmethodID midInit = (env)->GetMethodID(cls, "<init>", "(J)V");
 					    jobject intObj = (env)->NewObject(cls, midInit, valInt);
 					    (env)->SetObjectArrayElement( valArr, colIndex, intObj);
 					} else if (type == SQLITE_FLOAT) {
@@ -251,7 +250,34 @@ public class GdxSqlite {
 					    (env)->SetObjectArrayElement( valArr, colIndex, jstrValue);
 					    //free(valChar);
 					} else if (type == SQLITE_BLOB) {
-					    printf("columnName = %s,BLOB\n", columnName);
+				        int type;
+				        int length;
+				        jbyteArray jBlob;
+				        const void *blob;
+
+						type = sqlite3_column_type(stmt, colIndex);
+						blob = sqlite3_column_blob(stmt, colIndex);
+
+						if (!blob) {
+						    if (type == SQLITE_NULL) {
+							jBlob = NULL;
+						    }
+						    else {
+							// The return value from sqlite3_column_blob() for a zero-length BLOB is a NULL pointer.
+							jBlob = (env)->NewByteArray(0);
+						    }
+						}else{
+							length = sqlite3_column_bytes(stmt, colIndex);
+							jBlob = (env)->NewByteArray(length);
+							if (!jBlob) {
+								jBlob = NULL;
+							}else{
+								(env)->SetByteArrayRegion(jBlob, (jsize) 0, (jsize) length, (const jbyte*) blob);
+							}
+						}
+
+                        (env)->SetObjectArrayElement( valArr, colIndex, jBlob);
+
 					} else if (type == SQLITE_NULL) {
 					    (env)->SetObjectArrayElement( valArr, colIndex, NULL);
 					}
@@ -289,5 +315,30 @@ public class GdxSqlite {
             callback.newRow(collnames, values);
         }
     }
+
+
+    public GdxSqlitePreparedStatement prepare(String sql) {
+        GdxSqliteResult result = prepareNative(this.ptr, sql);
+        if (result.retValue > 0)
+            throwLastErr(result);
+
+        return new GdxSqlitePreparedStatement(result.ptr, this, sql);
+    }
+
+    private native GdxSqliteResult prepareNative(long ptr, String sql); /*
+        sqlite3* db = (sqlite3*)ptr;
+		const char *zErrMsg = 0;
+		const char *pzTest;
+        sqlite3_stmt* stmt;
+
+        int rc = sqlite3_prepare(db, sql, strlen(sql), &stmt, &pzTest);
+
+        if( rc != SQLITE_OK ){
+            zErrMsg = sqlite3_errmsg(db);
+        }
+
+        return javaResult(env, (long)stmt, rc, zErrMsg);
+    */
+
 
 }

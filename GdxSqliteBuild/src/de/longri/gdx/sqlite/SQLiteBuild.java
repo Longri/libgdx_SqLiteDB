@@ -59,7 +59,7 @@ public class SQLiteBuild {
                 " -DSQLITE_ENABLE_FTS3" +
                 " -DSQLITE_ENABLE_FTS3_PARENTHESIS" +
                 " -DSQLITE_ENABLE_RTREE" +
-                " -DSQLITE_ENABLE_UPDATE_DELETE_LIMIT" +
+//                " -DSQLITE_ENABLE_UPDATE_DELETE_LIMIT" +
                 " -DSQLITE_OMIT_AUTORESET" +
                 " -DSQLITE_OMIT_BUILTIN_TEST" +
                 " -DSQLITE_OMIT_LOAD_EXTENSION" +
@@ -143,6 +143,7 @@ public class SQLiteBuild {
             linux32.compilerPrefix = "";
             linux32.compilerSuffix = "";
             linux32.headerDirs = headers;
+//            linux32.linkerFlags="-shared -m32 -z execstack";
             linux32.cFlags += cFlags;
             targets.add(linux32);
         }
@@ -269,6 +270,40 @@ public class SQLiteBuild {
 
             db.closeDatabase();
             System.out.println("Pointer to closed DB: " + db.ptr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //Test prepared statement
+        try {
+            FileHandle fileHandle = new FileHandle("test/testDB2.db3");
+            fileHandle.parent().mkdirs();
+            GdxSqlite db = new GdxSqlite(fileHandle);
+            db.openOrCreateDatabase();
+
+
+            String sql = "CREATE TABLE COMPANY( \n" +
+                    "  NAME  TEXT PRIMARY KEY  NOT NULL);";
+            db.execSQL(sql);
+
+            String statement = "INSERT INTO COMPANY VALUES (?)";
+            GdxSqlitePreparedStatement preparedStatement = db.prepare(statement);
+
+            preparedStatement.bind("Test1").commit().reset();
+            preparedStatement.bind("Test2").commit().reset();
+            preparedStatement.bind("Test3").commit().reset();
+            preparedStatement.bind("Test4").commit().reset();
+
+            preparedStatement.close();
+
+            try {
+                preparedStatement.bind("Test5").commit().reset();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            db.closeDatabase();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
