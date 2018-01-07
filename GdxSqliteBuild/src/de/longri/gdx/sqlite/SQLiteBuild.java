@@ -248,7 +248,7 @@ public class SQLiteBuild {
             });
 
 
-            SQLiteGdxDatabaseCursor cursor = db.rawQuery(sql);
+            GdxSqliteCursor cursor = db.rawQuery(sql);
 
             cursor.moveToFirst();
             StringBuilder sb = new StringBuilder();

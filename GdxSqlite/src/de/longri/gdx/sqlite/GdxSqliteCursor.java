@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.Array;
 /**
  * Created by Longri on 22.12.2017.
  */
-public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
+public class GdxSqliteCursor {
 
     private Array<Object[]> valueRows = new Array<>();
     private int actRow = 0;
@@ -39,7 +39,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a byte array.
      */
-    @Override
     public byte[] getBlob(int columnIndex) {
         chkCursorposition();
         if (isNull(columnIndex)) return null;
@@ -52,7 +51,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a double.
      */
-    @Override
     public double getDouble(int columnIndex) {
         chkCursorposition();
         return (double) actRowValues[columnIndex];
@@ -64,7 +62,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a float.
      */
-    @Override
     public float getFloat(int columnIndex) {
         chkCursorposition();
         return (float) actRowValues[columnIndex];
@@ -76,7 +73,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a int.
      */
-    @Override
     public int getInt(int columnIndex) {
         chkCursorposition();
         return ((Long) actRowValues[columnIndex]).intValue();
@@ -88,7 +84,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a long.
      */
-    @Override
     public long getLong(int columnIndex) {
         chkCursorposition();
         return (long) actRowValues[columnIndex];
@@ -100,7 +95,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a short.
      */
-    @Override
     public short getShort(int columnIndex) {
         chkCursorposition();
         return (short) actRowValues[columnIndex];
@@ -112,7 +106,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a string.
      */
-    @Override
     public String getString(int columnIndex) {
         chkCursorposition();
         if (isNull(columnIndex)) return null;
@@ -122,7 +115,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
     /**
      * Returns TRUE if the value of the requested column are NULL
      */
-    @Override
     public boolean isNull(int columnIndex) {
         return actRowValues[columnIndex] == null;
     }
@@ -132,7 +124,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      *
      * @return whether the move was successful.
      */
-    @Override
     public boolean next() {
         this.actRow++;
         boolean re = !isAfterLast();
@@ -147,7 +138,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      * @return number of rows
      * @throws SQLiteGdxException
      */
-    @Override
     public int getCount() {
         return valueRows.size;
     }
@@ -155,7 +145,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
     /**
      * Closes the Cursor, releasing all of its resources and making it completely invalid.
      */
-    @Override
     public void close() {
         actRowValues = null;
         for (int i = 0; i < valueRows.size; i++) {
@@ -168,7 +157,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
     /**
      * Shifts the cursor position to the first row.
      */
-    @Override
     public void moveToFirst() {
         this.actRow = 0;
         actRowValues = valueRows.get(this.actRow);
@@ -180,7 +168,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
      * @return {@code true} if the cursor is after the last row,
      * {@code false} if the cursor is at any other position.
      */
-    @Override
     public boolean isAfterLast() {
         return this.actRow >= valueRows.size;
     }
@@ -188,7 +175,6 @@ public class GdxSqliteCursor implements SQLiteGdxDatabaseCursor {
     /**
      * Move the cursor to the next row.
      */
-    @Override
     public void moveToNext() {
         this.actRow++;
         if (!isAfterLast())
