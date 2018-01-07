@@ -17,6 +17,7 @@ package de.longri.gdx.sqlite;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.badlogic.gdx.utils.StringBuilder;
 
 /**
@@ -26,6 +27,10 @@ import com.badlogic.gdx.utils.StringBuilder;
  * Created by Longri on 22.12.2017.
  */
 public class GdxSqlite {
+
+    static {
+        new SharedLibraryLoader().load("GdxSqlite");
+    }
 
     private static final String BEGIN_TRANSACTION = "BEGIN TRANSACTION";
     private static final String END_TRANSACTION = "END TRANSACTION";
@@ -192,7 +197,7 @@ public class GdxSqlite {
      * @return {@link GdxSqliteCursor}
      * @throws SQLiteGdxException
      */
-    GdxSqliteCursor rawQuery(String sql) throws SQLiteGdxException {
+    public GdxSqliteCursor rawQuery(String sql) throws SQLiteGdxException {
         final GdxSqliteCursor cursor = new GdxSqliteCursor();
 
         //fill cursor over callback

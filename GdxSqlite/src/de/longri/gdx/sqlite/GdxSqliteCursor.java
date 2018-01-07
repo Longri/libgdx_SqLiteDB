@@ -97,7 +97,7 @@ public class GdxSqliteCursor {
      */
     public short getShort(int columnIndex) {
         chkCursorposition();
-        return (short) actRowValues[columnIndex];
+        return ((Long) actRowValues[columnIndex]).shortValue();
     }
 
     /**
