@@ -53,6 +53,7 @@ public class GdxSqliteCursor {
      */
     public double getDouble(int columnIndex) {
         chkCursorposition();
+        if (isNull(columnIndex)) return 0.0;
         return (double) actRowValues[columnIndex];
     }
 
@@ -64,6 +65,7 @@ public class GdxSqliteCursor {
      */
     public float getFloat(int columnIndex) {
         chkCursorposition();
+        if (isNull(columnIndex)) return 0.0f;
         return (float) actRowValues[columnIndex];
     }
 
@@ -75,6 +77,7 @@ public class GdxSqliteCursor {
      */
     public int getInt(int columnIndex) {
         chkCursorposition();
+        if (isNull(columnIndex)) return 0;
         return ((Long) actRowValues[columnIndex]).intValue();
     }
 
@@ -86,6 +89,7 @@ public class GdxSqliteCursor {
      */
     public long getLong(int columnIndex) {
         chkCursorposition();
+        if (isNull(columnIndex)) return 0;
         return (long) actRowValues[columnIndex];
     }
 
@@ -97,6 +101,7 @@ public class GdxSqliteCursor {
      */
     public short getShort(int columnIndex) {
         chkCursorposition();
+        if (isNull(columnIndex)) return 0;
         return ((Long) actRowValues[columnIndex]).shortValue();
     }
 
