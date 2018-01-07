@@ -186,13 +186,13 @@ public class GdxSqlite {
     }
 
     /**
-     * Runs the provided SQL and returns a {@link SQLiteGdxDatabaseCursor} over the result set.
+     * Runs the provided SQL and returns a {@link GdxSqliteCursor} over the result set.
      *
      * @param sql the SQL query. The SQL string must not be ; terminated
-     * @return {@link SQLiteGdxDatabaseCursor}
+     * @return {@link GdxSqliteCursor}
      * @throws SQLiteGdxException
      */
-    SQLiteGdxDatabaseCursor rawQuery(String sql) throws SQLiteGdxException {
+    GdxSqliteCursor rawQuery(String sql) throws SQLiteGdxException {
         final GdxSqliteCursor cursor = new GdxSqliteCursor();
 
         //fill cursor over callback

@@ -205,7 +205,7 @@ public class GdxSqliteTest {
 
         boolean exceptionThrowed = false;
         try {
-            SQLiteGdxDatabaseCursor cursor = db.rawQuery("SELECT * FROM CHRISTMAS");
+            GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM CHRISTMAS");
         } catch (SQLiteGdxException e) {
 //            e.printStackTrace();
             exceptionThrowed = true;
@@ -213,7 +213,7 @@ public class GdxSqliteTest {
         assertThat("Query on not exist Table must throw a exception", exceptionThrowed);
 
 
-        SQLiteGdxDatabaseCursor cursor = db.rawQuery("SELECT * FROM COMPANY");
+        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM COMPANY");
         assertThat("Cursor count must be 4", cursor.getCount() == 4);
         assertThat("Cursor must not after last", !cursor.isAfterLast());
         exceptionThrowed = false;

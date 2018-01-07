@@ -186,7 +186,7 @@ public class GdxSqlitePreparedStatementTest {
             }
         });
 
-        SQLiteGdxDatabaseCursor cursor = db.rawQuery("SELECT * FROM test WHERE ID=5");
+        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM test WHERE ID=5");
 
         cursor.moveToFirst();
         long value = cursor.getLong(1);
@@ -260,7 +260,7 @@ public class GdxSqlitePreparedStatementTest {
             }
         });
 
-        SQLiteGdxDatabaseCursor cursor = db.rawQuery("SELECT * FROM test WHERE ID=5");
+        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM test WHERE ID=5");
 
         cursor.moveToFirst();
         byte[] value = cursor.getBlob(1);
