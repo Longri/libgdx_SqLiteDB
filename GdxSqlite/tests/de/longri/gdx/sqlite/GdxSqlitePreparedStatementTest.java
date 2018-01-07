@@ -30,14 +30,15 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Created by Longri on 05.01.2018.
  */
-class GdxSqlitePreparedStatementTest {
+public class GdxSqlitePreparedStatementTest {
 
     static {
         TestUtils.initialGdx();
     }
 
-    public GdxSqlitePreparedStatementTest() {
-    } //constructor for core test reflection
+    public GdxSqlitePreparedStatementTest() {//constructor for core test reflection
+        super();
+    }
 
     static FileHandle testFolder = Gdx.files.local("GdxSqlite/testResources2");
 

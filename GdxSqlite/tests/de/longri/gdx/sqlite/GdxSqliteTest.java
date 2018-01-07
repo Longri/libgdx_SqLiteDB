@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Created by Longri on 18.12.2017.
  */
-class GdxSqliteTest {
+public class GdxSqliteTest {
 
     static {
         TestUtils.initialGdx();

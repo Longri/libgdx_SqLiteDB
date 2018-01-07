@@ -1,0 +1,6 @@
+<config>	
+	<libs>
+		<lib>libs/libGdxSqlite.a</lib>
+		<lib>libs/libsqlitecustom.a</lib>
+	</libs>
+</config>
