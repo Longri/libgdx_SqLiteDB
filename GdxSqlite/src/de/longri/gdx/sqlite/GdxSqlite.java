@@ -121,7 +121,7 @@ public class GdxSqlite {
             if( rc != SQLITE_OK ){
                 zErrMsg = sqlite3_errmsg(db);
             }
-            return javaResult(env, (long)db, rc, zErrMsg);
+            return javaResult(env, reinterpret_cast <jlong> (db), rc, zErrMsg);
     */
 
 
@@ -164,7 +164,7 @@ public class GdxSqlite {
 
             rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
-            return javaResult(env, (long)db, rc, zErrMsg);
+            return javaResult(env, reinterpret_cast <jlong> (db), rc, zErrMsg);
     */
 
     public interface RowCallback {
@@ -325,7 +325,7 @@ public class GdxSqlite {
 		    zErrMsg = sqlite3_errmsg(db);
 		}
 
-		return javaResult(env, (long)db, rc, zErrMsg);
+		return javaResult(env, reinterpret_cast <jlong> (db), rc, zErrMsg);
     */
 
     // called from C
@@ -358,7 +358,7 @@ public class GdxSqlite {
             zErrMsg = sqlite3_errmsg(db);
         }
 
-        return javaResult(env, (long)stmt, rc, zErrMsg);
+        return javaResult(env, reinterpret_cast <jlong> (stmt), rc, zErrMsg);
     */
 
     public void beginTransaction() {

@@ -61,7 +61,7 @@ public class GdxSqlitePreparedStatement {
 
 			if( rc != SQLITE_OK )
 				zErrMsg = sqlite3_errmsg(db);
-			return javaResult(env, (long)stmt, rc, zErrMsg);
+			return javaResult(env, reinterpret_cast <jlong> (stmt), rc, zErrMsg);
 		}
 
     */
@@ -148,7 +148,7 @@ public class GdxSqlitePreparedStatement {
             int rc = sqlite3_bind_text( stmt, idx, value, strlen(value), SQLITE_TRANSIENT);
             if( rc != SQLITE_OK )
                 zErrMsg = sqlite3_errmsg(db);
-            return javaResult(env, (long)stmt, rc, zErrMsg);
+            return javaResult(env, reinterpret_cast <jlong> (stmt), rc, zErrMsg);
     */
 
     private native GdxSqliteResult bind_int(long stmtPtr, long dbPtr, int idx, int value); /*
@@ -158,7 +158,7 @@ public class GdxSqlitePreparedStatement {
             int rc = sqlite3_bind_int( stmt, idx, value);
             if( rc != SQLITE_OK )
                 zErrMsg = sqlite3_errmsg(db);
-            return javaResult(env, (long)stmt, rc, zErrMsg);
+            return javaResult(env, reinterpret_cast <jlong> (stmt), rc, zErrMsg);
     */
 
     private native GdxSqliteResult bind_double(long stmtPtr, long dbPtr, int idx, double value); /*
@@ -168,7 +168,7 @@ public class GdxSqlitePreparedStatement {
             int rc = sqlite3_bind_double( stmt, idx, value);
             if( rc != SQLITE_OK )
                 zErrMsg = sqlite3_errmsg(db);
-            return javaResult(env, (long)stmt, rc, zErrMsg);
+            return javaResult(env, reinterpret_cast <jlong> (stmt), rc, zErrMsg);
     */
 
     private native GdxSqliteResult bind_long(long stmtPtr, long dbPtr, int idx, long value); /*
@@ -178,7 +178,7 @@ public class GdxSqlitePreparedStatement {
             int rc = sqlite3_bind_int64( stmt, idx, value);
             if( rc != SQLITE_OK )
                 zErrMsg = sqlite3_errmsg(db);
-            return javaResult(env, (long)stmt, rc, zErrMsg);
+            return javaResult(env, reinterpret_cast <jlong> (stmt), rc, zErrMsg);
     */
 
     private native GdxSqliteResult bind_blob(long stmtPtr, long dbPtr, int idx, byte[] value);
@@ -205,7 +205,7 @@ public class GdxSqlitePreparedStatement {
                 zErrMsg = sqlite3_errmsg(db);
             }
 
-            return javaResult(env, (long)stmt, rc, zErrMsg);
+            return javaResult(env, reinterpret_cast <jlong> (stmt), rc, zErrMsg);
 
     */
 
