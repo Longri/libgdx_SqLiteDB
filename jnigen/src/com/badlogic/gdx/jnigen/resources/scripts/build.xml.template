@@ -7,6 +7,8 @@
         			<fileset dir="../libs/macosx32" erroronmissingdir="false" includes="libGdxSqlite.dylib"/>
         			<fileset dir="../libs/linux32" erroronmissingdir="false" includes="libGdxSqlite.so"/>
         			<fileset dir="../libs/linux64" erroronmissingdir="false" includes="libGdxSqlite64.so"/>
+        			<fileset dir="../libs/windows64" erroronmissingdir="false" includes="GdxSqlite64.dll"/>
+                    <fileset dir="../libs/windows" erroronmissingdir="false" includes="GdxSqlite.dll"/>
         </jar>
         <jar destfile="../libs/GdxSqlite-platform-1.0-natives-arm64-v8a.jar">
         	<fileset dir="../libs/arm64-v8a" erroronmissingdir="false" includes="libGdxSqlite.so"/>

@@ -31,6 +31,7 @@ public class GdxSqlitePreparedStatement {
 		}
 
 		#include <vector>
+		#include <cstring>
 
 		static jobject javaResult(JNIEnv* env,long ptr, int sqliteResult, const char *errMsg) {
 		    jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");

@@ -121,6 +121,7 @@ public class GdxSqlitePreparedStatementTest {
 
             }
         });
+        db.closeDatabase();
     }
 
     @Test

@@ -29,7 +29,11 @@ import com.badlogic.gdx.utils.StringBuilder;
 public class GdxSqlite {
 
     static {
-        new SharedLibraryLoader().load("GdxSqlite");
+        try {
+            new SharedLibraryLoader().load("GdxSqlite");
+        } catch (Exception e) {
+           
+        }
     }
 
     private static final String BEGIN_TRANSACTION = "BEGIN TRANSACTION";
@@ -42,6 +46,7 @@ public class GdxSqlite {
 		}
 
 		#include <vector>
+		#include <cstring>
 
 		static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
 		    // dummy callback!
