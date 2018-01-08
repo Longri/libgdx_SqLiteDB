@@ -87,10 +87,10 @@ public class SQLiteBuild {
 
         if (all || cmd.hasOption("win64")) {
             BuildTarget win64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Windows, true);
-            win64.compilerPrefix = "";
-            win64.compilerSuffix = "";
+            win64.compilerSuffix = ".exe";
             win64.headerDirs = headers;
             win64.cFlags += cFlags;
+            win64.cppFlags+=" -fpermissive";
             targets.add(win64);
         }
 
