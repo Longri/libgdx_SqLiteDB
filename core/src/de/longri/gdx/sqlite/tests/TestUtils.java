@@ -1,5 +1,7 @@
 package de.longri.gdx.sqlite.tests;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 
 /**
@@ -11,7 +13,13 @@ public class TestUtils {
     }
 
     public static void loadSharedLib(String gdxSqlite) {
-        new SharedLibraryLoader().load(gdxSqlite);
+        try {
+            new SharedLibraryLoader().load(gdxSqlite);
+        } catch (Exception e) {
+            // try load local
+            FileHandle local = Gdx.files.local("../../GdxSqliteBuild/libs/GdxSqlite-platform-1.0-natives-desktop.jar");
+            new SharedLibraryLoader(local.file().getAbsolutePath()).load(gdxSqlite);
+        }
     }
 
     public static boolean arrayEquals(byte[] items1, byte[] items2) {

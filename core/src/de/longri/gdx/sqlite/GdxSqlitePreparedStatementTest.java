@@ -342,4 +342,318 @@ class GdxSqlitePreparedStatementTest {
         db.closeDatabase();
     }
 
+    @Test
+    void bindShort() {
+        FileHandle dbFileHandle = testFolder.child("statementTest5.db3");
+        GdxSqlite db = new GdxSqlite(dbFileHandle);
+        db.openOrCreateDatabase();
+
+        String sql = "CREATE TABLE Test (\n" +
+                "Id INTEGER NOT NULL PRIMARY KEY,\n" +
+                "shortValue  INTEGER,\n" +
+                "Name TEXT)";
+
+        db.execSQL(sql);
+
+        Object[][] values = new Object[10][];
+        values[0] = new Object[]{0, (short) 0, "row0"};
+        values[1] = new Object[]{1, (short) 1, "row1"};
+        values[2] = new Object[]{2, (short) 2, "row2"};
+        values[3] = new Object[]{3, (short) 3, "row3"};
+        values[4] = new Object[]{4, (short) 4, "row4"};
+        values[5] = new Object[]{5, (short) 5, "row5"};
+        values[6] = new Object[]{6, (short) 6, "row6"};
+        values[7] = new Object[]{7, (short) 7, "row7"};
+        values[8] = new Object[]{8, (short) 8, "row8"};
+        values[9] = new Object[]{9, (short) 9, "row9"};
+
+        String statement = "INSERT INTO test VALUES(?,?,?)";
+        GdxSqlitePreparedStatement preparedStatement = db.prepare(statement);
+
+        for (Object[] rowValues : values) {
+            if ((Integer) rowValues[0] == 9) break;
+            preparedStatement.bind(rowValues);
+            try {
+                preparedStatement.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            preparedStatement.reset();
+        }
+
+        // bind separately
+        preparedStatement.bind(1, values[9][0]);
+        preparedStatement.bind(2, values[9][1]);
+        preparedStatement.bind(3, values[9][2]);
+
+        preparedStatement.commit().reset();
+        preparedStatement.close();
+
+        final AtomicInteger cnt = new AtomicInteger(-1);
+        db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
+            @Override
+            public void newRow(String[] columnName, Object[] value) {
+                int id = cnt.incrementAndGet();
+                String num = Integer.toString(id);
+                short val = (short) id;
+                String name = "row" + num;
+
+                assertThat("Id of row ? must be ?".replace("?", num), ((Long) value[0]).intValue() == id);
+                assertThat("Value of row ? must be #".replace("?", num).replace("#", Short.toString(val)), ((Long) value[1]).shortValue() == val);
+                assertThat("Name of row ? must be #".replace("?", num).replace("#", name), value[2].equals(name));
+
+            }
+        });
+
+        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM test WHERE ID=5");
+
+        cursor.moveToFirst();
+        short value = cursor.getShort(1);
+        assertThat("Value must be False", value == 5);
+
+        cursor.close();
+        db.closeDatabase();
+    }
+
+    @Test
+    void bindFloat() {
+        FileHandle dbFileHandle = testFolder.child("statementTest6.db3");
+        GdxSqlite db = new GdxSqlite(dbFileHandle);
+        db.openOrCreateDatabase();
+
+        String sql = "CREATE TABLE Test (\n" +
+                "Id INTEGER NOT NULL PRIMARY KEY,\n" +
+                "floatValue  REAL,\n" +
+                "Name TEXT)";
+
+        db.execSQL(sql);
+
+        Object[][] values = new Object[10][];
+        values[0] = new Object[]{0, 0.0f, "row0"};
+        values[1] = new Object[]{1, 1.1f, "row1"};
+        values[2] = new Object[]{2, 2.2f, "row2"};
+        values[3] = new Object[]{3, 3.3f, "row3"};
+        values[4] = new Object[]{4, 4.4f, "row4"};
+        values[5] = new Object[]{5, 5.5f, "row5"};
+        values[6] = new Object[]{6, 6.6f, "row6"};
+        values[7] = new Object[]{7, 7.7f, "row7"};
+        values[8] = new Object[]{8, 8.8f, "row8"};
+        values[9] = new Object[]{9, 9.9f, "row9"};
+
+        String statement = "INSERT INTO test VALUES(?,?,?)";
+        GdxSqlitePreparedStatement preparedStatement = db.prepare(statement);
+
+        for (Object[] rowValues : values) {
+            if ((Integer) rowValues[0] == 9) break;
+            preparedStatement.bind(rowValues);
+            try {
+                preparedStatement.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            preparedStatement.reset();
+        }
+
+        // bind separately
+        preparedStatement.bind(1, values[9][0]);
+        preparedStatement.bind(2, values[9][1]);
+        preparedStatement.bind(3, values[9][2]);
+
+        preparedStatement.commit().reset();
+        preparedStatement.close();
+
+        final AtomicInteger cnt = new AtomicInteger(-1);
+        db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
+            @Override
+            public void newRow(String[] columnName, Object[] value) {
+                int id = cnt.incrementAndGet();
+                String num = Integer.toString(id);
+                float val = Float.valueOf(num + "." + num);
+                String name = "row" + num;
+
+                assertThat("Id of row ? must be ?".replace("?", num), ((Long) value[0]).intValue() == id);
+                assertThat("Value of row ? must be #".replace("?", num).replace("#", Float.toString(val)), ((Double) value[1]).floatValue() == val);
+                assertThat("Name of row ? must be #".replace("?", num).replace("#", name), value[2].equals(name));
+
+            }
+        });
+
+        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM test WHERE ID=5");
+
+        cursor.moveToFirst();
+        float value = cursor.getFloat(1);
+        assertThat("Value must be 5.5", value == 5.5f);
+
+        cursor.close();
+        db.closeDatabase();
+    }
+
+    @Test
+    void bindNull() {
+        FileHandle dbFileHandle = testFolder.child("statementTest7.db3");
+        GdxSqlite db = new GdxSqlite(dbFileHandle);
+        db.openOrCreateDatabase();
+
+        String sql = "CREATE TABLE Test (\n" +
+                "Id INTEGER NOT NULL PRIMARY KEY,\n" +
+                "realValue  REAL,\n" +
+                "Name TEXT NOT NULL )";
+
+        db.execSQL(sql);
+
+        Object[][] values = new Object[10][];
+        values[0] = new Object[]{0, 0.0, "row0"};
+        values[1] = new Object[]{1, 1.1, "row1"};
+        values[2] = new Object[]{2, 2.2, "row2"};
+        values[3] = new Object[]{3, 3.3, "row3"};
+        values[4] = new Object[]{4, 4.4, "row4"};
+        values[5] = new Object[]{5, null, "row5"};
+        values[6] = new Object[]{6, 6.6, "row6"};
+        values[7] = new Object[]{7, 7.7, "row7"};
+        values[8] = new Object[]{8, 8.8, "row8"};
+        values[9] = new Object[]{9, 9.9, "row9"};
+
+        String statement = "INSERT INTO test VALUES(?,?,?)";
+        GdxSqlitePreparedStatement preparedStatement = db.prepare(statement);
+
+        for (Object[] rowValues : values) {
+            if ((Integer) rowValues[0] == 9) break;
+            preparedStatement.bind(rowValues);
+            try {
+                preparedStatement.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            preparedStatement.reset();
+        }
+
+        // bind separately
+        preparedStatement.bind(1, values[9][0]);
+        preparedStatement.bind(2, values[9][1]);
+        preparedStatement.bind(3, values[9][2]);
+
+        preparedStatement.commit().reset();
+
+
+        final AtomicInteger cnt = new AtomicInteger(-1);
+        db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
+            @Override
+            public void newRow(String[] columnName, Object[] value) {
+                int id = cnt.incrementAndGet();
+                String num = Integer.toString(id);
+                double val = Double.valueOf(num + "." + num);
+                String name = "row" + num;
+
+                assertThat("Id of row ? must be ?".replace("?", num), ((Long) value[0]).intValue() == id);
+                if (id == 5) {
+                    assertThat("Value of row ? must be NULL".replace("?", num), value[1] == null);
+                } else {
+                    assertThat("Value of row ? must be #".replace("?", num).replace("#", Double.toString(val)), (Double) value[1] == val);
+                }
+                assertThat("Name of row ? must be #".replace("?", num).replace("#", name), value[2].equals(name));
+
+            }
+        });
+
+        //test bind NULL to not nullable column must throw a Exception
+        preparedStatement.bind(1, 10);
+        preparedStatement.bind(2, 10.10);
+        preparedStatement.bind(3, null);
+
+        boolean exceptionThrowed = false;
+        try {
+            preparedStatement.commit();
+        } catch (Exception e) {
+            exceptionThrowed = true;
+        }
+
+        assertThat("bind NULL to not nullable column must throw a Exception", exceptionThrowed);
+        preparedStatement.reset();
+
+
+        preparedStatement.close();
+        db.closeDatabase();
+    }
+
+    enum TestEnum {
+        ZERO, ONE, TWO, THREE, FOUR, FIFE, SIX, SEVEN, EIGHT, NINE
+    }
+
+
+    @Test
+    void bindEnum() {
+
+
+        FileHandle dbFileHandle = testFolder.child("statementTest8.db3");
+        GdxSqlite db = new GdxSqlite(dbFileHandle);
+        db.openOrCreateDatabase();
+
+        String sql = "CREATE TABLE Test (\n" +
+                "Id INTEGER NOT NULL PRIMARY KEY,\n" +
+                "shortValue  INTEGER,\n" +
+                "Name TEXT)";
+
+        db.execSQL(sql);
+
+        Object[][] values = new Object[10][];
+        values[0] = new Object[]{0, TestEnum.ZERO, "row0"};
+        values[1] = new Object[]{1, TestEnum.ONE, "row1"};
+        values[2] = new Object[]{2, TestEnum.TWO, "row2"};
+        values[3] = new Object[]{3, TestEnum.THREE, "row3"};
+        values[4] = new Object[]{4, TestEnum.FOUR, "row4"};
+        values[5] = new Object[]{5, TestEnum.FIFE, "row5"};
+        values[6] = new Object[]{6, TestEnum.SIX, "row6"};
+        values[7] = new Object[]{7, TestEnum.SEVEN, "row7"};
+        values[8] = new Object[]{8, TestEnum.EIGHT, "row8"};
+        values[9] = new Object[]{9, TestEnum.NINE, "row9"};
+
+        String statement = "INSERT INTO test VALUES(?,?,?)";
+        GdxSqlitePreparedStatement preparedStatement = db.prepare(statement);
+
+        for (Object[] rowValues : values) {
+            if ((Integer) rowValues[0] == 9) break;
+            preparedStatement.bind(rowValues);
+            try {
+                preparedStatement.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            preparedStatement.reset();
+        }
+
+        // bind separately
+        preparedStatement.bind(1, values[9][0]);
+        preparedStatement.bind(2, values[9][1]);
+        preparedStatement.bind(3, values[9][2]);
+
+        preparedStatement.commit().reset();
+        preparedStatement.close();
+
+        final AtomicInteger cnt = new AtomicInteger(-1);
+        db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
+            @Override
+            public void newRow(String[] columnName, Object[] value) {
+                int id = cnt.incrementAndGet();
+                String num = Integer.toString(id);
+                short val = (short) id;
+                String name = "row" + num;
+
+                assertThat("Id of row ? must be ?".replace("?", num), ((Long) value[0]).intValue() == id);
+                assertThat("Value of row ? must be #".replace("?", num).replace("#", Short.toString(val)), ((Long) value[1]).shortValue() == val);
+                assertThat("Name of row ? must be #".replace("?", num).replace("#", name), value[2].equals(name));
+
+            }
+        });
+
+        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM test WHERE ID=5");
+
+        cursor.moveToFirst();
+        short value = cursor.getShort(1);
+        assertThat("Value must be 5", value == 5);
+
+        cursor.close();
+        db.closeDatabase();
+    }
+
+
 }

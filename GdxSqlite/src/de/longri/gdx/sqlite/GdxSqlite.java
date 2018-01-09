@@ -53,18 +53,24 @@ public class GdxSqlite {
 		    return 0;
 		}
 
-		static jobject javaResult(JNIEnv* env,long ptr, int sqliteResult, const char *errMsg) {
+		static jobject javaResult(JNIEnv* env, sqlite3 *db, long ptr, int sqliteResult, const char *errMsg) {
 		    jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
 
 		    jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
 
+            if( sqliteResult == 1){
+                // return with error code
+                int extErr = sqlite3_extended_errcode(db);
+                jlong retPtr = ptr;
+		        jint retResult = extErr;
+		        jstring retErrMsg = (env)->NewStringUTF(errMsg);
+		        return (env)->NewObject(objectClass, cid, retPtr, retResult, retErrMsg);
+            }
+
 		    jlong retPtr = ptr;
 		    jint retResult = sqliteResult;
 		    jstring retErrMsg = (env)->NewStringUTF(errMsg);
-
-
 		    return (env)->NewObject(objectClass, cid, retPtr, retResult, retErrMsg);
-
 		}
 
     */
@@ -121,7 +127,7 @@ public class GdxSqlite {
             if( rc != SQLITE_OK ){
                 zErrMsg = sqlite3_errmsg(db);
             }
-            return javaResult(env, reinterpret_cast <jlong> (db), rc, zErrMsg);
+            return javaResult(env, db, reinterpret_cast <jlong> (db), rc, zErrMsg);
     */
 
 
@@ -164,7 +170,7 @@ public class GdxSqlite {
 
             rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
-            return javaResult(env, reinterpret_cast <jlong> (db), rc, zErrMsg);
+            return javaResult(env, db, reinterpret_cast <jlong> (db), rc, zErrMsg);
     */
 
     public interface RowCallback {
@@ -331,7 +337,7 @@ public class GdxSqlite {
 		    zErrMsg = sqlite3_errmsg(db);
 		}
 
-		return javaResult(env, reinterpret_cast <jlong> (db), rc, zErrMsg);
+		return javaResult(env, db, reinterpret_cast <jlong> (db), rc, zErrMsg);
     */
 
     // called from C
@@ -364,7 +370,7 @@ public class GdxSqlite {
             zErrMsg = sqlite3_errmsg(db);
         }
 
-        return javaResult(env, reinterpret_cast <jlong> (stmt), rc, zErrMsg);
+        return javaResult(env, db, reinterpret_cast <jlong> (stmt), rc, zErrMsg);
     */
 
     public void beginTransaction() {
