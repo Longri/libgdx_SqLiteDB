@@ -257,12 +257,13 @@ public class SQLiteBuild {
         sync(libsPath, precompiledLibsPath, "windows64");
         sync(libsPath, precompiledLibsPath, "armeabi");
         sync(libsPath, precompiledLibsPath, "armeabi-v7a");
+        sync(libsPath, precompiledLibsPath, "arm64-v8a");
         sync(libsPath, precompiledLibsPath, "ios32");
         sync(libsPath, precompiledLibsPath, "linux32");
         sync(libsPath, precompiledLibsPath, "linux64");
         sync(libsPath, precompiledLibsPath, "macosx32");
         sync(libsPath, precompiledLibsPath, "macosx64");
-        sync(libsPath, precompiledLibsPath, "x84");
+        sync(libsPath, precompiledLibsPath, "x86");
         sync(libsPath, precompiledLibsPath, "x86_64");
     }
 
