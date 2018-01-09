@@ -166,6 +166,11 @@ public class SQLiteBuild {
         BuildConfig config = new BuildConfig("GdxSqlite");
         new AntScriptGenerator().generate(config, targets);
 
+        FileDescriptor projectPath = new FileDescriptor("../");
+        FileDescriptor buildLibsPath = projectPath.child("GdxSqliteBuild/libs");
+        //delete outdated files
+        buildLibsPath.deleteDirectory();
+
 
         if (all || cmd.hasOption("linux32"))
             BuildExecutor.executeAnt("build-linux32.xml", "-v -Dhas-compiler=true", jniPath);
@@ -194,7 +199,7 @@ public class SQLiteBuild {
 
         //copy libs to local modules
 
-        FileDescriptor projectPath = new FileDescriptor("../");
+
         FileDescriptor java = projectPath.child("GdxSqlite/build/libs/GdxSqlite-1.0.jar");
 
         FileDescriptor core = projectPath.child("core");
@@ -250,21 +255,38 @@ public class SQLiteBuild {
         FileDescriptor libsPath = new FileDescriptor("../GdxSqliteBuild/libs/");
         FileDescriptor precompiledLibsPath = new FileDescriptor("../GdxSqliteBuild/precompiledLibs/");
         sync(libsPath, precompiledLibsPath, "windows64");
+        sync(libsPath, precompiledLibsPath, "armeabi");
+        sync(libsPath, precompiledLibsPath, "armeabi-v7a");
+        sync(libsPath, precompiledLibsPath, "ios32");
+        sync(libsPath, precompiledLibsPath, "linux32");
+        sync(libsPath, precompiledLibsPath, "linux64");
+        sync(libsPath, precompiledLibsPath, "macosx32");
+        sync(libsPath, precompiledLibsPath, "macosx64");
+        sync(libsPath, precompiledLibsPath, "x84");
+        sync(libsPath, precompiledLibsPath, "x86_64");
     }
 
     private static void sync(FileDescriptor libsPath, FileDescriptor precompiledLibsPath, String folder) {
         FileDescriptor lib = libsPath.child(folder);
         FileDescriptor pre = precompiledLibsPath.child(folder);
 
-        if (lib.exists()) {
+        if (folderExistAndNotEmpty(lib)) {
             //copy to precompiled!
             lib.copyTo(precompiledLibsPath);
+            System.out.println("New    compiled :" + folder);
         } else {
             //get from precompiled if exist
             if (pre.exists()) {
                 pre.copyTo(libsPath);
+                System.out.println("Use precompiled :" + folder);
             }
         }
+    }
+
+    private static boolean folderExistAndNotEmpty(FileDescriptor folder) {
+
+        if (!folder.exists() || !folder.isDirectory()) return false;
+        return (folder.list().length > 0);
     }
 
     private static void runTest() {
