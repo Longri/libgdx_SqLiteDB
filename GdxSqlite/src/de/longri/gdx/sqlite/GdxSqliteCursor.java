@@ -66,7 +66,7 @@ public class GdxSqliteCursor {
     public float getFloat(int columnIndex) {
         chkCursorposition();
         if (isNull(columnIndex)) return 0.0f;
-        return (float) actRowValues[columnIndex];
+        return ((Double) actRowValues[columnIndex]).floatValue();
     }
 
     /**

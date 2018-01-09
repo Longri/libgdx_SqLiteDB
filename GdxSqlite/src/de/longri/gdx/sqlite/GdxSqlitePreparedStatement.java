@@ -101,12 +101,16 @@ public class GdxSqlitePreparedStatement {
         GdxSqliteResult result = null;
         if (value instanceof String) {
             result = bind_text(this.ptr, this.db.ptr, idx, (String) value);
-        } else if (value instanceof Integer || value instanceof Short) {
+        } else if (value instanceof Integer) {
             result = bind_int(this.ptr, this.db.ptr, idx, (int) value);
+        } else if (value instanceof Short) {
+            result = bind_int(this.ptr, this.db.ptr, idx, ((Short) value).intValue());
         } else if (value instanceof Long) {
             result = bind_long(this.ptr, this.db.ptr, idx, (long) value);
-        } else if (value instanceof Double || value instanceof Float) {
+        } else if (value instanceof Double) {
             result = bind_double(this.ptr, this.db.ptr, idx, (double) value);
+        } else if (value instanceof Float) {
+            result = bind_double(this.ptr, this.db.ptr, idx, ((Float) value).doubleValue());
         } else if (value instanceof Byte[]) {
             result = bind_blob(this.ptr, this.db.ptr, idx, toPrimitives(((Byte[]) value)));
         } else if (value instanceof byte[]) {
