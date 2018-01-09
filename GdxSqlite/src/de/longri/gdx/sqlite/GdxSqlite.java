@@ -32,7 +32,7 @@ public class GdxSqlite {
         try {
             new SharedLibraryLoader().load("GdxSqlite");
         } catch (Exception e) {
-           
+
         }
     }
 
@@ -196,7 +196,8 @@ public class GdxSqlite {
     }
 
     /**
-     * Runs the provided SQL and returns a {@link GdxSqliteCursor} over the result set.
+     * Runs the provided SQL and returns a {@link GdxSqliteCursor} over the result set,
+     * or NULL if the result are empty!
      *
      * @param sql the SQL query. The SQL string must not be ; terminated
      * @return {@link GdxSqliteCursor}
@@ -212,6 +213,11 @@ public class GdxSqlite {
                 cursor.addRow(columnNames, values);
             }
         });
+
+        if (cursor.getCount() == 0) {
+            cursor.close();
+            return null;
+        }
         return cursor;
     }
 

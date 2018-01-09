@@ -111,6 +111,9 @@ public class GdxSqlitePreparedStatement {
             result = bind_blob(this.ptr, this.db.ptr, idx, toPrimitives(((Byte[]) value)));
         } else if (value instanceof byte[]) {
             result = bind_blob(this.ptr, this.db.ptr, idx, (byte[]) value);
+        } else if (value instanceof Boolean) {
+            int intValue = ((boolean) value) ? 1 : 0;
+            result = bind_int(this.ptr, this.db.ptr, idx, intValue);
         } else {
             String error = "Bind value for class '" + value.getClass().getSimpleName() + "' not implemented";
             db.throwLastErr(new GdxSqliteResult(-1, -1, error));

@@ -35,8 +35,9 @@ class GdxSqlitePreparedStatementTest {
         TestUtils.initialGdx();
     }
 
-    public GdxSqlitePreparedStatementTest() {
-    } //constructor for core test reflection
+    public GdxSqlitePreparedStatementTest() {//constructor for core test reflection
+        super();
+    }
 
     static FileHandle testFolder = Gdx.files.local("GdxSqlite/testResources2");
 
@@ -119,6 +120,7 @@ class GdxSqlitePreparedStatementTest {
 
             }
         });
+        db.closeDatabase();
     }
 
     @Test
@@ -194,7 +196,6 @@ class GdxSqlitePreparedStatementTest {
         db.closeDatabase();
     }
 
-
     @Test
     void bindBlob() {
         FileHandle dbFileHandle = testFolder.child("statementTest3.db3");
@@ -263,6 +264,79 @@ class GdxSqlitePreparedStatementTest {
         cursor.moveToFirst();
         byte[] value = cursor.getBlob(1);
         assertThat("Value must be [5,5,5,5]", TestUtils.arrayEquals((byte[]) value, new byte[]{5, 5, 5, 5}));
+
+        cursor.close();
+        db.closeDatabase();
+    }
+
+    @Test
+    void bindBoolean() {
+        FileHandle dbFileHandle = testFolder.child("statementTest4.db3");
+        GdxSqlite db = new GdxSqlite(dbFileHandle);
+        db.openOrCreateDatabase();
+
+        String sql = "CREATE TABLE Test (\n" +
+                "Id INTEGER NOT NULL PRIMARY KEY,\n" +
+                "intLikeBoolean  INTEGER,\n" +
+                "Name TEXT)";
+
+        db.execSQL(sql);
+
+        Object[][] values = new Object[10][];
+        values[0] = new Object[]{0, true, "row0"};
+        values[1] = new Object[]{1, false, "row1"};
+        values[2] = new Object[]{2, true, "row2"};
+        values[3] = new Object[]{3, false, "row3"};
+        values[4] = new Object[]{4, Boolean.TRUE, "row4"};
+        values[5] = new Object[]{5, Boolean.FALSE, "row5"};
+        values[6] = new Object[]{6, true, "row6"};
+        values[7] = new Object[]{7, false, "row7"};
+        values[8] = new Object[]{8, Boolean.TRUE, "row8"};
+        values[9] = new Object[]{9, Boolean.FALSE, "row9"};
+
+        String statement = "INSERT INTO test VALUES(?,?,?)";
+        GdxSqlitePreparedStatement preparedStatement = db.prepare(statement);
+
+        for (Object[] rowValues : values) {
+            if ((Integer) rowValues[0] == 9) break;
+            preparedStatement.bind(rowValues);
+            try {
+                preparedStatement.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            preparedStatement.reset();
+        }
+
+        // bind separately
+        preparedStatement.bind(1, values[9][0]);
+        preparedStatement.bind(2, values[9][1]);
+        preparedStatement.bind(3, values[9][2]);
+
+        preparedStatement.commit().reset();
+        preparedStatement.close();
+
+        final AtomicInteger cnt = new AtomicInteger(-1);
+        db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
+            @Override
+            public void newRow(String[] columnName, Object[] value) {
+                int id = cnt.incrementAndGet();
+                String num = Integer.toString(id);
+                boolean val = id % 2 == 0;
+                String name = "row" + num;
+
+                assertThat("Id of row ? must be ?".replace("?", num), ((Long) value[0]).intValue() == id);
+                assertThat("Value of row ? must be #".replace("?", num).replace("#", Boolean.toString(val)), ((long) value[1] > 0) == val);
+                assertThat("Name of row ? must be #".replace("?", num).replace("#", name), value[2].equals(name));
+
+            }
+        });
+
+        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM test WHERE ID=5");
+
+        cursor.moveToFirst();
+        boolean value = cursor.getBoolean(1);
+        assertThat("Value must be False", (boolean) value == false);
 
         cursor.close();
         db.closeDatabase();

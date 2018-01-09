@@ -106,6 +106,18 @@ public class GdxSqliteCursor {
     }
 
     /**
+     * Returns the value of the requested column as a boolean. <br><br>
+     * TRUE if int value > 0 <br>
+     * FALSE if int value == 0 <br>
+     *
+     * @param columnIndex the zero-based index of the target column.
+     * @return the value of that column as a boolean.
+     */
+    public boolean getBoolean(int columnIndex) {
+        return getInt(columnIndex) > 0;
+    }
+
+    /**
      * Returns the value of the requested column as a string.
      *
      * @param columnIndex the zero-based index of the target column.
@@ -197,4 +209,6 @@ public class GdxSqliteCursor {
         System.arraycopy(values, 0, newValues, 0, length);
         valueRows.add(newValues);
     }
+
+
 }

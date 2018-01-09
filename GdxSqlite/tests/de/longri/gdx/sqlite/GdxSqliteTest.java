@@ -410,4 +410,23 @@ public class GdxSqliteTest {
 
     }
 
+    @Test
+    void emptyCursorAccess() {
+
+        FileHandle dbFileHandle = testFolder.child("createTest6.db3");
+        GdxSqlite db = new GdxSqlite(dbFileHandle);
+        db.openOrCreateDatabase();
+
+        final String CREATE = "CREATE TABLE Test (\n" +
+                "    Id          INTEGER        NOT NULL\n" +
+                "                               PRIMARY KEY AUTOINCREMENT,\n" +
+                "    testName NVARCHAR (255)\n" +
+                ");";
+
+        db.execSQL(CREATE);
+        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM Test WHERE id=0");
+        assertThat("Cursor must be NULL", cursor == null);
+
+        db.closeDatabase();
+    }
 }
