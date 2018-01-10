@@ -247,10 +247,15 @@ public class GdxSqlite {
 		    std::vector<const char *> names;
 		    int colCount = sqlite3_column_count(stmt);
 
-		    // Create a String[colCount]
+		    // Create a Object[colCount]
 		    jclass objectClass = (env)->FindClass("java/lang/Object");
 		    jobjectArray valArr = (env)->NewObjectArray( colCount, objectClass, NULL);
 
+            // Create a String[colCount]
+			jclass stringClass = (env)->FindClass("java/lang/String");
+			jobjectArray nameArr = (env)->NewObjectArray( colCount, stringClass, NULL);
+
+            int flagNameArrInit = 0;
 
 		    while (rc != SQLITE_DONE && rc != SQLITE_OK) {
 	            rowCount++;
@@ -317,25 +322,35 @@ public class GdxSqlite {
 
 				// callback to Java
 
-				// Create a String[colCount]
-				jclass stringClass = (env)->FindClass("java/lang/String");
-				jobjectArray arr = (env)->NewObjectArray( colCount, stringClass, NULL);
 
-				// Add name items
-				for (int colIndex = 0; colIndex < colCount; colIndex++) {
-				    jstring jstrName = (env)->NewStringUTF( names[colIndex]);
-				    (env)->SetObjectArrayElement( arr, colIndex, jstrName);
-				}
+                if(flagNameArrInit == 0){
+                    // Add name items
+				    for (int colIndex = 0; colIndex < colCount; colIndex++) {
+				        jstring jstrName = (env)->NewStringUTF( names[colIndex]);
+				        (env)->SetObjectArrayElement( nameArr, colIndex, jstrName);
+				    }
+				    flagNameArrInit = 1;
+                }
 
-				(env)->CallVoidMethod(object, mid, callBackPtr, arr, valArr);
 
-				names.clear();
+				(env)->CallVoidMethod(object, mid, callBackPtr, nameArr, valArr);
+
 				rc = sqlite3_step(stmt);
 		    }
+
+
+		    //release resources
+		    names.clear();
+		    std::vector<const char *>().swap(names);
+            (env)->DeleteLocalRef(nameArr);
+            (env)->DeleteLocalRef(valArr);
+
 		    rc = sqlite3_finalize(stmt);
 		} else {
 		    zErrMsg = sqlite3_errmsg(db);
 		}
+
+
 
 		return javaResult(env, db, reinterpret_cast <jlong> (db), rc, zErrMsg);
     */
