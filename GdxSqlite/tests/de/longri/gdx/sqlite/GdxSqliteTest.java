@@ -39,7 +39,7 @@ public class GdxSqliteTest {
     public GdxSqliteTest() {
     } //constructor for core test reflection
 
-    static FileHandle testFolder = Gdx.files.local("GdxSqlite/testResources");
+    static FileHandle testFolder = Gdx.files.local("GdxSqlite/testResources1");
 
     @BeforeAll
     static void setUp() {

@@ -159,6 +159,14 @@ public class SQLiteBuild {
             BuildTarget android = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Android, false);
             android.headerDirs = headers;
             android.cFlags += cFlags;
+
+            if (System.getProperty("os.name").startsWith("Windows")) {
+                android.ndkHome = "C:/android-ndk-r16b";
+                android.ndkSuffix = ".cmd";
+            } else {
+                android.ndkHome = "/Volumes/HDD_DATA/android-ndk-r16b";
+            }
+
             targets.add(android);
         }
 

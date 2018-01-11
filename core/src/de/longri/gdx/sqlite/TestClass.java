@@ -47,7 +47,8 @@ public class TestClass extends ApplicationAdapter {
             public void run() {
                 state = 0;
 
-                if (TestMain.runTests(GdxSqliteTest.class, GdxSqlitePreparedStatementTest.class, GdxSqliteTransactionTest.class)) {
+                if (TestMain.runTests(GdxSqliteTest.class, GdxSqlitePreparedStatementTest.class,
+                        GdxSqliteTransactionTest.class, CB_DB_Tests.class)) {
                     state = 1;
                 } else {
                     state = 2;

@@ -21,6 +21,9 @@ package com.badlogic.gdx.jnigen;
  * create Ant build files that invoke the compiler toolchain to create the shared libraries.
  */
 public class BuildTarget {
+    public String ndkHome = "";
+    public String ndkSuffix = "";
+
     /**
      * The target operating system of a build target.
      */
