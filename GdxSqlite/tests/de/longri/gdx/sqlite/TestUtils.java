@@ -15,8 +15,9 @@
  */
 package de.longri.gdx.sqlite;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
+import com.badlogic.gdx.utils.Clipboard;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 
 /**
@@ -26,6 +27,137 @@ public class TestUtils {
     public static void initialGdx() {
         if (Gdx.files != null) return;
         Gdx.files = new LwjglFiles();
+        Gdx.app = new Application() {
+            @Override
+            public ApplicationListener getApplicationListener() {
+                return null;
+            }
+
+            @Override
+            public Graphics getGraphics() {
+                return null;
+            }
+
+            @Override
+            public Audio getAudio() {
+                return null;
+            }
+
+            @Override
+            public Input getInput() {
+                return null;
+            }
+
+            @Override
+            public Files getFiles() {
+                return null;
+            }
+
+            @Override
+            public Net getNet() {
+                return null;
+            }
+
+            @Override
+            public void log(String s, String s1) {
+
+            }
+
+            @Override
+            public void log(String s, String s1, Throwable throwable) {
+
+            }
+
+            @Override
+            public void error(String s, String s1) {
+
+            }
+
+            @Override
+            public void error(String s, String s1, Throwable throwable) {
+
+            }
+
+            @Override
+            public void debug(String s, String s1) {
+
+            }
+
+            @Override
+            public void debug(String s, String s1, Throwable throwable) {
+
+            }
+
+            @Override
+            public void setLogLevel(int i) {
+
+            }
+
+            @Override
+            public int getLogLevel() {
+                return 0;
+            }
+
+            @Override
+            public void setApplicationLogger(ApplicationLogger applicationLogger) {
+
+            }
+
+            @Override
+            public ApplicationLogger getApplicationLogger() {
+                return null;
+            }
+
+            @Override
+            public ApplicationType getType() {
+                return ApplicationType.HeadlessDesktop;
+            }
+
+            @Override
+            public int getVersion() {
+                return 0;
+            }
+
+            @Override
+            public long getJavaHeap() {
+                return 0;
+            }
+
+            @Override
+            public long getNativeHeap() {
+                return 0;
+            }
+
+            @Override
+            public Preferences getPreferences(String s) {
+                return null;
+            }
+
+            @Override
+            public Clipboard getClipboard() {
+                return null;
+            }
+
+            @Override
+            public void postRunnable(Runnable runnable) {
+
+            }
+
+            @Override
+            public void exit() {
+
+            }
+
+            @Override
+            public void addLifecycleListener(LifecycleListener lifecycleListener) {
+
+            }
+
+            @Override
+            public void removeLifecycleListener(LifecycleListener lifecycleListener) {
+
+            }
+        };
     }
 
     public static void loadSharedLib(String gdxSqlite) {
