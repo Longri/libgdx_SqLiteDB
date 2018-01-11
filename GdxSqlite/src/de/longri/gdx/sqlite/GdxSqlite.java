@@ -275,11 +275,20 @@ public class GdxSqlite {
 					}
 
 					if (type == SQLITE_INTEGER) {
-					    (env)->SetObjectArrayElement( valArr, colIndex, (env)->NewObject(longCls, midInitLong, sqlite3_column_int64(stmt, colIndex)));
+                        jlong valInt = sqlite3_column_int64(stmt, colIndex);
+					    jobject intObj = (env)->NewObject(longCls, midInitLong, valInt);
+					    (env)->SetObjectArrayElement( valArr, colIndex, intObj);;
+					    (env)->DeleteLocalRef(intObj);
 					} else if (type == SQLITE_FLOAT) {
-					    (env)->SetObjectArrayElement( valArr, colIndex, (env)->NewObject(doubleCls, midInitDouble, sqlite3_column_double(stmt, colIndex)));
+					    double valDouble = sqlite3_column_double(stmt, colIndex);
+					    jobject idoubleObj = (env)->NewObject(doubleCls, midInitDouble, valDouble);
+					    (env)->SetObjectArrayElement( valArr, colIndex, idoubleObj);
+					    (env)->DeleteLocalRef(idoubleObj);
 					} else if (type == SQLITE_TEXT) {
-					    (env)->SetObjectArrayElement( valArr, colIndex, (env)->NewStringUTF(reinterpret_cast < const char* >( sqlite3_column_text(stmt, colIndex) )));
+					    const char * val = reinterpret_cast < const char* >( sqlite3_column_text(stmt, colIndex) );
+					    jstring jstrValue = (env)->NewStringUTF(val);
+					    (env)->SetObjectArrayElement( valArr, colIndex, jstrValue);
+                        (env)->DeleteLocalRef(jstrValue);
 					} else if (type == SQLITE_BLOB) {
 				        int length;
 				        jbyteArray jBlob;
@@ -300,7 +309,7 @@ public class GdxSqlite {
 							}
 						}
                         (env)->SetObjectArrayElement( valArr, colIndex, jBlob);
-
+                        (env)->DeleteLocalRef(jBlob);
 					} else if (type == SQLITE_NULL) {
 					    (env)->SetObjectArrayElement( valArr, colIndex, NULL);
 					}

@@ -22,6 +22,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -46,7 +48,7 @@ public class CB_DB_Tests {
         testFolder.mkdirs();
 
         FileHandle asset = Gdx.files.internal("GdxSqlite/testResources/cachebox.db3");
-        if (asset.exists()&& (Gdx.app.getType()== Application.ApplicationType.Android || Gdx.app.getType()== Application.ApplicationType.iOS)) {
+        if (asset.exists() && (Gdx.app.getType() == Application.ApplicationType.Android || Gdx.app.getType() == Application.ApplicationType.iOS)) {
 
             //delete old tests
             testFolder.deleteDirectory();
@@ -76,8 +78,17 @@ public class CB_DB_Tests {
         GdxSqlite db = new GdxSqlite(dbFileHandle);
         db.openOrCreateDatabase();
 
-        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM CacheCoreInfo ");
+        AtomicInteger count = new AtomicInteger(0);
 
+        db.rawQuery("SELECT * FROM CacheCoreInfo ", new GdxSqlite.RowCallback() {
+            @Override
+            public void newRow(String[] columnName, Object[] value) {
+//                System.out.println("Row: " + Integer.toString(count.incrementAndGet()));
+            }
+        });
+
+
+        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM CacheCoreInfo ");
         assertThat("Cursor count must be 5925", cursor.getCount() == 5925);
 
 
