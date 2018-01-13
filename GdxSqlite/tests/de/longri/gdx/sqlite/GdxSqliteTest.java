@@ -429,4 +429,73 @@ public class GdxSqliteTest {
 
         db.closeDatabase();
     }
+
+    @Test
+    public void writeReadUtf8(){
+        FileHandle dbFileHandle = testFolder.child("createTest7.db3");
+        GdxSqlite db = new GdxSqlite(dbFileHandle);
+        db.openOrCreateDatabase();
+
+        final String CREATE = "CREATE TABLE Test (\n" +
+                "    ID          INTEGER        NOT NULL\n" +
+                "                               PRIMARY KEY AUTOINCREMENT,\n" +
+                "    utf NVARCHAR (255)\n" +
+                ");";
+
+        db.execSQL(CREATE);
+
+        final String INSERT = "INSERT INTO Test (ID, utf) " +
+                "VALUES (1, '\uD83D\uDE39'); " +
+                "INSERT INTO Test (ID, utf) " +
+                "VALUES (2, '\uD83D\uDEB4'); " +
+                "INSERT INTO Test (ID, utf)" +
+                "VALUES (3, NULL);" +
+                "INSERT INTO Test (ID, utf)" +
+                "VALUES (4, 'Mark' );";
+
+        db.execSQL(INSERT);
+
+        db.rawQuery("SELECT * FROM Test", new GdxSqlite.RowCallback() {
+
+            final AtomicInteger rowCount = new AtomicInteger(-1);
+            @Override
+            public void newRow(String[] columnName, Object[] value) {
+
+                switch (rowCount.incrementAndGet()) {
+                    case 0:
+                        assertThat("ColumnName must be ID", columnName[0].equals("ID"));
+                        assertThat("ColumnName must be utf", columnName[1].equals("utf"));
+
+                        assertThat("Value 0 must Instance of Long and 1", value[0] instanceof Long && (Long) value[0] == 1);
+                        assertThat("Value 1 must Instance of String and Paul", value[1] instanceof String && value[1].equals("\uD83D\uDE39"));
+                        break;
+                    case 1:
+                        assertThat("ColumnName must be ID", columnName[0].equals("ID"));
+                        assertThat("ColumnName must be utf", columnName[1].equals("utf"));
+
+                        assertThat("Value 0 must Instance of Long and 2", value[0] instanceof Long && (Long) value[0] == 2);
+                        assertThat("Value 1 must Instance of String and Allen", value[1] instanceof String && value[1].equals("\uD83D\uDEB4"));
+                         break;
+                    case 2:
+                        assertThat("ColumnName must be ID", columnName[0].equals("ID"));
+                        assertThat("ColumnName must be utf", columnName[1].equals("utf"));
+
+                        assertThat("Value 0 must Instance of Long and 3", value[0] instanceof Long && (Long) value[0] == 3);
+                        assertThat("Value 1 must be NULL", value[1] == null);
+                        break;
+                    case 3:
+                        assertThat("ColumnName must be ID", columnName[0].equals("ID"));
+                        assertThat("ColumnName must be utf", columnName[1].equals("utf"));
+
+                        assertThat("Value 0 must Instance of Long and 4", value[0] instanceof Long && (Long) value[0] == 4);
+                        assertThat("Value 1 must Instance of String and Mark", value[1] instanceof String && value[1].equals("Mark"));
+                       break;
+                    default:
+                        assertThat("Unknown result", false);
+                }
+            }
+        });
+        db.closeDatabase();
+
+    }
 }

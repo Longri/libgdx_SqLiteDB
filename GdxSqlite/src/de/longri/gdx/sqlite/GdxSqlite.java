@@ -20,6 +20,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.badlogic.gdx.utils.StringBuilder;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * SQLite native wrapper
  * <p>
@@ -38,6 +40,18 @@ public class GdxSqlite {
 
     private static final String BEGIN_TRANSACTION = "BEGIN TRANSACTION";
     private static final String END_TRANSACTION = "END TRANSACTION";
+
+    static byte[] utf8Bytes(String str) {
+        if (str == null) {
+            return null;
+        }
+        try {
+            return str.getBytes("UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new SQLiteGdxException("UTF-8 is not supported", e);
+        }
+    }
 
     //@off
     /*JNI

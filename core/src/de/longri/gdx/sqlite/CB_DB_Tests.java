@@ -80,18 +80,29 @@ public class CB_DB_Tests {
 
         AtomicInteger count = new AtomicInteger(0);
 
-        db.rawQuery("SELECT * FROM CacheCoreInfo ", new GdxSqlite.RowCallback() {
+        db.rawQuery("SELECT PlacedBy FROM CacheCoreInfo ", new GdxSqlite.RowCallback() {
             @Override
             public void newRow(String[] columnName, Object[] value) {
-//                System.out.println("Row: " + Integer.toString(count.incrementAndGet()));
+                System.out.println("Row: " + Integer.toString(count.incrementAndGet())+value[0]);
+                System.out.println("\uD83D\uDE39");
+            }
+        });
+
+        db.rawQuery("SELECT PlacedBy FROM CacheCoreInfo WHERE Id = 19193462783361863", new GdxSqlite.RowCallback() {
+            @Override
+            public void newRow(String[] columnName, Object[] value) {
+                System.out.println("Result: " + value[0]);
             }
         });
 
 
-        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM CacheCoreInfo ");
-        assertThat("Cursor count must be 5925", cursor.getCount() == 5925);
+//        GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM CacheCoreInfo ");
+//        assertThat("Cursor count must be 5925", cursor.getCount() == 5925);
 
 
     }
+
+
+
 
 }

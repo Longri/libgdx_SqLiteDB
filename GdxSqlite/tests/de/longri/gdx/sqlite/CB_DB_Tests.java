@@ -72,7 +72,7 @@ public class CB_DB_Tests {
     }
 
 
-    @Test
+//    @Test
     void readDB() {
         FileHandle dbFileHandle = testFolder.child("cachebox.db3");
         GdxSqlite db = new GdxSqlite(dbFileHandle);
@@ -84,6 +84,14 @@ public class CB_DB_Tests {
             @Override
             public void newRow(String[] columnName, Object[] value) {
 //                System.out.println("Row: " + Integer.toString(count.incrementAndGet()));
+            }
+        });
+
+
+        db.rawQuery("SELECT PlacedBy FROM CacheCoreInfo WHERE Id = 19193462783361863", new GdxSqlite.RowCallback() {
+            @Override
+            public void newRow(String[] columnName, Object[] value) {
+                System.out.println("Result: " + value[0]);
             }
         });
 

@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
     <name>gdx SQLite</name>
 
-    <version>0.0.6-SNAPSHOT</version>
+    <version>0.1.2-SNAPSHOT</version>
     <!--set global version with command line:
     versions:set -DnewVersion=2.0-RELEASE-->
 
