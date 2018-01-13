@@ -47,8 +47,7 @@ public class GdxSqlite {
         }
         try {
             return str.getBytes("UTF-8");
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new SQLiteGdxException("UTF-8 is not supported", e);
         }
     }
@@ -85,6 +84,44 @@ public class GdxSqlite {
 		    jint retResult = sqliteResult;
 		    jstring retErrMsg = (env)->NewStringUTF(errMsg);
 		    return (env)->NewObject(objectClass, cid, retPtr, retResult, retErrMsg);
+		}
+
+		static inline void javaByteArrayConvert(JNIEnv *env, jbyteArray array, char** bytes, int* length){
+		    jsize byte_length;
+		    char* buf;
+
+		    *bytes = NULL;
+		    if (length) *length = 0;
+
+		    byte_length = (env)->GetArrayLength((jarray) array);
+
+		    buf = (char*) malloc(byte_length + 1);
+
+		    (env)->GetByteArrayRegion(array, 0, byte_length, (jbyte*)buf);
+
+		    buf[byte_length] = '\0';
+
+		    *bytes = buf;
+		    if (length){
+			  *length = (int) byte_length;
+		    }
+		}
+
+
+		JNIEXPORT jobject JNICALL Java_de_longri_gdx_sqlite_GdxSqlite_exec(JNIEnv* env, jobject object, jlong ptr, jbyteArray sql) {
+			char *zErrMsg = 0;
+			int rc;
+			sqlite3* db = (sqlite3*)ptr;
+			char* sql_bytes;
+
+			javaByteArrayConvert(env, sql, &sql_bytes, NULL);
+
+			rc = sqlite3_exec(db, sql_bytes, callback, 0, &zErrMsg);
+
+			free(sql_bytes);
+
+			return javaResult(env, db, reinterpret_cast <jlong> (db), rc, zErrMsg);
+
 		}
 
     */
@@ -171,21 +208,13 @@ public class GdxSqlite {
      */
     public void execSQL(String sql) throws SQLiteGdxException {
         checkOpen();
-        GdxSqliteResult result = this.exec(this.ptr, sql);
+        GdxSqliteResult result = this.exec(this.ptr, utf8Bytes(sql));
         if (result.retValue > 0) {
             throwLastErr(result);
         }
     }
 
-    private native GdxSqliteResult exec(long ptr, String sql); /*
-            char *zErrMsg = 0;
-            int rc;
-            sqlite3* db = (sqlite3*)ptr;
-
-            rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
-
-            return javaResult(env, db, reinterpret_cast <jlong> (db), rc, zErrMsg);
-    */
+    private native GdxSqliteResult exec(long ptr, byte[] sql);
 
     public interface RowCallback {
         void newRow(String[] columnName, Object[] value);
