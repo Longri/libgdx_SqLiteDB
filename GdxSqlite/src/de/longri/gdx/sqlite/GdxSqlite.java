@@ -61,11 +61,6 @@ public class GdxSqlite {
 		#include <vector>
 		#include <cstring>
 
-		static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
-		    // dummy callback!
-		    return 0;
-		}
-
 		static jobject javaResult(JNIEnv* env, sqlite3 *db, long ptr, int sqliteResult, const char *errMsg) {
 		    jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
 
@@ -116,7 +111,7 @@ public class GdxSqlite {
 
 			javaByteArrayConvert(env, sql, &sql_bytes, NULL);
 
-			rc = sqlite3_exec(db, sql_bytes, callback, 0, &zErrMsg);
+			rc = sqlite3_exec(db, sql_bytes, 0, 0, &zErrMsg);
 
 			free(sql_bytes);
 
@@ -162,11 +157,6 @@ public class GdxSqlite {
         String errMsg = result.errorMsg;
         throw new SQLiteGdxException(errMsg);
     }
-
-    private native String getErrorMsg(long ptr); /*
-            sqlite3* db = (sqlite3*)ptr;
-            return (env)->NewStringUTF(sqlite3_errmsg(db));
-    */
 
 
     private native GdxSqliteResult open(String path) throws SQLiteGdxException; /*
