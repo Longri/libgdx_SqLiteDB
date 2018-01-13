@@ -120,21 +120,20 @@ public class GdxSqlite {
 		}
 
 
-		JNIEXPORT jobject JNICALL Java_de_longri_gdx_sqlite_GdxSqlite_query(JNIEnv* env, jobject object, jlong ptr, jstring obj_sql, jint callBackPtr) {
-			    char* sql = (char*)env->GetStringUTFChars(obj_sql, 0);
-
+		JNIEXPORT jobject JNICALL Java_de_longri_gdx_sqlite_GdxSqlite_query(JNIEnv* env, jobject object, jlong ptr, jbyteArray sql, jint callBackPtr) {
 			    sqlite3* db = (sqlite3*)ptr;
 				const char *zErrMsg = 0;
 				sqlite3_stmt *stmt = NULL;
+                char* sql_bytes;
 
-
-				int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+			    javaByteArrayConvert(env, sql, &sql_bytes, NULL);
+				int rc = sqlite3_prepare_v2(db, sql_bytes, -1, &stmt, NULL);
+				free(sql_bytes);
 
 				if (rc == SQLITE_OK) {
 
 				    int rowCount = 0;
 				    rc = sqlite3_step(stmt);
-
 
 				    jclass cls = (env)->GetObjectClass( object);
 				    jmethodID mid = (env)->GetMethodID( cls, "nativeCallback", "(I[Ljava/lang/String;[Ljava/lang/Object;)V");
@@ -348,7 +347,7 @@ public class GdxSqlite {
             callbackPtr = statiCallbackPtr++;
             callbackMap.put(callbackPtr, callback);
         }
-        GdxSqliteResult result = this.query(this.ptr, sql, callbackPtr);
+        GdxSqliteResult result = this.query(this.ptr, utf8Bytes(sql), callbackPtr);
 
         //remove callBack
         synchronized (callbackMap) {
@@ -387,7 +386,7 @@ public class GdxSqlite {
     }
 
 
-    private native GdxSqliteResult query(long ptr, String sql, int callBackPtr);
+    private native GdxSqliteResult query(long ptr, byte[] sql, int callBackPtr);
 
     // called from C
     private void nativeCallback(int callbackPointer, String[] collnames, Object[] values) {
