@@ -309,13 +309,9 @@ public class GdxSqliteCursor {
 
 
     void addRow(String[] columnNames, Object[] values, int[] types) {
-
         if (names == null) {
             this.names = columnNames;
-            this.types = new int[types.length];
-            for (int i = 0; i < types.length; i++) {
-                this.types[i] = types[i];
-            }
+            this.types = types;
         }
 
         // the Object array is every time the same, so we must copy the values
@@ -325,6 +321,4 @@ public class GdxSqliteCursor {
 
         this.valueRows.add(newValues);
     }
-
-
 }
