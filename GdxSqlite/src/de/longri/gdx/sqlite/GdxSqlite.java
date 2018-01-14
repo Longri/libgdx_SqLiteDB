@@ -74,7 +74,10 @@ public class GdxSqlite {
 
     public static void convertValuesByteArraysToString(Object[] values, int[] types) {
         for (int i = 0; i < types.length; i++) {
-            if (types[i] == SQLITE_TEXT) {
+            if (types[i] == SQLITE_TEXT || types[i] == SQLITE_NULL) {
+
+                //check if value a byte[]
+                if (!(values[i] instanceof byte[])) continue;
                 values[i] = GdxSqlite.stringFromUtf8Bytes((byte[]) values[i]);
             }
         }
