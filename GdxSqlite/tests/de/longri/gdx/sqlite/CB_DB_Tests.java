@@ -20,11 +20,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by Longri on 11.01.2018.
@@ -71,33 +69,14 @@ public class CB_DB_Tests {
     }
 
 
-//    @Test
+    @Test
     void readDB() {
         FileHandle dbFileHandle = testFolder.child("cachebox.db3");
         GdxSqlite db = new GdxSqlite(dbFileHandle);
         db.openOrCreateDatabase();
 
-        AtomicInteger count = new AtomicInteger(0);
-
-        db.rawQuery("SELECT * FROM CacheCoreInfo ", new GdxSqlite.RowCallback() {
-            @Override
-            public void newRow(String[] columnName, Object[] value, Long[] types) {
-//                System.out.println("Row: " + Integer.toString(count.incrementAndGet()));
-            }
-        });
-
-
-        db.rawQuery("SELECT PlacedBy FROM CacheCoreInfo WHERE Id = 19193462783361863", new GdxSqlite.RowCallback() {
-            @Override
-            public void newRow(String[] columnName, Object[] value, Long[] types) {
-                System.out.println("Result: " + value[0]);
-            }
-        });
-
-
         GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM CacheCoreInfo ");
         assertThat("Cursor count must be 5925", cursor.getCount() == 5925);
-
 
     }
 

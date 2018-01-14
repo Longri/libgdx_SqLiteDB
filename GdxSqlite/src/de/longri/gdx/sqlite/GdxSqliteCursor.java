@@ -308,13 +308,13 @@ public class GdxSqliteCursor {
     }
 
 
-    void addRow(String[] columnNames, Object[] values, Long[] types) {
+    void addRow(String[] columnNames, Object[] values, int[] types) {
 
         if (names == null) {
             this.names = columnNames;
             this.types = new int[types.length];
             for (int i = 0; i < types.length; i++) {
-                this.types[i] = types[i].intValue();
+                this.types[i] = types[i];
             }
         }
 

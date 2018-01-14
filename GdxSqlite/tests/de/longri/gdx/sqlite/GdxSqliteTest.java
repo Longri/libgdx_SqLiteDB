@@ -305,7 +305,7 @@ public class GdxSqliteTest {
         final AtomicInteger rowCount = new AtomicInteger(-1);
         db.rawQuery("SELECT * FROM COMPANY", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value, Long[] types) {
+            public void newRow(String[] columnName, Object[] value, int[] types) {
 
                 switch (rowCount.incrementAndGet()) {
                     case 0:
@@ -479,7 +479,7 @@ public class GdxSqliteTest {
             final AtomicInteger rowCount = new AtomicInteger(-1);
 
             @Override
-            public void newRow(String[] columnName, Object[] value, Long[] types) {
+            public void newRow(String[] columnName, Object[] value, int[] types) {
 
                 switch (rowCount.incrementAndGet()) {
                     case 0:
