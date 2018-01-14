@@ -350,7 +350,7 @@ public class SQLiteBuild {
 
             db.rawQuery(sql, new GdxSqlite.RowCallback() {
                 @Override
-                public void newRow(String[] columnNames, Object[] values) {
+                public void newRow(String[] columnNames, Object[] values, Long[] types) {
                     System.out.println("Native Callback : "
                             + " => " + arrayToString(columnNames)
                             + " => " + arrayToString(values)

@@ -41,7 +41,14 @@ public class GdxSqlite {
     private static final String BEGIN_TRANSACTION = "BEGIN TRANSACTION";
     private static final String END_TRANSACTION = "END TRANSACTION";
 
-    static byte[] utf8Bytes(String str) {
+
+    public final static int SQLITE_INTEGER = 1;
+    public final static int SQLITE_FLOAT = 2;
+    public final static int SQLITE_TEXT = 3;
+    public final static int SQLITE_BLOB = 4;
+    public final static int SQLITE_NULL = 5;
+
+    public static byte[] utf8Bytes(String str) {
         if (str == null) {
             return null;
         }
@@ -49,6 +56,25 @@ public class GdxSqlite {
             return str.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new SQLiteGdxException("UTF-8 is not supported", e);
+        }
+    }
+
+    public static String stringFromUtf8Bytes(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
+        try {
+            return new String(bytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new SQLiteGdxException("UTF-8 is not supported", e);
+        }
+    }
+
+    public static void convertValuesByteArraysToString(Object[] values, Long[] types) {
+        for (int i = 0; i < types.length; i++) {
+            if (types[i] == SQLITE_TEXT) {
+                values[i] = GdxSqlite.stringFromUtf8Bytes((byte[]) values[i]);
+            }
         }
     }
 
@@ -61,7 +87,7 @@ public class GdxSqlite {
 		#include <vector>
 		#include <cstring>
 
-		static jobject javaResult(JNIEnv* env, sqlite3 *db, long ptr, int sqliteResult, const char *errMsg) {
+		static inline jobject javaResult(JNIEnv* env, sqlite3 *db, long ptr, int sqliteResult, const char *errMsg) {
 		    jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
 
 		    jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
@@ -102,6 +128,19 @@ public class GdxSqlite {
 		    }
 		}
 
+		static inline jbyteArray convertToJavaByteArray(JNIEnv *env, const char* bytes, int length){
+		     jbyteArray result;
+
+		     if (!bytes){
+			 return NULL;
+		     }
+
+		     result = (env)->NewByteArray((jsize) length);
+		     (env)->SetByteArrayRegion(result, (jsize) 0, (jsize) length, (const jbyte*) bytes);
+
+		     return result;
+		}
+
 
 		JNIEXPORT jobject JNICALL Java_de_longri_gdx_sqlite_GdxSqlite_exec(JNIEnv* env, jobject object, jlong ptr, jbyteArray sql) {
 			char *zErrMsg = 0;
@@ -119,7 +158,6 @@ public class GdxSqlite {
 
 		}
 
-
 		JNIEXPORT jobject JNICALL Java_de_longri_gdx_sqlite_GdxSqlite_query(JNIEnv* env, jobject object, jlong ptr, jbyteArray sql, jint callBackPtr) {
 			    sqlite3* db = (sqlite3*)ptr;
 				const char *zErrMsg = 0;
@@ -136,9 +174,11 @@ public class GdxSqlite {
 				    rc = sqlite3_step(stmt);
 
 				    jclass cls = (env)->GetObjectClass( object);
-				    jmethodID mid = (env)->GetMethodID( cls, "nativeCallback", "(I[Ljava/lang/String;[Ljava/lang/Object;)V");
+				    jmethodID mid = (env)->GetMethodID( cls, "nativeCallback", "(I[Ljava/lang/String;[Ljava/lang/Object;[Ljava/lang/Long;)V");
 
 				    std::vector<const char *> names;
+				    std::vector<int> types;
+
 				    int colCount = sqlite3_column_count(stmt);
 
 				    // Create a Object[colCount]
@@ -155,8 +195,9 @@ public class GdxSqlite {
 					jclass doubleCls = (env)->FindClass("java/lang/Double");
 				    jmethodID midInitDouble = (env)->GetMethodID(doubleCls, "<init>", "(D)V");
 
+                    jobjectArray typeArr = (env)->NewObjectArray( colCount, longCls, NULL);
 
-			    int flagNameArrInit = 0;
+			        int flagNameArrInit = 0;
 
 				    while (rc != SQLITE_DONE && rc != SQLITE_OK) {
 				    rowCount++;
@@ -166,10 +207,11 @@ public class GdxSqlite {
 
 							if(flagNameArrInit == 0){
 							    names.push_back(sqlite3_column_name(stmt, colIndex));
+							    types.push_back(type);
 							}
 
 							if (type == SQLITE_INTEGER) {
-					jlong valInt = sqlite3_column_int64(stmt, colIndex);
+					            jlong valInt = sqlite3_column_int64(stmt, colIndex);
 							    jobject intObj = (env)->NewObject(longCls, midInitLong, valInt);
 							    (env)->SetObjectArrayElement( valArr, colIndex, intObj);;
 							    (env)->DeleteLocalRef(intObj);
@@ -179,14 +221,21 @@ public class GdxSqlite {
 							    (env)->SetObjectArrayElement( valArr, colIndex, idoubleObj);
 							    (env)->DeleteLocalRef(idoubleObj);
 							} else if (type == SQLITE_TEXT) {
-							    const char * val = reinterpret_cast < const char* >( sqlite3_column_text(stmt, colIndex) );
-							    jstring jstrValue = (env)->NewStringUTF(val);
-							    (env)->SetObjectArrayElement( valArr, colIndex, jstrValue);
-					(env)->DeleteLocalRef(jstrValue);
+							    const char *bytes;
+                                int length;
+
+                                bytes = (const char*) sqlite3_column_text(stmt, colIndex);
+                                length = sqlite3_column_bytes(stmt, colIndex);
+
+                                jbyteArray strByteArr = convertToJavaByteArray(env, bytes, length);
+
+							    (env)->SetObjectArrayElement( valArr, colIndex, strByteArr);
+					            (env)->DeleteLocalRef(strByteArr);
 							} else if (type == SQLITE_BLOB) {
-							int length;
-							jbyteArray jBlob;
-							const void *blob;
+
+							    int length;
+							    jbyteArray jBlob;
+							    const void *blob;
 
 								blob = sqlite3_column_blob(stmt, colIndex);
 
@@ -202,25 +251,29 @@ public class GdxSqlite {
 										(env)->SetByteArrayRegion(jBlob, (jsize) 0, (jsize) length, (const jbyte*) blob);
 									}
 								}
-					(env)->SetObjectArrayElement( valArr, colIndex, jBlob);
-					(env)->DeleteLocalRef(jBlob);
+					            (env)->SetObjectArrayElement( valArr, colIndex, jBlob);
+					            (env)->DeleteLocalRef(jBlob);
 							} else if (type == SQLITE_NULL) {
 							    (env)->SetObjectArrayElement( valArr, colIndex, NULL);
 							}
 						}
 
 						// callback to Java
-				if(flagNameArrInit == 0){
-				    // Add name items
+				        if(flagNameArrInit == 0){
+				        // Add name items
 						    for (int colIndex = 0; colIndex < colCount; colIndex++) {
-							jstring jstrName = (env)->NewStringUTF( names[colIndex]);
-							(env)->SetObjectArrayElement( nameArr, colIndex, jstrName);
+							    jstring jstrName = (env)->NewStringUTF( names[colIndex]);
+							    (env)->SetObjectArrayElement( nameArr, colIndex, jstrName);
+							    jobject typeObj = (env)->NewObject(longCls, midInitLong, types[colIndex]);
+							    (env)->SetObjectArrayElement( typeArr, colIndex, typeObj);
+
+							    (env)->DeleteLocalRef(jstrName);
+							    (env)->DeleteLocalRef(typeObj);
 						    }
 						    flagNameArrInit = 1;
-				}
+				        }
 
-
-						(env)->CallVoidMethod(object, mid, callBackPtr, nameArr, valArr);
+						(env)->CallVoidMethod(object, mid, callBackPtr, nameArr, valArr, typeArr);
 
 						rc = sqlite3_step(stmt);
 				    }
@@ -229,21 +282,20 @@ public class GdxSqlite {
 				    //release resources
 				    names.clear();
 				    std::vector<const char *>().swap(names);
-			    (env)->DeleteLocalRef(nameArr);
-			    (env)->DeleteLocalRef(valArr);
-			    (env)->DeleteLocalRef(objectClass);
-			    (env)->DeleteLocalRef(stringClass);
-			    (env)->DeleteLocalRef(longCls);
-			    (env)->DeleteLocalRef(doubleCls);
-			    rc = sqlite3_finalize(stmt);
+			        (env)->DeleteLocalRef(nameArr);
+			        (env)->DeleteLocalRef(valArr);
+			        (env)->DeleteLocalRef(typeArr);
+			        (env)->DeleteLocalRef(objectClass);
+			        (env)->DeleteLocalRef(stringClass);
+			        (env)->DeleteLocalRef(longCls);
+			        (env)->DeleteLocalRef(doubleCls);
+			        rc = sqlite3_finalize(stmt);
 				} else {
 				    zErrMsg = sqlite3_errmsg(db);
 				}
 
-				return javaResult(env, db, reinterpret_cast <jlong> (db), rc, zErrMsg);
-
-		}
-
+				 return javaResult(env, db, reinterpret_cast <jlong> (db), rc, zErrMsg);
+		 }
     */
 
     public static native String getSqliteVersion(); /*
@@ -332,7 +384,7 @@ public class GdxSqlite {
     private native GdxSqliteResult exec(long ptr, byte[] sql);
 
     public interface RowCallback {
-        void newRow(String[] columnName, Object[] value);
+        void newRow(String[] columnName, Object[] value, Long[] types);
     }
 
 
@@ -373,8 +425,8 @@ public class GdxSqlite {
         //fill cursor over callback
         rawQuery(sql, new RowCallback() {
             @Override
-            public void newRow(String[] columnNames, Object[] values) {
-                cursor.addRow(columnNames, values);
+            public void newRow(String[] columnNames, Object[] values, Long[] types) {
+                cursor.addRow(columnNames, values, types);
             }
         });
 
@@ -389,10 +441,14 @@ public class GdxSqlite {
     private native GdxSqliteResult query(long ptr, byte[] sql, int callBackPtr);
 
     // called from C
-    private void nativeCallback(int callbackPointer, String[] collnames, Object[] values) {
+    private void nativeCallback(int callbackPointer, String[] collnames, Object[] values, Long[] types) {
         synchronized (callbackMap) {
             RowCallback callback = callbackMap.get(callbackPointer);
-            callback.newRow(collnames, values);
+
+            //if any value from type text we must change the byte[] to utf8 String
+            GdxSqlite.convertValuesByteArraysToString(values, types);
+            
+            callback.newRow(collnames, values, types);
         }
     }
 
@@ -436,7 +492,7 @@ public class GdxSqlite {
         StringBuilder sb = new StringBuilder();
         rawQuery("PRAGMA compile_options", new RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, Long[] types) {
                 sb.append(value[0]).append("\n");
             }
         });

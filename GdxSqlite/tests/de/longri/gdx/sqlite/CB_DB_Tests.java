@@ -20,7 +20,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -82,7 +81,7 @@ public class CB_DB_Tests {
 
         db.rawQuery("SELECT * FROM CacheCoreInfo ", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, Long[] types) {
 //                System.out.println("Row: " + Integer.toString(count.incrementAndGet()));
             }
         });
@@ -90,7 +89,7 @@ public class CB_DB_Tests {
 
         db.rawQuery("SELECT PlacedBy FROM CacheCoreInfo WHERE Id = 19193462783361863", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, Long[] types) {
                 System.out.println("Result: " + value[0]);
             }
         });

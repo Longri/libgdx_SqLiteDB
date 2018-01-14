@@ -17,6 +17,7 @@ package de.longri.gdx.sqlite;
 
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /**
  * Created by Longri on 22.12.2017.
@@ -26,6 +27,8 @@ public class GdxSqliteCursor {
     private Array<Object[]> valueRows = new Array<>();
     private int actRow = 0;
     private Object[] actRowValues;
+    private String[] names;
+    private int[] types;
 
     private void chkCursorposition() {
         if (actRowValues == null)
@@ -45,6 +48,17 @@ public class GdxSqliteCursor {
         return (byte[]) actRowValues[columnIndex];
     }
 
+
+    /**
+     * Returns the value of the requested column as a byte array.
+     *
+     * @param columnName the name of the target column.
+     * @return the value of that column as a byte array.
+     */
+    public byte[] getBlob(String columnName) {
+        return getBlob(resolveIndex(columnName));
+    }
+
     /**
      * Returns the value of the requested column as a double.
      *
@@ -55,6 +69,17 @@ public class GdxSqliteCursor {
         chkCursorposition();
         if (isNull(columnIndex)) return 0.0;
         return (double) actRowValues[columnIndex];
+    }
+
+
+    /**
+     * Returns the value of the requested column as a double.
+     *
+     * @param columnName the name of the target column.
+     * @return the value of that column as a double.
+     */
+    public double getDouble(String columnName) {
+        return getDouble(resolveIndex(columnName));
     }
 
     /**
@@ -69,6 +94,17 @@ public class GdxSqliteCursor {
         return ((Double) actRowValues[columnIndex]).floatValue();
     }
 
+
+    /**
+     * Returns the value of the requested column as a float.
+     *
+     * @param columnName the name of the target column.
+     * @return the value of that column as a float.
+     */
+    public float getFloat(String columnName) {
+        return getFloat(resolveIndex(columnName));
+    }
+
     /**
      * Returns the value of the requested column as a int.
      *
@@ -79,6 +115,17 @@ public class GdxSqliteCursor {
         chkCursorposition();
         if (isNull(columnIndex)) return 0;
         return ((Long) actRowValues[columnIndex]).intValue();
+    }
+
+
+    /**
+     * Returns the value of the requested column as a int.
+     *
+     * @param columnName the name of the target column.
+     * @return the value of that column as a int.
+     */
+    public int getInt(String columnName) {
+        return getInt(resolveIndex(columnName));
     }
 
     /**
@@ -93,6 +140,17 @@ public class GdxSqliteCursor {
         return (long) actRowValues[columnIndex];
     }
 
+
+    /**
+     * Returns the value of the requested column as a long.
+     *
+     * @param columnName the name of the target column.
+     * @return the value of that column as a long.
+     */
+    public long getLong(String columnName) {
+        return getLong(resolveIndex(columnName));
+    }
+
     /**
      * Returns the value of the requested column as a short.
      *
@@ -103,6 +161,17 @@ public class GdxSqliteCursor {
         chkCursorposition();
         if (isNull(columnIndex)) return 0;
         return ((Long) actRowValues[columnIndex]).shortValue();
+    }
+
+
+    /**
+     * Returns the value of the requested column as a short.
+     *
+     * @param columnName the name of the target column.
+     * @return the value of that column as a short.
+     */
+    public short getShort(String columnName) {
+        return getShort(resolveIndex(columnName));
     }
 
     /**
@@ -117,6 +186,19 @@ public class GdxSqliteCursor {
         return getInt(columnIndex) > 0;
     }
 
+
+    /**
+     * Returns the value of the requested column as a boolean. <br><br>
+     * TRUE if int value > 0 <br>
+     * FALSE if int value == 0 <br>
+     *
+     * @param columnName the name of the target column.
+     * @return the value of that column as a boolean.
+     */
+    public boolean getBoolean(String columnName) {
+        return getBoolean(resolveIndex(columnName));
+    }
+
     /**
      * Returns the value of the requested column as a string.
      *
@@ -127,6 +209,31 @@ public class GdxSqliteCursor {
         chkCursorposition();
         if (isNull(columnIndex)) return null;
         return (String) actRowValues[columnIndex];
+    }
+
+    /**
+     * Returns the value of the requested column as a string.
+     *
+     * @param columnName the name of the target column.
+     * @return the value of that column as a string.
+     */
+    public String getString(String columnName) {
+        return getString(resolveIndex(columnName));
+    }
+
+    private int resolveIndex(String columnName) {
+        for (int i = 0; i < names.length; i++) {
+            if (names[i].equals(columnName)) return i;
+        }
+        throw new GdxRuntimeException("No such column name:" + columnName);
+    }
+
+    public String getColumnName(int columnIndex) {
+        return names[columnIndex];
+    }
+
+    public int getColumnType(int columnIndex) {
+        return types[columnIndex];
     }
 
     /**
@@ -158,6 +265,7 @@ public class GdxSqliteCursor {
     public int getCount() {
         return valueRows.size;
     }
+
 
     /**
      * Closes the Cursor, releasing all of its resources and making it completely invalid.
@@ -200,14 +308,22 @@ public class GdxSqliteCursor {
     }
 
 
-    void addRow(String[] columnNames, Object[] values) {
-        //TODO store column names
+    void addRow(String[] columnNames, Object[] values, Long[] types) {
+
+        if (names == null) {
+            this.names = columnNames;
+            this.types = new int[types.length];
+            for (int i = 0; i < types.length; i++) {
+                this.types[i] = types[i].intValue();
+            }
+        }
 
         // the Object array is every time the same, so we must copy the values
         int length = values.length;
         Object[] newValues = new Object[values.length];
         System.arraycopy(values, 0, newValues, 0, length);
-        valueRows.add(newValues);
+
+        this.valueRows.add(newValues);
     }
 
 
