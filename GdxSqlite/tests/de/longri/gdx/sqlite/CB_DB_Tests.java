@@ -22,10 +22,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by Longri on 11.01.2018.
@@ -78,19 +75,8 @@ public class CB_DB_Tests {
         GdxSqlite db = new GdxSqlite(dbFileHandle);
         db.openOrCreateDatabase();
 
-        AtomicInteger count = new AtomicInteger(0);
-
-        db.rawQuery("SELECT * FROM CacheCoreInfo ", new GdxSqlite.RowCallback() {
-            @Override
-            public void newRow(String[] columnName, Object[] value) {
-//                System.out.println("Row: " + Integer.toString(count.incrementAndGet()));
-            }
-        });
-
-
         GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM CacheCoreInfo ");
         assertThat("Cursor count must be 5925", cursor.getCount() == 5925);
-
 
     }
 

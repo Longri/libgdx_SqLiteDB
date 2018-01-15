@@ -78,19 +78,8 @@ public class CB_DB_Tests {
         GdxSqlite db = new GdxSqlite(dbFileHandle);
         db.openOrCreateDatabase();
 
-        AtomicInteger count = new AtomicInteger(0);
-
-        db.rawQuery("SELECT * FROM CacheCoreInfo ", new GdxSqlite.RowCallback() {
-            @Override
-            public void newRow(String[] columnName, Object[] value) {
-//                System.out.println("Row: " + Integer.toString(count.incrementAndGet()));
-            }
-        });
-
-
         GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM CacheCoreInfo ");
         assertThat("Cursor count must be 5925", cursor.getCount() == 5925);
-
 
     }
 

@@ -108,7 +108,7 @@ class GdxSqlitePreparedStatementTest {
         final AtomicInteger cnt = new AtomicInteger(-1);
         db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, int[] types) {
                 int id = cnt.incrementAndGet();
                 String num = Integer.toString(id);
                 double val = Double.valueOf(num + "." + num);
@@ -173,7 +173,7 @@ class GdxSqlitePreparedStatementTest {
         final AtomicInteger cnt = new AtomicInteger(-1);
         db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, int[] types) {
                 int id = cnt.incrementAndGet();
                 String num = Integer.toString(id);
                 long val = Long.MAX_VALUE - id;
@@ -246,7 +246,7 @@ class GdxSqlitePreparedStatementTest {
         final AtomicInteger cnt = new AtomicInteger(-1);
         db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, int[] types) {
                 int id = cnt.incrementAndGet();
                 String num = Integer.toString(id);
                 byte[] val = new byte[]{(byte) id, (byte) id, (byte) id, (byte) id};
@@ -319,7 +319,7 @@ class GdxSqlitePreparedStatementTest {
         final AtomicInteger cnt = new AtomicInteger(-1);
         db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, int[] types) {
                 int id = cnt.incrementAndGet();
                 String num = Integer.toString(id);
                 boolean val = id % 2 == 0;
@@ -392,7 +392,7 @@ class GdxSqlitePreparedStatementTest {
         final AtomicInteger cnt = new AtomicInteger(-1);
         db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, int[] types) {
                 int id = cnt.incrementAndGet();
                 String num = Integer.toString(id);
                 short val = (short) id;
@@ -465,7 +465,7 @@ class GdxSqlitePreparedStatementTest {
         final AtomicInteger cnt = new AtomicInteger(-1);
         db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, int[] types) {
                 int id = cnt.incrementAndGet();
                 String num = Integer.toString(id);
                 float val = Float.valueOf(num + "." + num);
@@ -538,7 +538,7 @@ class GdxSqlitePreparedStatementTest {
         final AtomicInteger cnt = new AtomicInteger(-1);
         db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, int[] types) {
                 int id = cnt.incrementAndGet();
                 String num = Integer.toString(id);
                 double val = Double.valueOf(num + "." + num);
@@ -632,7 +632,7 @@ class GdxSqlitePreparedStatementTest {
         final AtomicInteger cnt = new AtomicInteger(-1);
         db.rawQuery("SELECT * FROM test", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, int[] types) {
                 int id = cnt.incrementAndGet();
                 String num = Integer.toString(id);
                 short val = (short) id;

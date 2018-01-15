@@ -18,7 +18,6 @@ package de.longri.gdx.sqlite;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.SharedLibraryLoader;
 import de.longri.gdx.sqlite.tests.AfterAll;
 import de.longri.gdx.sqlite.tests.BeforeAll;
 import de.longri.gdx.sqlite.tests.Test;
@@ -225,11 +224,30 @@ public class GdxSqliteTest {
         assertThat("Invalid cursor position must throw a exception", exceptionThrowed);
         cursor.moveToFirst();
 
+        assertThat("Cursor column 1 must be a SQLite Type : SQLITE_INTEGER", cursor.getColumnType(0) == GdxSqlite.SQLITE_INTEGER);
+        assertThat("Cursor column 2 must be a SQLite Type : SQLITE_TEXT", cursor.getColumnType(1) == GdxSqlite.SQLITE_TEXT);
+        assertThat("Cursor column 3 must be a SQLite Type : SQLITE_INTEGER", cursor.getColumnType(2) == GdxSqlite.SQLITE_INTEGER);
+        assertThat("Cursor column 4 must be a SQLite Type : SQLITE_TEXT", cursor.getColumnType(3) == GdxSqlite.SQLITE_TEXT);
+        assertThat("Cursor column 5 must be a SQLite Type : SQLITE_FLOAT", cursor.getColumnType(4) == GdxSqlite.SQLITE_FLOAT);
+
+        assertThat("Cursor column name 1 must be: ID", cursor.getColumnName(0).equals("ID"));
+        assertThat("Cursor column name 2 must be: NAME", cursor.getColumnName(1).equals("NAME"));
+        assertThat("Cursor column name 3 must be: AGE", cursor.getColumnName(2).equals("AGE"));
+        assertThat("Cursor column name 4 must be: ADDRESS", cursor.getColumnName(3).equals("ADDRESS"));
+        assertThat("Cursor column name 5 must be: SALARY", cursor.getColumnName(4).equals("SALARY"));
+
+        assertThat("Cursor column 1 must be a Integer : 1", cursor.getInt("ID") == 1);
+        assertThat("Cursor column 2 must be a String : Paul", cursor.getString("NAME").equals("Paul"));
+        assertThat("Cursor column 3 must be a Integer : 32", cursor.getInt("AGE") == 32);
+        assertThat("Cursor column 4 must be a String : California", cursor.getString("ADDRESS").equals("California"));
+        assertThat("Cursor column 5 must be a Double : 20000.12", cursor.getDouble("SALARY") == 20000.12);
+
         assertThat("Cursor column 1 must be a Integer : 1", cursor.getInt(0) == 1);
         assertThat("Cursor column 2 must be a String : Paul", cursor.getString(1).equals("Paul"));
         assertThat("Cursor column 3 must be a Integer : 32", cursor.getInt(2) == 32);
         assertThat("Cursor column 4 must be a String : California", cursor.getString(3).equals("California"));
         assertThat("Cursor column 5 must be a Double : 20000.12", cursor.getDouble(4) == 20000.12);
+
 
         cursor.next();
         assertThat("Cursor column 1 must be a Integer : 2", cursor.getInt(0) == 2);
@@ -288,7 +306,7 @@ public class GdxSqliteTest {
         final AtomicInteger rowCount = new AtomicInteger(-1);
         db.rawQuery("SELECT * FROM COMPANY", new GdxSqlite.RowCallback() {
             @Override
-            public void newRow(String[] columnName, Object[] value) {
+            public void newRow(String[] columnName, Object[] value, int[] types) {
 
                 switch (rowCount.incrementAndGet()) {
                     case 0:
@@ -430,5 +448,75 @@ public class GdxSqliteTest {
         assertThat("Cursor must be NULL", cursor == null);
 
         db.closeDatabase();
+    }
+
+    @Test
+    public void writeReadUtf8() {
+        FileHandle dbFileHandle = testFolder.child("createTest7.db3");
+        GdxSqlite db = new GdxSqlite(dbFileHandle);
+        db.openOrCreateDatabase();
+
+        final String CREATE = "CREATE TABLE Test (\n" +
+                "    ID          INTEGER        NOT NULL\n" +
+                "                               PRIMARY KEY AUTOINCREMENT,\n" +
+                "    utf NVARCHAR (255)\n" +
+                ");";
+
+        db.execSQL(CREATE);
+
+        final String INSERT = "INSERT INTO Test (ID, utf) " +
+                "VALUES (1, '\uD83D\uDE39'); " +
+                "INSERT INTO Test (ID, utf) " +
+                "VALUES (2, '\uD83D\uDEB4'); " +
+                "INSERT INTO Test (ID, utf)" +
+                "VALUES (3, NULL);" +
+                "INSERT INTO Test (ID, utf)" +
+                "VALUES (4, 'Mark' );";
+
+        db.execSQL(INSERT);
+
+        db.rawQuery("SELECT * FROM Test", new GdxSqlite.RowCallback() {
+
+            final AtomicInteger rowCount = new AtomicInteger(-1);
+
+            @Override
+            public void newRow(String[] columnName, Object[] value, int[] types) {
+
+                switch (rowCount.incrementAndGet()) {
+                    case 0:
+                        assertThat("ColumnName must be ID", columnName[0].equals("ID"));
+                        assertThat("ColumnName must be utf", columnName[1].equals("utf"));
+
+                        assertThat("Value 0 must Instance of Long and 1", value[0] instanceof Long && (Long) value[0] == 1);
+                        assertThat("Value 1 must Instance of String and Paul", value[1] instanceof String && value[1].equals("\uD83D\uDE39"));
+                        break;
+                    case 1:
+                        assertThat("ColumnName must be ID", columnName[0].equals("ID"));
+                        assertThat("ColumnName must be utf", columnName[1].equals("utf"));
+
+                        assertThat("Value 0 must Instance of Long and 2", value[0] instanceof Long && (Long) value[0] == 2);
+                        assertThat("Value 1 must Instance of String and Allen", value[1] instanceof String && value[1].equals("\uD83D\uDEB4"));
+                        break;
+                    case 2:
+                        assertThat("ColumnName must be ID", columnName[0].equals("ID"));
+                        assertThat("ColumnName must be utf", columnName[1].equals("utf"));
+
+                        assertThat("Value 0 must Instance of Long and 3", value[0] instanceof Long && (Long) value[0] == 3);
+                        assertThat("Value 1 must be NULL", value[1] == null);
+                        break;
+                    case 3:
+                        assertThat("ColumnName must be ID", columnName[0].equals("ID"));
+                        assertThat("ColumnName must be utf", columnName[1].equals("utf"));
+
+                        assertThat("Value 0 must Instance of Long and 4", value[0] instanceof Long && (Long) value[0] == 4);
+                        assertThat("Value 1 must Instance of String and Mark", value[1] instanceof String && value[1].equals("Mark"));
+                        break;
+                    default:
+                        assertThat("Unknown result", false);
+                }
+            }
+        });
+        db.closeDatabase();
+
     }
 }

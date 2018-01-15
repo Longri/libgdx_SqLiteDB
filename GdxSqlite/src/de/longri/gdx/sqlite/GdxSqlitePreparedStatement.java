@@ -127,7 +127,7 @@ public class GdxSqlitePreparedStatement {
             int intValue = ((boolean) value) ? 1 : 0;
             result = bind_int(this.ptr, this.db.ptr, idx, intValue);
         } else if (value instanceof Enum) {
-            int intValue = ((Enum)value).ordinal();
+            int intValue = ((Enum) value).ordinal();
             result = bind_int(this.ptr, this.db.ptr, idx, intValue);
         } else {
             String error = "Bind value for class '" + value.getClass().getSimpleName() + "' not implemented";
@@ -214,10 +214,22 @@ public class GdxSqlitePreparedStatement {
 
     public GdxSqlitePreparedStatement commit() {
         chkClosed();
+
+        //if not in transaction, set a single transaction for improve commit
+        boolean singleTransaction = false;
+        if (!this.db.isInTransaction()) {
+            this.db.beginTransaction();
+            singleTransaction = true;
+        }
+
         GdxSqliteResult result = nativeCommit(this.ptr, this.db.ptr);
 
         if (result.retValue != SQLITE_DONE)
             db.throwLastErr(result);
+
+        if (singleTransaction) {
+            this.db.endTransaction();
+        }
 
         return this;
     }
