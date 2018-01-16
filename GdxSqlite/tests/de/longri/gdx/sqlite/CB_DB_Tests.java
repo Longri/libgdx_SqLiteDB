@@ -44,16 +44,24 @@ public class CB_DB_Tests {
         TestUtils.loadSharedLib("GdxSqlite");
         testFolder.mkdirs();
 
-        FileHandle asset = Gdx.files.internal("GdxSqlite/testResources/cachebox.db3");
-        if (asset.exists() && (Gdx.app.getType() == Application.ApplicationType.Android || Gdx.app.getType() == Application.ApplicationType.iOS)) {
+        //delete old tests
+        testFolder.deleteDirectory();
+        testFolder.mkdirs();
 
-            //delete old tests
-            testFolder.deleteDirectory();
-            testFolder.mkdirs();
-
-            // copy to test folder
-            asset.copyTo(testFolder);
+        // copy test DB
+        String localPath = Gdx.files.local("").file().getAbsolutePath();
+        String dbPath;
+        if (localPath.endsWith("GdxSqlite")) {
+            dbPath = localPath + "/testResources/cachebox.db3";
+        } else {
+            dbPath = localPath + "/GdxSqlite/testResources/cachebox.db3";
         }
+
+        FileHandle dbFileHandle = Gdx.files.absolute(dbPath);
+
+        // copy to test folder
+        dbFileHandle.copyTo(testFolder);
+
 
         try {
             Thread.sleep(1000);
