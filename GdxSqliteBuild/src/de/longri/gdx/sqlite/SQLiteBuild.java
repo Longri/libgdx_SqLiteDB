@@ -51,7 +51,7 @@ public class SQLiteBuild {
 
 
         //cleanup
-        jniDescriptor.deleteDirectory();
+//        jniDescriptor.deleteDirectory();
 //        targetDescriptor.deleteDirectory();
 
 
@@ -147,11 +147,13 @@ public class SQLiteBuild {
 
         if (all || cmd.hasOption("linux64")) {
             BuildTarget linux64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Linux, true);
-            linux64.compilerPrefix = "";
+//            linux64.compilerPrefix = "x86_64-w64-mingw32-";
             linux64.compilerSuffix = "";
             linux64.headerDirs = headers;
-            linux64.linkerFlags = "-shared -m64 -Wl, " + jniPathString + "/memcpy_wrap.c";
-            linux64.cFlags += cFlags;
+//            linux64.linkerFlags = "-shared -m64 -Wl, " + jniPathString + "/memcpy_wrap.c";
+            linux64.linkerFlags = "-shared -m64 -march=native -z noexecstack";
+            linux64.cFlags += cFlags+" -march=native ";
+            linux64.cExcludes = new String[]{"shell.c"};
             targets.add(linux64);
         }
 
@@ -176,24 +178,27 @@ public class SQLiteBuild {
 
         FileDescriptor projectPath = new FileDescriptor("../");
         FileDescriptor buildLibsPath = projectPath.child("GdxSqliteBuild/libs");
+
+
+
         //delete outdated files
-        buildLibsPath.deleteDirectory();
+//        buildLibsPath.deleteDirectory();
 
 
-        if (all || cmd.hasOption("linux32"))
-            BuildExecutor.executeAnt("build-linux32.xml", "-v -Dhas-compiler=true", jniPath);
+//        if (all || cmd.hasOption("linux32"))
+//            BuildExecutor.executeAnt("build-linux32.xml", "-v", jniPath);
         if (all || cmd.hasOption("linux64"))
-            BuildExecutor.executeAnt("build-linux64.xml", "-v -Dhas-compiler=true", jniPath);
-        if (all || cmd.hasOption("win32")) BuildExecutor.executeAnt("build-windows32.xml", "-v", jniPath);
-        if (all || cmd.hasOption("win64")) BuildExecutor.executeAnt("build-windows64.xml", "-v", jniPath);
-        if (all || cmd.hasOption("mac64")) BuildExecutor.executeAnt("build-macosx64.xml", "-v", jniPath);
-        if (all || cmd.hasOption("mac32")) BuildExecutor.executeAnt("build-macosx32.xml", "-v", jniPath);
-        if (all || cmd.hasOption("ios32")) {
-            BuildExecutor.executeAnt("build-ios32.xml", "-v", jniPath);
-        }
-        if (all || cmd.hasOption("android")) BuildExecutor.executeAnt("build-android32.xml", "-v", jniPath);
-
-        syncPrecopmiledLibs();
+            BuildExecutor.executeAnt("build-linux64.xml", "-v", jniPath);
+//        if (all || cmd.hasOption("win32")) BuildExecutor.executeAnt("build-windows32.xml", "-v", jniPath);
+//        if (all || cmd.hasOption("win64")) BuildExecutor.executeAnt("build-windows64.xml", "-v", jniPath);
+//        if (all || cmd.hasOption("mac64")) BuildExecutor.executeAnt("build-macosx64.xml", "-v", jniPath);
+//        if (all || cmd.hasOption("mac32")) BuildExecutor.executeAnt("build-macosx32.xml", "-v", jniPath);
+//        if (all || cmd.hasOption("ios32")) {
+//            BuildExecutor.executeAnt("build-ios32.xml", "-v", jniPath);
+//        }
+//        if (all || cmd.hasOption("android")) BuildExecutor.executeAnt("build-android32.xml", "-v", jniPath);
+//
+//        syncPrecopmiledLibs();
 
 
         BuildExecutor.executeAnt("build.xml", "-v", jniPath);
