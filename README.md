@@ -1,4 +1,6 @@
 # libgdx_SqLiteDB
+[![Build Status](https://travis-ci.org/Longri/libgdx_SqLiteDB.svg?branch=master)](https://travis-ci.org/Longri/libgdx_SqLiteDB)
+
 A SQLite wrapper library containing a SQLite version compiled especially for iOS/Android/Desktop.
 
 The SQLite library is compiled using JinGen for Android and Desktop.

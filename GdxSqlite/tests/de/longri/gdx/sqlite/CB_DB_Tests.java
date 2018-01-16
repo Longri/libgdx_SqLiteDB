@@ -36,7 +36,7 @@ public class CB_DB_Tests {
     public CB_DB_Tests() {
     } //constructor for core test reflection
 
-    static FileHandle testFolder = Gdx.files.local("GdxSqlite/testResources");
+    static FileHandle testFolder = Gdx.files.local("GdxSqlite/testResources4");
 
     @BeforeAll
     static void setUp() {
@@ -73,7 +73,7 @@ public class CB_DB_Tests {
 
     @AfterAll
     static void tearDown() {
-
+        assertThat("Test folder must be deleted after cleanup", testFolder.deleteDirectory());
     }
 
 
@@ -86,6 +86,7 @@ public class CB_DB_Tests {
         GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM CacheCoreInfo ");
         assertThat("Cursor count must be 5925", cursor.getCount() == 5925);
 
+        db.closeDatabase();
     }
 
 }
