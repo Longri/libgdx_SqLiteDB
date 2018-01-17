@@ -27,7 +27,7 @@ import static de.longri.gdx.sqlite.tests.TestMain.assertThat;
 /**
  * Created by Longri on 17.01.2018.
  */
-class GdxSqliteCursorTest {
+public class GdxSqliteCursorTest {
 
     static {
         TestUtils.initialGdx();
