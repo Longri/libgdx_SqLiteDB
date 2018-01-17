@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 team-cachebox.de
+ * Copyright (C) 2017 - 2018 team-cachebox.de
  *
  * Licensed under the : GNU General  License (GPL);
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@ package de.longri.gdx.sqlite;
 
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by Longri on 22.12.2017.
  */
 public class GdxSqliteCursor {
+
+    private static Logger log = LoggerFactory.getLogger(GdxSqliteCursor.class);
 
     private Array<Object[]> valueRows = new Array<>();
     private int actRow = 0;
@@ -31,6 +34,7 @@ public class GdxSqliteCursor {
     private int[] types;
 
     private void chkCursorposition() {
+        chkClosed(true);
         if (actRowValues == null)
             throw new SQLiteGdxException("Invalid cursor position, try moveToFirst");
     }
@@ -225,14 +229,16 @@ public class GdxSqliteCursor {
         for (int i = 0; i < names.length; i++) {
             if (names[i].equals(columnName)) return i;
         }
-        throw new GdxRuntimeException("No such column name:" + columnName);
+        throw new SQLiteGdxException("No such column name:" + columnName);
     }
 
     public String getColumnName(int columnIndex) {
+        chkClosed(true);
         return names[columnIndex];
     }
 
     public int getColumnType(int columnIndex) {
+        chkClosed(true);
         return types[columnIndex];
     }
 
@@ -240,6 +246,7 @@ public class GdxSqliteCursor {
      * Returns TRUE if the value of the requested column are NULL
      */
     public boolean isNull(int columnIndex) {
+        chkClosed(true);
         return actRowValues[columnIndex] == null;
     }
 
@@ -249,6 +256,7 @@ public class GdxSqliteCursor {
      * @return whether the move was successful.
      */
     public boolean next() {
+        chkClosed(true);
         this.actRow++;
         boolean re = !isAfterLast();
         if (re)
@@ -263,6 +271,7 @@ public class GdxSqliteCursor {
      * @throws SQLiteGdxException
      */
     public int getCount() {
+        chkClosed(true);
         return valueRows.size;
     }
 
@@ -271,18 +280,36 @@ public class GdxSqliteCursor {
      * Closes the Cursor, releasing all of its resources and making it completely invalid.
      */
     public void close() {
+        if (chkClosed(false)) return;
+
         actRowValues = null;
         for (int i = 0; i < valueRows.size; i++) {
             valueRows.pop(); // with pop the Array item will set to NULL!
         }
         valueRows.clear();
         valueRows = null;
+        names = null;
+        types = null;
+    }
+
+    private boolean chkClosed(boolean throwException) {
+        if (valueRows == null) {
+            // cursor is closed
+            if (throwException) {
+                throw new SQLiteGdxException("Cursor is closed");
+            } else {
+                log.warn("Cursor is closed");
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
      * Shifts the cursor position to the first row.
      */
     public void moveToFirst() {
+        chkClosed(true);
         this.actRow = 0;
         actRowValues = valueRows.get(this.actRow);
     }
@@ -294,6 +321,7 @@ public class GdxSqliteCursor {
      * {@code false} if the cursor is at any other position.
      */
     public boolean isAfterLast() {
+        chkClosed(true);
         return this.actRow >= valueRows.size;
     }
 
@@ -301,6 +329,7 @@ public class GdxSqliteCursor {
      * Move the cursor to the next row.
      */
     public void moveToNext() {
+        chkClosed(true);
         this.actRow++;
         if (!isAfterLast())
             actRowValues = valueRows.get(this.actRow);

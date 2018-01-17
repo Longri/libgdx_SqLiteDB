@@ -48,7 +48,7 @@ public class TestClass extends ApplicationAdapter {
                 state = 0;
 
                 if (TestMain.runTests(GdxSqliteTest.class, GdxSqlitePreparedStatementTest.class,
-                        GdxSqliteTransactionTest.class, CB_DB_Tests.class)) {
+                        GdxSqliteTransactionTest.class, CB_DB_Tests.class, GdxSqliteCursorTest.class)) {
                     state = 1;
                 } else {
                     state = 2;
