@@ -136,8 +136,10 @@ public class GdxSqliteTest {
                 "SALARY         REAL );";
 
         final String INSERT = "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY) " +
-                "VALUES (1, 'Paul', 32, 'California', 20000.00 ); " +
-                "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY) " +
+                "VALUES (1, 'Paul', 32, 'California', 20000.00 ); ";
+
+
+        final String INSERT2 = "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY) " +
                 "VALUES (2, 'Allen', 25, 'Texas', 15000.00 ); " +
                 "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)" +
                 "VALUES (3, 'Teddy', 23, 'Norway', 20000.00 );" +
@@ -152,6 +154,10 @@ public class GdxSqliteTest {
 
         db.execSQL(CREATE);
         db.execSQL(INSERT);
+        assertThat("Changes must be one", db.changes() == 1);
+
+        db.execSQL(INSERT2);
+        assertThat("Changes must be three", db.changes() == 3);
 
 
         boolean exceptionThrowed = false;

@@ -388,6 +388,21 @@ public class GdxSqlite {
 
     private native GdxSqliteResult exec(long ptr, byte[] sql);
 
+    /**
+     * @return Number of rows that were INSERT, UPDATE or DELETE <br>
+     * by the last SQL statement
+     */
+    public int changes() {
+        checkOpen();
+        return changes(this.ptr);
+    }
+
+    private native int changes(long ptr);/*
+            sqlite3* db = (sqlite3*)ptr;
+            return sqlite3_changes(db);
+    */
+
+
     public boolean isInTransaction() {
         return inTransaction;
     }
