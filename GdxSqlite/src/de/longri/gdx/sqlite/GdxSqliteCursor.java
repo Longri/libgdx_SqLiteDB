@@ -60,7 +60,7 @@ public class GdxSqliteCursor {
      * @return the value of that column as a byte array.
      */
     public byte[] getBlob(String columnName) {
-        return getBlob(resolveIndex(columnName));
+        return getBlob(resolveIndex(columnName, true));
     }
 
     /**
@@ -83,7 +83,7 @@ public class GdxSqliteCursor {
      * @return the value of that column as a double.
      */
     public double getDouble(String columnName) {
-        return getDouble(resolveIndex(columnName));
+        return getDouble(resolveIndex(columnName, true));
     }
 
     /**
@@ -106,7 +106,7 @@ public class GdxSqliteCursor {
      * @return the value of that column as a float.
      */
     public float getFloat(String columnName) {
-        return getFloat(resolveIndex(columnName));
+        return getFloat(resolveIndex(columnName, true));
     }
 
     /**
@@ -129,7 +129,7 @@ public class GdxSqliteCursor {
      * @return the value of that column as a int.
      */
     public int getInt(String columnName) {
-        return getInt(resolveIndex(columnName));
+        return getInt(resolveIndex(columnName, true));
     }
 
     /**
@@ -152,7 +152,7 @@ public class GdxSqliteCursor {
      * @return the value of that column as a long.
      */
     public long getLong(String columnName) {
-        return getLong(resolveIndex(columnName));
+        return getLong(resolveIndex(columnName, true));
     }
 
     /**
@@ -175,7 +175,7 @@ public class GdxSqliteCursor {
      * @return the value of that column as a short.
      */
     public short getShort(String columnName) {
-        return getShort(resolveIndex(columnName));
+        return getShort(resolveIndex(columnName, true));
     }
 
     /**
@@ -200,7 +200,7 @@ public class GdxSqliteCursor {
      * @return the value of that column as a boolean.
      */
     public boolean getBoolean(String columnName) {
-        return getBoolean(resolveIndex(columnName));
+        return getBoolean(resolveIndex(columnName, true));
     }
 
     /**
@@ -222,14 +222,28 @@ public class GdxSqliteCursor {
      * @return the value of that column as a string.
      */
     public String getString(String columnName) {
-        return getString(resolveIndex(columnName));
+        return getString(resolveIndex(columnName, true));
     }
 
-    private int resolveIndex(String columnName) {
+    private int resolveIndex(String columnName, boolean throwException) {
         for (int i = 0; i < names.length; i++) {
             if (names[i].equals(columnName)) return i;
         }
-        throw new SQLiteGdxException("No such column name:" + columnName);
+        if (throwException)
+            throw new SQLiteGdxException("No such column name:" + columnName);
+        return -1;
+    }
+
+    /**
+     * Returns the index of the given column name, <br>
+     * or -1 if column not exist!
+     *
+     * @param columnName the name of the target column.
+     * @return index of the column by name
+     */
+    public int getColumnIndex(String columnName) {
+        chkClosed(true);
+        return resolveIndex(columnName, false);
     }
 
     public String getColumnName(int columnIndex) {
