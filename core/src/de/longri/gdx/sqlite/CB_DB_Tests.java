@@ -98,7 +98,7 @@ public class CB_DB_Tests {
         db.openOrCreateDatabase();
 
         final String CREATE = "CREATE TABLE Config (\n" +
-                "    [Key]      NVARCHAR (30)  NOT NULL,\n" +
+                "    [Key]      NVARCHAR (30) PRIMARY KEY UNIQUE NOT NULL,\n" +
                 "    Value      NVARCHAR (255),\n" +
                 "    LongString NTEXT,\n" +
                 "    desired    NTEXT\n" +
@@ -106,7 +106,7 @@ public class CB_DB_Tests {
 
         db.execSQL(CREATE);
 
-        GdxSqlitePreparedStatement statement = db.prepare("INSERT OR REPLACE INTO Config VALUES(?,?,?,?) ;");
+        GdxSqlitePreparedStatement statement = db.prepare("REPLACE INTO Config VALUES(?,?,?,?) ;");
         db.beginTransaction();
         statement.bind("Key1", "Value1", "LongString1", "-1").commit().reset();
         statement.bind("Key2", "Value2", "LongString2", "-2").commit().reset();
@@ -204,6 +204,43 @@ public class CB_DB_Tests {
                 }
             }
         });
+
+
+        db.beginTransaction();
+        statement.bind("Key4", "changedValue4", "changedLongString4", "-4").commit().reset();
+        db.endTransaction();
+
+        db.rawQuery("SELECT * FROM Config", new GdxSqlite.RowCallback() {
+
+            AtomicInteger idx = new AtomicInteger(0);
+
+            @Override
+            public void newRow(String[] columnName, Object[] value, int[] types) {
+                switch (idx.getAndIncrement()) {
+                    case 0:
+                        assertThat("", value[0].equals("Key1"));
+                        assertThat("", value[1].equals("Value1"));
+                        assertThat("", value[2].equals("LongString1"));
+                        assertThat("", value[3].equals("-1"));
+                        break;
+                    case 2:
+                        assertThat("", value[0].equals("Key4"));
+                        assertThat("", value[1].equals("changedValue4"));
+                        assertThat("", value[2].equals("changedLongString4"));
+                        assertThat("", value[3].equals("-4"));
+                        break;
+                    case 1:
+                        assertThat("", value[0].equals("Key6"));
+                        assertThat("", value[1].equals("Value6"));
+                        assertThat("", value[2].equals("LongString6"));
+                        assertThat("", value[3].equals("-6"));
+                        break;
+                    default:
+                        assertThat("To match entries", false);
+                }
+            }
+        });
+
 
 
         deleteStatement.close();
