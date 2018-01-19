@@ -179,6 +179,28 @@ public class GdxSqliteCursor {
     }
 
     /**
+     * Returns the value of the requested column as a byte.
+     *
+     * @param columnIndex the zero-based index of the target column.
+     * @return the value of that column as a byte.
+     */
+    public byte getByte(int columnIndex) {
+        chkCursorposition();
+        if (isNull(columnIndex)) return 0;
+        return ((Long) actRowValues[columnIndex]).byteValue();
+    }
+
+    /**
+     * Returns the value of the requested column as a byte.
+     *
+     * @param columnName the name of the target column.
+     * @return the value of that column as a byte.
+     */
+    public byte getByte(String columnName) {
+        return getByte(resolveIndex(columnName, true));
+    }
+
+    /**
      * Returns the value of the requested column as a boolean. <br><br>
      * TRUE if int value > 0 <br>
      * FALSE if int value == 0 <br>
@@ -364,4 +386,6 @@ public class GdxSqliteCursor {
 
         this.valueRows.add(newValues);
     }
+
+
 }

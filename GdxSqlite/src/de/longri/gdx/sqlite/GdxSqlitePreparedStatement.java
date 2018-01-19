@@ -117,6 +117,8 @@ public class GdxSqlitePreparedStatement {
             result = bind_int(this.ptr, this.db.ptr, idx, ((Short) value).intValue());
         } else if (value instanceof Long) {
             result = bind_long(this.ptr, this.db.ptr, idx, (long) value);
+        } else if (value instanceof Byte) {
+            result = bind_int(this.ptr, this.db.ptr, idx, ((Byte) value).intValue());
         } else if (value instanceof Double) {
             result = bind_double(this.ptr, this.db.ptr, idx, (double) value);
         } else if (value instanceof Float) {
