@@ -388,4 +388,8 @@ public class GdxSqliteCursor {
     }
 
 
+    public int getColumnCount() {
+        chkClosed(true);
+        return types.length;
+    }
 }

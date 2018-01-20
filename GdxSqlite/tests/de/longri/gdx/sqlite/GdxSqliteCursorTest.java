@@ -91,6 +91,9 @@ public class GdxSqliteCursorTest {
 
 
         GdxSqliteCursor cursor = db.rawQuery("SELECT * FROM COMPANY");
+
+
+        assertThat("Cursor column count must be 5", cursor.getColumnCount() == 5);
         assertThat("Cursor count must be 4", cursor.getCount() == 4);
         assertThat("Cursor must not after last", !cursor.isAfterLast());
         exceptionThrowed = false;
@@ -356,7 +359,6 @@ public class GdxSqliteCursorTest {
             exceptionThrowed = true;
         }
         assertThat("After cursor.close(), 'cursor.getBlob()' must throw exception", exceptionThrowed);
-
 
 
     }
