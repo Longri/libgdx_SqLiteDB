@@ -111,6 +111,8 @@ public class GdxSqlitePreparedStatement {
             result = bind_null(this.ptr, this.db.ptr, idx);
         } else if (value instanceof String) {
             result = bind_text(this.ptr, this.db.ptr, idx, (String) value);
+        } else if (value instanceof CharSequence) {
+            result = bind_text(this.ptr, this.db.ptr, idx, (String) value.toString());
         } else if (value instanceof Integer) {
             result = bind_int(this.ptr, this.db.ptr, idx, (int) value);
         } else if (value instanceof Short) {
@@ -143,6 +145,7 @@ public class GdxSqlitePreparedStatement {
 
         return this;
     }
+
 
 
     private static byte[] toPrimitives(Byte[] oBytes) {
