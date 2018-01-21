@@ -218,23 +218,9 @@ public class GdxSqlitePreparedStatement {
 
     public GdxSqlitePreparedStatement commit() {
         chkClosed();
-
-        //if not in transaction, set a single transaction for improve commit
-        boolean singleTransaction = false;
-        if (!this.db.isInTransaction()) {
-            this.db.beginTransaction();
-            singleTransaction = true;
-        }
-
         GdxSqliteResult result = nativeCommit(this.ptr, this.db.ptr);
-
         if (result.retValue != SQLITE_DONE)
             db.throwLastErr(result);
-
-        if (singleTransaction) {
-            this.db.endTransaction();
-        }
-
         return this;
     }
 
