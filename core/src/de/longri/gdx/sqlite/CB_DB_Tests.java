@@ -61,6 +61,10 @@ public class CB_DB_Tests {
 
         FileHandle dbFileHandle = Gdx.files.absolute(dbPath);
 
+        if (!dbFileHandle.exists()) {
+            dbFileHandle = Gdx.files.internal("GdxSqlite/testResources/cachebox.db3");
+        }
+
         // copy to test folder
         dbFileHandle.copyTo(testFolder);
 
@@ -240,7 +244,6 @@ public class CB_DB_Tests {
                 }
             }
         });
-
 
 
         deleteStatement.close();
