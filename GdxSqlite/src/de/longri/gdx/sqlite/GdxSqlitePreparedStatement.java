@@ -114,15 +114,15 @@ public class GdxSqlitePreparedStatement {
         } else if (value instanceof CharSequence) {
             result = bind_text(this.ptr, this.db.ptr, idx, (String) value.toString());
         } else if (value instanceof Integer) {
-            result = bind_int(this.ptr, this.db.ptr, idx, (int) value);
+            result = bind_int(this.ptr, this.db.ptr, idx, (Integer) value);
         } else if (value instanceof Short) {
             result = bind_int(this.ptr, this.db.ptr, idx, ((Short) value).intValue());
         } else if (value instanceof Long) {
-            result = bind_long(this.ptr, this.db.ptr, idx, (long) value);
+            result = bind_long(this.ptr, this.db.ptr, idx, (Long) value);
         } else if (value instanceof Byte) {
             result = bind_int(this.ptr, this.db.ptr, idx, ((Byte) value).intValue());
         } else if (value instanceof Double) {
-            result = bind_double(this.ptr, this.db.ptr, idx, (double) value);
+            result = bind_double(this.ptr, this.db.ptr, idx, (Double) value);
         } else if (value instanceof Float) {
             result = bind_double(this.ptr, this.db.ptr, idx, ((Float) value).doubleValue());
         } else if (value instanceof Byte[]) {
@@ -130,7 +130,7 @@ public class GdxSqlitePreparedStatement {
         } else if (value instanceof byte[]) {
             result = bind_blob(this.ptr, this.db.ptr, idx, (byte[]) value);
         } else if (value instanceof Boolean) {
-            int intValue = ((boolean) value) ? 1 : 0;
+            int intValue = ((Boolean) value) ? 1 : 0;
             result = bind_int(this.ptr, this.db.ptr, idx, intValue);
         } else if (value instanceof Enum) {
             int intValue = ((Enum) value).ordinal();

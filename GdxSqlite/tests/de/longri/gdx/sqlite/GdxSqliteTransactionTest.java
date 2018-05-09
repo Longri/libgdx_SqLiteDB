@@ -119,6 +119,8 @@ public class GdxSqliteTransactionTest {
         long start = System.currentTimeMillis();
         for (Object[] values : data) {
             preparedStatement.bind(values).commit().reset();
+
+            assertThat("Transaction must inactive (Autocommit>0)",db.getAutoCommit()>0);
         }
         preparedStatement.close();
         long withoutTransaction = System.currentTimeMillis() - start;
@@ -134,8 +136,10 @@ public class GdxSqliteTransactionTest {
         db.beginTransaction();
         for (Object[] values : data) {
             preparedStatement.bind(values).commit().reset();
+            assertThat("Transaction must active (Autocommit==0)",db.getAutoCommit()==0);
         }
         db.endTransaction();
+        assertThat("Transaction must inactive (Autocommit>0)",db.getAutoCommit()>0);
         preparedStatement.close();
         long withTransaction = System.currentTimeMillis() - start;
         db.closeDatabase();
@@ -151,7 +155,7 @@ public class GdxSqliteTransactionTest {
     }
 
     private Object[][] createData() {
-        int COUNT = 1000;
+        int COUNT = 100;
         Object[][] data = new Object[COUNT][];
         for (int i = 0; i < COUNT; i++) {
             String num = Integer.toString(i);

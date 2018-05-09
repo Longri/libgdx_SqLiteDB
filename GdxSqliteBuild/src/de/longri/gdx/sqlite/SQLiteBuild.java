@@ -82,12 +82,12 @@ public class SQLiteBuild {
 
         //generate build scripts
         boolean all = cmd.hasOption("all");
-        Array<BuildTarget> targets = new Array<>();
+        Array<BuildTarget> targets = new Array<BuildTarget>();
 
 
         if (all || cmd.hasOption("win64")) {
             BuildTarget win64 = BuildTarget.newDefaultTarget(BuildTarget.TargetOs.Windows, true);
-//            win64.compilerSuffix = ".exe";
+            win64.compilerSuffix = ".exe";
             win64.headerDirs = headers;
             win64.cFlags += cFlags;
 //            win64.cppFlags += " -fpermissive";
@@ -175,7 +175,6 @@ public class SQLiteBuild {
 
         FileDescriptor projectPath = new FileDescriptor("../");
         FileDescriptor buildLibsPath = projectPath.child("GdxSqliteBuild/libs");
-
 
 
         //delete outdated files
@@ -411,6 +410,18 @@ public class SQLiteBuild {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+
+            Thread.sleep(500);
+
+
+            System.out.println("AutoCommit result: " + db.getAutoCommit());
+            System.out.println("Set Transaction");
+            db.beginTransaction();
+            System.out.println("AutoCommit result: " + db.getAutoCommit());
+            System.out.println("Set EndTransaction");
+            db.endTransaction();
+            System.out.println("AutoCommit result: " + db.getAutoCommit());
 
             db.closeDatabase();
 

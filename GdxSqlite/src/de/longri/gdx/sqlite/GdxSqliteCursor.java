@@ -27,7 +27,7 @@ public class GdxSqliteCursor {
 
     private static Logger log = LoggerFactory.getLogger(GdxSqliteCursor.class);
 
-    private Array<Object[]> valueRows = new Array<>();
+    private Array<Object[]> valueRows = new Array<Object[]>();
     private int actRow = 0;
     private Object[] actRowValues;
     private String[] names;
@@ -72,7 +72,7 @@ public class GdxSqliteCursor {
     public double getDouble(int columnIndex) {
         chkCursorposition();
         if (isNull(columnIndex)) return 0.0;
-        return (double) actRowValues[columnIndex];
+        return (Double) actRowValues[columnIndex];
     }
 
 
@@ -141,7 +141,7 @@ public class GdxSqliteCursor {
     public long getLong(int columnIndex) {
         chkCursorposition();
         if (isNull(columnIndex)) return 0;
-        return (long) actRowValues[columnIndex];
+        return (Long) actRowValues[columnIndex];
     }
 
 

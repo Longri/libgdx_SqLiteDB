@@ -59,7 +59,7 @@ public class GdxSqliteTest {
 
     @Test
     void getSqliteVersion() {
-        assertEquals("3.21.0", GdxSqlite.getSqliteVersion(), "SQLite version must be correct");
+        assertEquals("3.23.1", GdxSqlite.getSqliteVersion(), "SQLite version must be correct");
     }
 
     @Test
@@ -390,7 +390,7 @@ public class GdxSqliteTest {
     @Test
     void compileOptionTest() {
 
-        Array<String> expectedOptions = new Array<>();
+        Array<String> expectedOptions = new Array<String>();
         expectedOptions.add("ENABLE_API_ARMOR");
         expectedOptions.add("ENABLE_FTS3");
         expectedOptions.add("ENABLE_FTS3_PARENTHESIS");
@@ -406,7 +406,7 @@ public class GdxSqliteTest {
         db.openOrCreateDatabase();
 
         String[] otions = db.getCompileOptions().split("\n");
-        Array<String> includedOptions = new Array<>(otions);
+        Array<String> includedOptions = new Array<String>(otions);
 
         // remove 'COMPILER=clang.....'
         String remove = null;

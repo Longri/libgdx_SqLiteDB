@@ -326,7 +326,7 @@ class GdxSqlitePreparedStatementTest {
                 String name = "row" + num;
 
                 assertThat("Id of row ? must be ?".replace("?", num), ((Long) value[0]).intValue() == id);
-                assertThat("Value of row ? must be #".replace("?", num).replace("#", Boolean.toString(val)), ((long) value[1] > 0) == val);
+                assertThat("Value of row ? must be #".replace("?", num).replace("#", Boolean.toString(val)), ((Long) value[1] > 0) == val);
                 assertThat("Name of row ? must be #".replace("?", num).replace("#", name), value[2].equals(name));
 
             }

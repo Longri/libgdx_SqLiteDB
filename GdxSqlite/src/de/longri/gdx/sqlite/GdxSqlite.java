@@ -316,7 +316,6 @@ public class GdxSqlite {
             return (env)->NewStringUTF(sqlite3_libversion());
     */
 
-
     private final String path;
     Long ptr = null;
 
@@ -412,6 +411,27 @@ public class GdxSqlite {
     */
 
 
+
+    /**
+     * returns non-zero or zero if the given database connection is or is not in autocommit mode, respectively.<br>
+     * Autocommit mode is on by default. Autocommit mode is disabled by a BEGIN statement.<br>
+     * Autocommit mode is re-enabled by a COMMIT or ROLLBACK.
+     *
+     * @throws SQLiteGdxException
+     */
+    public int getAutoCommit() throws SQLiteGdxException {
+        if (this.ptr >= 0) {
+            return getAutoCommit(this.ptr);
+        }
+        return -1;
+    }
+
+    private static native int getAutoCommit(long ptr);/*
+            sqlite3* db = (sqlite3*)ptr;
+            return sqlite3_get_autocommit(db);
+    */
+
+
     public boolean isInTransaction() {
         return inTransaction;
     }
@@ -421,7 +441,7 @@ public class GdxSqlite {
     }
 
 
-    ObjectMap<Integer, RowCallback> callbackMap = new ObjectMap<>();
+    ObjectMap<Integer, RowCallback> callbackMap = new ObjectMap<Integer, RowCallback>();
     static int statiCallbackPtr = 0;
 
     public void rawQuery(String sql, RowCallback callback) throws SQLiteGdxException {
@@ -524,7 +544,7 @@ public class GdxSqlite {
 
     public String getCompileOptions() {
         checkOpen();
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         rawQuery("PRAGMA compile_options", new RowCallback() {
             @Override
             public void newRow(String[] columnName, Object[] value, int[] types) {
