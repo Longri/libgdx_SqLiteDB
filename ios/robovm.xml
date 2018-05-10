@@ -19,7 +19,6 @@
     </resource>
   </resources>
   <forceLinkClasses>
-    <pattern>de.longri.gdx.sqlite.GdxSqlite</pattern>
     <pattern>com.badlogic.gdx.scenes.scene2d.ui.*</pattern>
     <pattern>com.badlogic.gdx.graphics.g3d.particles.**</pattern>
     <pattern>com.android.okhttp.HttpHandler</pattern>

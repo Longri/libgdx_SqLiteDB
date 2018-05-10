@@ -62,7 +62,14 @@ public class SQLiteBuild {
                 " -DSQLITE_OMIT_AUTORESET" +
                 " -DSQLITE_OMIT_LOAD_EXTENSION" +
                 " -DSQLITE_SYSTEM_MALLOC" +
-                " -DSQLITE_THREADSAFE=2";
+                " -DSQLITE_THREADSAFE=2" +
+                " -DSQLITE_ENABLE_JSON1" +
+                " -DSQLITE_ENABLE_LOCKING_STYLE=1" +
+                " -DSQLITE_ENABLE_UPDATE_DELETE_LIMIT" +
+                " -DSQLITE_HAS_CODEC" +
+                " -DSQLITE_HAVE_ISNAN" +
+                " -DSQLITE_MAX_MMAP_SIZE=20971520" +
+                " -DSQLITE_OMIT_BUILTIN_TEST";
 
 
         String[] headers = new String[]{sqlitePathString};

@@ -11257,6 +11257,7 @@ static FILE *output_file_open(const char *zFile, int bTextMode){
   return f;
 }
 
+#if !defined(SQLITE_UNTESTABLE)
 #if !defined(SQLITE_OMIT_TRACE) && !defined(SQLITE_OMIT_FLOATING_POINT)
 /*
 ** A routine for handling output from sqlite3_trace().
@@ -11278,6 +11279,7 @@ static int sql_trace_callback(
   }
   return 0;
 }
+#endif
 #endif
 
 /*

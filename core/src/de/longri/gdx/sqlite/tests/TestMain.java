@@ -171,7 +171,8 @@ public class TestMain {
 
     public static void assertEquals(Object expected, Object actual, String message) {
         if (!objectsAreEqual(expected, actual)) {
-            throw new AssertionError(message);
+            throw new AssertionError(message + "\nExpected:" + expected.toString()
+                    + "\nActual: " + actual.toString());
         }
     }
 

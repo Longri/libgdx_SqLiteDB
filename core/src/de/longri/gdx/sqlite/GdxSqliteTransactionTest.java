@@ -152,6 +152,10 @@ public class GdxSqliteTransactionTest {
         sb.append("Insert without transaction took's ").append(withoutTransaction).append(" ms\n");
         sb.append("Insert with transaction took's ").append(withTransaction).append(" ms\n");
 
+
+        sb.append("\n");
+        sb.append("SQLite-Version:");
+        sb.append(GdxSqlite.getSqliteVersion());
         System.out.println(sb.toString());
     }
 

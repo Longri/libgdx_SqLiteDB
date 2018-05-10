@@ -18,6 +18,7 @@ package de.longri.gdx.sqlite;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.SharedLibraryLoader;
 import de.longri.gdx.sqlite.tests.AfterAll;
 import de.longri.gdx.sqlite.tests.BeforeAll;
 import de.longri.gdx.sqlite.tests.Test;
@@ -60,7 +61,8 @@ public class GdxSqliteTest {
 
     @Test
     void getSqliteVersion() {
-        assertEquals("3.21.0", GdxSqlite.getSqliteVersion(), "SQLite version must be correct");
+        String version = SharedLibraryLoader.isIos ? "3.16.0" : "3.23.0";
+        assertEquals(version, GdxSqlite.getSqliteVersion(), "SQLite version must be correct");
     }
 
     @Test
@@ -400,6 +402,14 @@ public class GdxSqliteTest {
         expectedOptions.add("OMIT_LOAD_EXTENSION");
         expectedOptions.add("SYSTEM_MALLOC");
         expectedOptions.add("THREADSAFE=2");
+
+        expectedOptions.add("ENABLE_JSON1");
+        expectedOptions.add("ENABLE_LOCKING_STYLE=1");
+        expectedOptions.add("ENABLE_UPDATE_DELETE_LIMIT");
+        expectedOptions.add("HAS_CODEC");
+        expectedOptions.add("HAVE_ISNAN");
+        expectedOptions.add("MAX_MMAP_SIZE=20971520");
+        expectedOptions.add("OMIT_BUILTIN_TEST");
 
 
         //Default Constructor opened a in memory DataBase
