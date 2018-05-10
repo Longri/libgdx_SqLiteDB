@@ -38,8 +38,8 @@ public class GdxSqlite {
         }
     }
 
-    private static final String BEGIN_TRANSACTION = "BEGIN TRANSACTION";
-    private static final String END_TRANSACTION = "END TRANSACTION";
+    private static final String BEGIN_TRANSACTION = "BEGIN;";
+    private static final String END_TRANSACTION = "COMMIT;";
 
 
     public final static int SQLITE_INTEGER = 1;
@@ -368,7 +368,7 @@ public class GdxSqlite {
      * @throws SQLiteGdxException
      */
     public void closeDatabase() throws SQLiteGdxException {
-        if (this.ptr >= 0) {
+        if (this.ptr !=null) {
             close(this.ptr);
             this.ptr = null;
         }
@@ -420,7 +420,7 @@ public class GdxSqlite {
      * @throws SQLiteGdxException
      */
     public int getAutoCommit() throws SQLiteGdxException {
-        if (this.ptr >= 0) {
+        if (this.ptr !=null) {
             return getAutoCommit(this.ptr);
         }
         return -1;

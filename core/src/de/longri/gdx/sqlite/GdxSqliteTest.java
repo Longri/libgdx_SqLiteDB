@@ -61,8 +61,7 @@ public class GdxSqliteTest {
 
     @Test
     void getSqliteVersion() {
-        String version = SharedLibraryLoader.isIos ? "3.16.0" : "3.23.0";
-        assertEquals(version, GdxSqlite.getSqliteVersion(), "SQLite version must be correct");
+        assertEquals("3.21.0", GdxSqlite.getSqliteVersion(), "SQLite version must be correct");
     }
 
     @Test
@@ -403,13 +402,6 @@ public class GdxSqliteTest {
         expectedOptions.add("SYSTEM_MALLOC");
         expectedOptions.add("THREADSAFE=2");
 
-        expectedOptions.add("ENABLE_JSON1");
-        expectedOptions.add("ENABLE_LOCKING_STYLE=1");
-        expectedOptions.add("ENABLE_UPDATE_DELETE_LIMIT");
-        expectedOptions.add("HAS_CODEC");
-        expectedOptions.add("HAVE_ISNAN");
-        expectedOptions.add("MAX_MMAP_SIZE=20971520");
-        expectedOptions.add("OMIT_BUILTIN_TEST");
 
 
         //Default Constructor opened a in memory DataBase
