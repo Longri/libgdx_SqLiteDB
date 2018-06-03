@@ -30,12 +30,20 @@ import java.io.UnsupportedEncodingException;
  */
 public class GdxSqlite {
 
+    static final String EXPECTED_NATIVE_VERSION = "0.6.3-SNAPSHOT";
+
     static {
         try {
             new SharedLibraryLoader().load("GdxSqlite");
         } catch (Exception e) {
 
         }
+        //check native version
+            String nativeVersion = getGdxSqliteVersion();
+            if (!nativeVersion.equals(EXPECTED_NATIVE_VERSION))
+                throw new RuntimeException("Wrong Native version! expected:" + EXPECTED_NATIVE_VERSION +
+                        " but was:" + nativeVersion);
+
     }
 
     private static final String BEGIN_TRANSACTION = "BEGIN;";
@@ -220,8 +228,8 @@ public class GdxSqlite {
 
                     if(flagNameArrInit == 0){
                         names.push_back(sqlite3_column_name(stmt, colIndex));
-                        types.push_back(type);
                     }
+                    types.push_back(type);
 
                     if (type == SQLITE_INTEGER) {
                         jlong valInt = sqlite3_column_int64(stmt, colIndex);
@@ -279,13 +287,14 @@ public class GdxSqlite {
                         (env)->SetObjectArrayElement( nameArr, colIndex, jstrName);
                         (env)->DeleteLocalRef(jstrName);
                     }
-                    env->SetIntArrayRegion( typeArr, 0, types.size(), ( jint * ) &types[0] );
 
                     flagNameArrInit = 1;
                 }
 
+                env->SetIntArrayRegion( typeArr, 0, types.size(), ( jint * ) &types[0] );
                 (env)->CallVoidMethod(object, mid, callBackPtr, nameArr, valArr, typeArr);
 
+                types.clear();
                 rc = sqlite3_step(stmt);
             }
 
@@ -314,6 +323,10 @@ public class GdxSqlite {
 
     public static native String getSqliteVersion(); /*
             return (env)->NewStringUTF(sqlite3_libversion());
+    */
+
+    public static native String getGdxSqliteVersion(); /*
+            return (env)->NewStringUTF("0.6.3-SNAPSHOT");
     */
 
     private final String path;
@@ -368,7 +381,7 @@ public class GdxSqlite {
      * @throws SQLiteGdxException
      */
     public void closeDatabase() throws SQLiteGdxException {
-        if (this.ptr !=null) {
+        if (this.ptr != null) {
             close(this.ptr);
             this.ptr = null;
         }
@@ -411,7 +424,6 @@ public class GdxSqlite {
     */
 
 
-
     /**
      * returns non-zero or zero if the given database connection is or is not in autocommit mode, respectively.<br>
      * Autocommit mode is on by default. Autocommit mode is disabled by a BEGIN statement.<br>
@@ -420,7 +432,7 @@ public class GdxSqlite {
      * @throws SQLiteGdxException
      */
     public int getAutoCommit() throws SQLiteGdxException {
-        if (this.ptr !=null) {
+        if (this.ptr != null) {
             return getAutoCommit(this.ptr);
         }
         return -1;
