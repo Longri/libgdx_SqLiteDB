@@ -60,6 +60,7 @@ public class GdxSqliteTest {
     @Test
     void getSqliteVersion() {
         assertEquals("3.21.0", GdxSqlite.getSqliteVersion(), "SQLite version must be correct");
+        assertEquals("0.6.6-SNAPSHOT", GdxSqlite.getGdxSqliteVersion(), "GdxSQLite version must be correct");
     }
 
     @Test

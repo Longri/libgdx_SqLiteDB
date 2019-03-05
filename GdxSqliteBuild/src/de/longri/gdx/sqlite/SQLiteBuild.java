@@ -310,6 +310,7 @@ public class SQLiteBuild {
 
 
             System.out.println(GdxSqlite.getSqliteVersion());
+            System.out.println(GdxSqlite.getGdxSqliteVersion());
 
             try {
                 FileHandle fileHandleExc = new FileHandle("test/fail/testDB.db3");

@@ -30,7 +30,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class GdxSqlite {
 
-    static final String EXPECTED_NATIVE_VERSION = "0.6.3-SNAPSHOT";
+    static final String EXPECTED_NATIVE_VERSION = "0.6.6-SNAPSHOT";
 
     static {
         try {
@@ -326,7 +326,7 @@ public class GdxSqlite {
     */
 
     public static native String getGdxSqliteVersion(); /*
-            return (env)->NewStringUTF("0.6.3-SNAPSHOT");
+            return (env)->NewStringUTF("0.6.6-SNAPSHOT");
     */
 
     private final String path;
