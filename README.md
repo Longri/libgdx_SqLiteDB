@@ -24,3 +24,40 @@ The set of SQLite compile flags are:
 * -DSQLITE_THREADSAFE=2
 * -DSQLITE_OS_UNIX=1
 
+To add to your project using Gradle, add the following to the root build.gradle. Once the following are added sync the project.
+
+
+allprojects
+ext
+```
+     gdxSqliteVersion = '0.5.5-SNAPSHOT'
+```
+
+(desktop)
+dependencies
+```
+     compile "de.longri.gdx-sqlite:gdx-sqlite-platform:$gdxSqliteVersion:natives-desktop"
+```
+
+(android)
+dependencies
+```
+     compile "de.longri.gdx-sqlite:gdx-sqlite:$gdxSqliteVersion"
+     natives "de.longri.gdx-sqlite:gdx-sqlite-platform:$gdxSqliteVersion:natives-armeabi"
+     natives "de.longri.gdx-sqlite:gdx-sqlite-platform:$gdxSqliteVersion:natives-armeabi-v7a"
+     natives "de.longri.gdx-sqlite:gdx-sqlite-platform:$gdxSqliteVersion:natives-arm64-v8a"
+     natives "de.longri.gdx-sqlite:gdx-sqlite-platform:$gdxSqliteVersion:natives-x86"
+     natives "de.longri.gdx-sqlite:gdx-sqlite-platform:$gdxSqliteVersion:natives-x86_64"
+```
+
+(ios)
+dependencies
+```
+     compile "de.longri.gdx-sqlite:gdx-sqlite-platform:$gdxSqliteVersion:natives-ios"
+```
+
+(core)
+dependencies
+```
+     compile "de.longri.gdx-sqlite:gdx-sqlite:$gdxSqliteVersion"
+```
