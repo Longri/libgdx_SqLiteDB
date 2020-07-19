@@ -1,10 +1,47 @@
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.java.srcDirs = ["src/"]
 
-sourceCompatibility = '1.6'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
+configurations { natives }
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+sourceSets.main.java.srcDirs = ["src/"]
+
 ext {
-	mainClassName = "de.longri.gdx.sqlite.IOSLauncher"
+    mainClassName = "de.longri.cachebox3.IOS_Launcher"
+}
+
+// called every time gradle gets executed, takes the native dependencies of
+// the natives configuration, and extracts them to the proper build/ folders
+// so they get packed with the IPA.
+task copyIosNatives() {
+    file("build/native/").mkdirs()
+
+    configurations.natives.files.each { jar ->
+        def outputDir = null
+        if (jar.name.endsWith("natives.jar")) outputDir = file("build/native/")
+        if (outputDir != null) {
+            copy {
+                from zipTree(jar)
+                into outputDir
+            }
+        }
+
+        if (jar.name.endsWith("natives-ios.jar")) outputDir = file("build/native/")
+        if (outputDir != null) {
+            copy {
+                from zipTree(jar)
+                into outputDir
+            }
+        }
+
+    }
+   }
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn copyIosNatives
 }
 
 launchIPhoneSimulator.dependsOn build
@@ -13,10 +50,6 @@ launchIOSDevice.dependsOn build
 createIPA.dependsOn build
 
 robovm {
-	archs = "thumbv7:arm64"
+    archs = "thumbv7:arm64"
 }
 
-eclipse.project {
-    name = appName + "-ios"
-    natures 'org.robovm.eclipse.RoboVMNature'
-}
