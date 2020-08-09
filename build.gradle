@@ -12,7 +12,7 @@ buildscript {
     dependencies {
         classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
         classpath 'org.wisepersist:gwt-gradle-plugin:1.0.9'
-        classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath 'com.android.tools.build:gradle:4.0.1'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.10-SNAPSHOT'
     }
 }
@@ -59,76 +59,9 @@ project(":GdxSqlite"){
 
     }
 }
-//
-//project(":jnigen") {
-//    apply plugin: "java-library"
-//
-//    dependencies {
-//        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-//
-//        //include libs
-//        api fileTree(include: ['*.jar'], dir: 'libs')
-//    }
-//}
-
-project(":desktop") {
-    apply plugin: "java-library"
-
-
-    dependencies {
-        implementation project(":core")
-        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-
-        //include libs
-        api fileTree(include: ['*.jar'], dir: 'libs')
-        
-    }
-}
-
-project(":android") {
-    apply plugin: "android"
-
-    configurations { natives }
-
-    dependencies {
-        implementation project(":core")
-
-        api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-
-
-        //include libs
-        api fileTree(include: ['*.jar'], dir: 'libs')
-    }
-}
-
-project(":ios") {
-    apply plugin: "java-library"
-    apply plugin: "robovm"
-
-    configurations { natives }
-
-    dependencies {
-        implementation project(":core")
-        api "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
-        api "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
-        api "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
-        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
-
-        //include libs
-        api fileTree(dir: 'libs', include: ['*.jar'])
-    }
-}
 
 project(":core") {
     apply plugin: "java-library"
-
 
     dependencies {
         implementation project(":GdxSqlite")
@@ -139,4 +72,88 @@ project(":core") {
 
     }
 }
+
+
+project(":jnigen") {
+    apply plugin: "java-library"
+
+    dependencies {
+        api "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+        //include libs
+        api fileTree(include: ['*.jar'], dir: 'libs')
+    }
+}
+
+
+project(":GdxSqliteBuild") {
+    apply plugin: "java-library"
+
+    dependencies {
+        implementation project(":GdxSqlite")
+        implementation project(":jnigen")
+        api "com.badlogicgames.gdx:gdx:$gdxVersion"
+        api group: 'commons-cli', name: 'commons-cli', version: '1.4'
+
+        //include libs
+        api fileTree(dir: 'libs', include: ['*.jar'])
+
+    }
+}
+
+
+//project(":desktop") {
+//    apply plugin: "java-library"
+//
+//
+//    dependencies {
+//        implementation project(":core")
+//        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+//        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+//
+//        //include libs
+//        api fileTree(include: ['*.jar'], dir: 'libs')
+//
+//    }
+//}
+//
+//project(":android") {
+//    apply plugin: "android"
+//
+//    configurations { natives }
+//
+//    dependencies {
+//        implementation project(":core")
+//
+//        api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+//        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
+//        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+//        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+//        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+//        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+//
+//
+//        //include libs
+//        api fileTree(include: ['*.jar'], dir: 'libs')
+//    }
+//}
+//
+//project(":ios") {
+//    apply plugin: "java-library"
+//    apply plugin: "robovm"
+//
+//    configurations { natives }
+//
+//    dependencies {
+//        implementation project(":core")
+//        api "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
+//        api "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
+//        api "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
+//        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+//        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
+//
+//        //include libs
+//        api fileTree(dir: 'libs', include: ['*.jar'])
+//    }
+//}
 

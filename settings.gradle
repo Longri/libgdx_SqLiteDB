@@ -1,4 +1,7 @@
-include 'desktop', 'android', 'ios', 'core', 'GdxSqliteBuild', 'GdxSqlite'
+include 'GdxSqlite'
+include 'core'
+include 'jnigen'
+include 'GdxSqliteBuild'
 
-//, 'jnigen'
+//  'desktop', 'android', 'ios'
 

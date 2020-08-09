@@ -68,7 +68,11 @@ public class SQLiteBuild {
         String[] headers = new String[]{sqlitePathString};
 
         // generate native code
-        new NativeCodeGenerator().generate("../GdxSqlite/src", buildPathString, jniPathString);
+        try {
+            new NativeCodeGenerator().generate("../GdxSqlite/src", buildPathString, jniPathString);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         //copy c/c++ src to 'jni' folder
