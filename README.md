@@ -61,3 +61,9 @@ dependencies
 ```
      compile "de.longri.gdx-sqlite:gdx-sqlite:$gdxSqliteVersion"
 ```
+
+##Develop:
+####tools required:
+* Gradle
+* ANT install ==> https://ant.apache.org/manual/install.html
+* Maven

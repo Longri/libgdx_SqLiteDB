@@ -36,7 +36,7 @@ public class SQLiteBuild {
 
         FileDescriptor targetDescriptor = new FileDescriptor("libs");
         FileDescriptor jniDescriptor = new FileDescriptor("jni");
-        FileDescriptor buildDescriptor = new FileDescriptor("../GdxSqlite/build/classes/main");
+        FileDescriptor buildDescriptor = new FileDescriptor("../GdxSqlite/build/classes/java/main");
         FileDescriptor sqliteDescriptor = new FileDescriptor("sqlite_src");
 
         File jniPath = jniDescriptor.file().getAbsoluteFile();
@@ -339,7 +339,11 @@ public class SQLiteBuild {
                     "         AGE            INT     NOT NULL, \n" +
                     "         ADDRESS        CHAR(50), \n" +
                     "         SALARY         REAL );";
-            db.execSQL(sql);
+            try {
+                db.execSQL(sql);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
 
             sql = " INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)    \n" +
@@ -350,7 +354,11 @@ public class SQLiteBuild {
                     "          VALUES (3, 'Teddy', 23, 'Norway', NULL );  \n" +
                     "          INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)  \n" +
                     "          VALUES (4, 'Mark', 25, 'Rich-Mond ', 65000.00 );";
-            db.execSQL(sql);
+            try {
+                db.execSQL(sql);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             sql = "SELECT * from COMPANY";
 
