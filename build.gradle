@@ -86,22 +86,6 @@ project(":jnigen") {
 }
 
 
-project(":GdxSqliteBuild") {
-    apply plugin: "java-library"
-
-    dependencies {
-        implementation project(":GdxSqlite")
-        implementation project(":jnigen")
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api group: 'commons-cli', name: 'commons-cli', version: '1.4'
-
-        //include libs
-        api fileTree(dir: 'libs', include: ['*.jar'])
-
-    }
-}
-
-
 //project(":desktop") {
 //    apply plugin: "java-library"
 //

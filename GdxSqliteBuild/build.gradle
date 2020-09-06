@@ -8,3 +8,15 @@ sourceCompatibility = 1.8
 
 //sourceSets without LibGdx tests (aka release)
 sourceSets.main.java.srcDirs = ["src/"]
+
+dependencies {
+    implementation project(":core")
+    implementation project(":GdxSqlite")
+    implementation project(":jnigen")
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    api group: 'commons-cli', name: 'commons-cli', version: '1.4'
+
+    //include libs
+    api fileTree(dir: 'libs', include: ['*.jar'])
+
+}
