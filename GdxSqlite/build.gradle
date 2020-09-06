@@ -1,15 +1,11 @@
 apply plugin: "java-library"
 
-sourceSets {
-    main {
-        java{
-            srcDirs = ["src/"]
-        }
 
-        resources {
-            srcDirs = ["src/"]
-            includes = ["**/*.h", "**/*.c","**/*.template"]
-        }
-    }
+sourceSets.main.java.srcDirs = ["src/"]
+
+sourceSets.test.java.srcDirs = ["tests/"]
+
+test {
+    useJUnitPlatform()
 }
 
