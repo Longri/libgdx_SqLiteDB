@@ -103,7 +103,7 @@ public class GdxSqlite {
 		#include <stdlib.h>
 		#include <cstdlib>
 
-		static inline jobject javaResult(JNIEnv* env, sqlite3 *db, long ptr, int sqliteResult, const char *errMsg) {
+		static inline jobject javaResult(JNIEnv* env, sqlite3 *db, jlong ptr, int sqliteResult, const char *errMsg) {
 		    jclass objectClass = (env)->FindClass("de/longri/gdx/sqlite/GdxSqliteResult");
 
 		    jmethodID cid = (env)->GetMethodID(objectClass, "<init>", "(JILjava/lang/String;)V");
