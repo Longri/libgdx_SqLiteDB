@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SQLiteBuild Win64" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="de.longri.gdx.sqlite.SQLiteBuild" />
+    <module name="libgdx_SqLiteDB.GdxSqliteBuild.main" />
+    <option name="PROGRAM_PARAMETERS" value="-win64" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/GdxSqliteBuild" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
