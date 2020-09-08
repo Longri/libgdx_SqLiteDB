@@ -326,7 +326,7 @@ public class GdxSqlite {
     */
 
     public static native String getGdxSqliteVersion(); /*
-            return (env)->NewStringUTF("0.6.6-SNAPSHOT");
+            return (env)->NewStringUTF("0.7.0-SNAPSHOT");
     */
 
     private final String path;
