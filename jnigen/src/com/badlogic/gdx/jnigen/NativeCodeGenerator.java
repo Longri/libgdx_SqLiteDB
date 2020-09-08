@@ -16,6 +16,8 @@
 
 package com.badlogic.gdx.jnigen;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.jnigen.parsing.CMethodParser;
 import com.badlogic.gdx.jnigen.parsing.CMethodParser.CMethod;
 import com.badlogic.gdx.jnigen.parsing.CMethodParser.CMethodParserResult;
@@ -28,9 +30,11 @@ import com.badlogic.gdx.jnigen.parsing.JniHeaderCMethodParser;
 import com.badlogic.gdx.jnigen.parsing.RobustJavaMethodParser;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * Goes through a Java source directory, checks each .java file for native methods and emits C/C++ code accordingly, both .h and
@@ -276,9 +280,6 @@ public class NativeCodeGenerator {
                         }
                         System.out.print("Generating C/C++ for '" + file + "'...");
 
-
-                        FileDescriptor redirectFileDescripter = new FileDescriptor();
-
                         generateHFile(file);
                         generateCppFile(javaSegments, hFile, cppFile);
                         System.out.println("done");
@@ -295,10 +296,21 @@ public class NativeCodeGenerator {
     }
 
     private void generateHFile(FileDescriptor file) throws Exception {
+        String javaDir = "";
+
+        try {
+            Properties properties = new Properties();
+            FileDescriptor localPropertieFielDescripter = new FileDescriptor("../").child("local.properties");
+            properties.load(localPropertieFielDescripter.read());
+            javaDir = properties.getProperty("java.dir");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
         String className = getFullyQualifiedClassName(file);
-        String command = "javah -classpath " + classpath + " -o " + jniDir.path() + "/" + className + ".h " + className;
+        String command = javaDir + "javah -classpath " + classpath + " -o " + jniDir.path() + "/" + className + ".h " + className;
+
         Process process = Runtime.getRuntime().exec(command);
         process.waitFor();
         if (process.exitValue() != 0) {
