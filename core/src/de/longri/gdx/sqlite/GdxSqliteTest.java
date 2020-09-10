@@ -23,6 +23,7 @@ import de.longri.gdx.sqlite.tests.AfterAll;
 import de.longri.gdx.sqlite.tests.BeforeAll;
 import de.longri.gdx.sqlite.tests.Test;
 import de.longri.gdx.sqlite.tests.TestUtils;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -63,6 +64,7 @@ public class GdxSqliteTest {
     @Test
     void getSqliteVersion() {
         assertEquals("3.33.0", GdxSqlite.getSqliteVersion(), "SQLite version must be correct");
+        assertEquals("0.7.0-SNAPSHOT", GdxSqlite.getGdxSqliteVersion(), "GdxSQLite version must be correct");
     }
 
     @Test

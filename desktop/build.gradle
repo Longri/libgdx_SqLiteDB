@@ -1,7 +1,21 @@
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
-sourceSets.main.java.srcDirs = [ "src/" ]
+apply plugin: "java-library"
+
+
+sourceSets.main.java.srcDirs = ["src/"]
+
 sourceSets.main.resources.srcDirs = ["./workingDir"]
+
+
+dependencies {
+    implementation project(":core")
+    api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+    //include libs
+    api fileTree(include: ['*.jar'], dir: 'libs')
+
+}
+
 
 project.ext.mainClassName = "com.badlogic.gdx.backends.lwjgl3.TouchLwjgl3Launcher"
 project.ext.assetsDir = new File("./workingDir")

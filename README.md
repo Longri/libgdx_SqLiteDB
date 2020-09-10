@@ -65,5 +65,9 @@ dependencies
 ##Develop:
 ####tools required:
 * Gradle
-* ANT install ==> https://ant.apache.org/manual/install.html
+* ANT 
+```
+Windows  ->   install ==> https://ant.apache.org/manual/install.html
+Mac Os X ->   use homebrew! ==>  $ brew update | $ brew install ant
+```
 * Maven

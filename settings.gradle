@@ -2,6 +2,7 @@ include 'GdxSqlite'
 include 'core'
 include 'jnigen'
 include 'GdxSqliteBuild'
+include 'desktop'
 
-//  'desktop', 'android', 'ios'
+//  'android', 'ios'
 

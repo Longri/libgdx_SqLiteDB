@@ -19,6 +19,7 @@ package de.longri.gdx.sqlite;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.jnigen.*;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.badlogic.gdx.utils.StringBuilder;
 import org.apache.commons.cli.*;
 
@@ -310,8 +311,8 @@ public class SQLiteBuild {
 
 
         try {
-            new JniGenSharedLibraryLoader("libs/GdxSqlite-platform-1.0-natives-desktop.jar").load("GdxSqlite");
-
+//            new JniGenSharedLibraryLoader("libs/GdxSqlite-platform-1.0-natives-desktop.jar").load("GdxSqlite");
+            new SharedLibraryLoader("libs/GdxSqlite-platform-1.0-natives-desktop.jar").load("GdxSqlite");
 
             System.out.println(GdxSqlite.getSqliteVersion());
             System.out.println(GdxSqlite.getGdxSqliteVersion());

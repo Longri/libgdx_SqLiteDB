@@ -22,7 +22,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "sqliteGdx"
-        gdxVersion = '1.9.10'
+        gdxVersion = '1.9.11'
         roboVMVersion = '2.3.10-SNAPSHOT'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
@@ -86,20 +86,6 @@ project(":jnigen") {
 }
 
 
-//project(":desktop") {
-//    apply plugin: "java-library"
-//
-//
-//    dependencies {
-//        implementation project(":core")
-//        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-//        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-//
-//        //include libs
-//        api fileTree(include: ['*.jar'], dir: 'libs')
-//
-//    }
-//}
 //
 //project(":android") {
 //    apply plugin: "android"
